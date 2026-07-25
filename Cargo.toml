@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/models",
+    "crates/highlighter",
+    "crates/renderer",
+    "crates/app",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# Small + fast WASM binary.
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

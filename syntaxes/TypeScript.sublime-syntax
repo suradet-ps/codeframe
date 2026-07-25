@@ -1,0 +1,23 @@
+%YAML 1.2
+---
+# Lightweight TypeScript grammar for CodeShot.
+#
+# Why this exists: the official Sublime TypeScript grammar uses `extends:`
+# (syntax inheritance) and `version: 2` branching, which syntect cannot parse.
+# This wrapper highlights TS-specific keywords itself and defers everything
+# else to the bundled JavaScript grammar via a scope include.
+name: TypeScript
+scope: source.ts
+file_extensions:
+  - ts
+  - mts
+  - cts
+contexts:
+  main:
+    # TS declaration keywords; the lookbehind avoids matching property
+    # accesses such as `foo.type`.
+    - match: '(?<![\w$.])(?:declare|namespace|interface|type|abstract|implements|readonly|enum)\b'
+      scope: storage.modifier
+    - match: '(?<![\w$.])(?:as|satisfies|keyof|infer)\b'
+      scope: keyword.operator
+    - include: 'scope:source.js'

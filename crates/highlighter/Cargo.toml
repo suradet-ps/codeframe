@@ -1,0 +1,13 @@
+[package]
+name = "codeshot-highlighter"
+description = "Wraps syntect and exposes a framework-agnostic token stream"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+codeshot-models = { path = "../models" }
+# `default-fancy` = pure-Rust fancy-regex backend; the default `onig` C
+# bindings do not compile to wasm32 (see AGENTS.md §2).
+syntect = { version = "5", default-features = false, features = ["default-fancy"] }
+thiserror = "2"
