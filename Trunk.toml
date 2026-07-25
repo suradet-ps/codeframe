@@ -1,0 +1,18 @@
+# Trunk config for the CodeShot workspace.
+#
+# This file must exist: without it, Trunk auto-detects the workspace-root
+# Cargo.toml as its config source and fails because a virtual manifest has no
+# root package. The Rust app to build is wired up in index.html via
+# `<link data-trunk rel="rust" href="crates/app/Cargo.toml" .../>`.
+
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+# Never rebuild on cargo/rustc or trunk's own output.
+ignore = ["target", "dist"]
+
+[serve]
+port = 8080
+open = false
