@@ -1,5 +1,3 @@
-<div align="center">
-
 # CodeShot
 
 **Code → PNG, entirely in your browser.**
@@ -10,8 +8,6 @@ No server. No tracking. No watermarks.
 [![leptos](https://img.shields.io/badge/Leptos-0.8-000000?style=flat)](https://leptos.dev/)
 [![wasm](https://img.shields.io/badge/WebAssembly-654FF0?style=flat&logo=webassembly)](https://webassembly.org/)
 [![license](https://img.shields.io/badge/License-MIT-000000?style=flat)](LICENSE)
-
-</div>
 
 ---
 
@@ -111,4 +107,6 @@ CodeShot uses an editorial monochrome design system inspired by austere, restrai
 
 ## License
 
-[MIT](LICENSE)
+This project is licensed under the [MIT License](LICENSE).
+
+You are free to use, modify, and distribute this software for personal or commercial purposes, provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software. See the full license text for details.
