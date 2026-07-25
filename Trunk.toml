@@ -8,11 +8,15 @@
 [build]
 target = "index.html"
 dist = "dist"
+public_url = "/"
 
 [watch]
-# Never rebuild on cargo/rustc or trunk's own output.
 ignore = ["target", "dist"]
 
 [serve]
+address = "127.0.0.1"
 port = 8080
 open = false
+
+[tools]
+wasm_opt = "Oz"
