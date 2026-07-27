@@ -44,9 +44,11 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Workspace**: 4 crates — `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
   drawing, no Leptos), `app` (the only Leptos-aware crate).
-- **CI** (`.github/workflows/ci.yml`): 5 jobs — `check` (WASM), `clippy`,
-  `fmt --check`, `test` (`cargo test --lib`), gated `trunk build --release`.
-  `RUSTFLAGS: "-Dwarnings"` enforced globally.
+- **CI** (`.github/workflows/ci.yml`): 7 jobs — `check` (WASM), `clippy`,
+  `fmt --check`, `test` (`cargo test --lib`), `cargo audit`, `cargo deny`,
+  gated `trunk build --release`. SHA-pinned actions, `persist-credentials:
+  false`, `permissions: contents: read`. `RUSTFLAGS: "-Dwarnings"` enforced
+  globally.
 - **Syntax highlighting**: `syntect` with `default-fancy` (fancy-regex backend,
   wasm32-compatible). 15 languages. Extra grammars: TypeScript (wrapper),
   TOML (vendored).
@@ -71,7 +73,15 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Safety**: `#![deny(unsafe_code)]` in every crate. No `unwrap()` in
   production paths.
 
-### What exists and works
+### Current status
+
+Phase 1 (Foundation + CI Hardening) is **complete**. PR #1 merged into `main`
+with all 7 CI jobs passing. The project now has:
+
+- Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
+- Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
+- Visual identity: SVG favicon linked in `index.html`
+- CI hardened: SHA-pinned actions, restricted permissions, 7-job pipeline
 
 | Feature | Status |
 |---------|--------|
@@ -90,46 +100,45 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 | Staleness guard in preview (generation counter) | Working |
 | Separate preview/export canvases | Working |
 | `#![deny(unsafe_code)]` | Enforced |
-| CI (5 jobs) | Enforced |
+| CI (7 jobs) | Enforced |
+| DESIGN.md | Exists |
+| CONTRIBUTING.md | Exists |
+| SECURITY.md | Exists |
+| Favicon (SVG) | Exists |
+| `cargo audit` | Passes |
+| `cargo deny` | Passes |
 
 ### Gaps found while reading the repo
 
-1. **No DESIGN.md, CONTRIBUTING.md, or SECURITY.md.** The README mentions
-   the design system in passing, but there is no authoritative design spec.
-   AGENTS.md references files that don't exist yet.
-
-2. **No dark/light theme toggle for the UI itself.** The canvas output has
+1. **No dark/light theme toggle for the UI itself.** The canvas output has
    4 themes, but the controls and chrome are always light. A user working in
    Dracula at 2 AM stares at a white sidebar.
 
-3. **No favicon or wordmark.** The app has no visual identity in a browser
-   tab. `index.html` has no `<link rel="icon">`.
-
-4. **Inline hex colors leak past the token system.** The renderer's
+2. **Inline hex colors leak past the token system.** The renderer's
    `TRAFFIC_LIGHT_COLORS` array in `canvas.rs` uses `["#ff5f57", "#febc2e",
    "#28c840"]` — hardcoded, not routable through the design system. The
    preview canvas shadow in `style.css` uses `rgba(0, 0, 0, 0.08)` and
    `rgba(0, 0, 0, 0.12)` inline.
 
-5. **No SVG export.** The token stream is generic enough to support it, but
+3. **No SVG export.** The token stream is generic enough to support it, but
    no implementation exists. The README explicitly marks this as a known
    limitation.
 
-6. **No clipboard integration.** Users must use the file-download flow
+4. **No clipboard integration.** Users must use the file-download flow
    even when they just want to paste the image into Slack or a slide.
 
-7. **No undo/redo for the code editor.** The `<textarea>` has native undo,
+5. **No undo/redo for the code editor.** The `<textarea>` has native undo,
    but there is no history for the full settings state (theme, scale, etc.).
 
-8. **No URL sharing of settings.** Each page load starts from the same
+6. **No URL sharing of settings.** Each page load starts from the same
    defaults. There is no way to bookmark a specific configuration.
 
-9. **`line_height` is hardcoded to 1.5** in `Settings::export_options()`.
+7. **`line_height` is hardcoded to 1.5** in `Settings::export_options()`.
    Not exposed as a user control, not documented as intentional.
 
-10. **No offline story.** The app is a static site, but there is no service
-    worker, no manifest, no PWA support. It could work offline trivially
-    (it's already CSR + static), but doesn't yet.
+8. **No offline story.** The app is a static site, but there is no service
+   worker, no manifest, no PWA support. It could work offline trivially
+   (it's already CSR + static), but doesn't yet.
 
 ---
 
@@ -137,7 +146,7 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 
 | Milestone | Theme | What ships |
 |-----------|-------|------------|
-| **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI |
+| **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured |
 | **v0.6** | Export & UX | SVG export, copy to clipboard, new controls (line-height, tab-width, custom bg), keyboard shortcuts |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
@@ -145,44 +154,44 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 
 ---
 
-## Phase 1: Foundation + CI Hardening
+## Phase 1: Foundation + CI Hardening ✅
 
 The project already references `DESIGN.md`, `CONTRIBUTING.md`, and
 `SECURITY.md` — none of which exist. At the same time, supply-chain
 security should be enforced from day one, not bolted on later. This
 phase does both: writes the missing docs *and* tightens CI.
 
-- [ ] **Write `DESIGN.md`** — an authoritative spec for CodeShot's visual
+- [x] **Write `DESIGN.md`** — an authoritative spec for CodeShot's visual
   identity: the editorial monochrome system, palette tokens, type scale,
   spacing grid, elevation model, and the *why* behind each choice. Reference
   the existing `:root` tokens in `style.css` as the source of truth. This
   file is the single reference for any future UI work.
 
-- [ ] **Write `CONTRIBUTING.md`** — how to set up the dev environment, run
+- [x] **Write `CONTRIBUTING.md`** — how to set up the dev environment, run
   the CI checks locally, the crate boundary rules (AGENTS.md §3), the
   `#![deny(unsafe_code)]` policy, and the PR workflow. Should be short and
   actionable.
 
-- [ ] **Write `SECURITY.md`** — the security posture: static-site-only (no
+- [x] **Write `SECURITY.md`** — the security posture: static-site-only (no
   server, no secrets in client code), no user data collected, no cookies,
   no tracking, no analytics. What the CSP and Vercel headers protect
   against. How to report a vulnerability.
 
-- [ ] **`cargo audit` in CI** — fail the build on any advisory for a direct
+- [x] **`cargo audit` in CI** — fail the build on any advisory for a direct
   dependency. Yanked crate detection. Add as a new job in
   `.github/workflows/ci.yml`.
 
-- [ ] **`cargo deny` in CI** — license audit (only MIT/Apache-2.0 allowed),
+- [x] **`cargo deny` in CI** — license audit (only MIT/Apache-2.0 allowed),
   duplicate crate detection, yanked crate detection. Add as a new job in
   `.github/workflows/ci.yml`.
 
-- [ ] **Favicon** — generate a simple SVG favicon (a code bracket icon or
+- [x] **Favicon** — generate a simple SVG favicon (a code bracket icon or
   the letters "CS"). Add `<link rel="icon">` to `index.html`. Minimal
   visual identity so the tab is recognizable.
 
 **Acceptance:** all three docs exist, are accurate to the code (not aspirational),
 and are referenced from the README; `cargo audit` + `cargo deny` jobs pass
-in CI; favicon loads in all browsers.
+in CI; favicon loads in all browsers. ✅ **All met.**
 
 ---
 
