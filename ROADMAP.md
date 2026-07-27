@@ -200,24 +200,24 @@ in CI; favicon loads in all browsers. ✅ **All met.**
 The canvas has themes. The UI chrome does not. A user working at night
 should not be blinded by a white sidebar.
 
-- [ ] **Write `DESIGN.md`'s dark mode extension** — define how the
+- [x] **Write `DESIGN.md`'s dark mode extension** — define how the
   monochrome system adapts under `[data-theme="dark"]` and
   `[data-theme="sepia"]`. Same token names, different values. No new hex —
   all three modes derive from the same CSS custom properties.
 
-- [ ] **Add `data-theme` attribute toggle** to `<html>`, cycling through
+- [x] **Add `data-theme` attribute toggle** to `<html>`, cycling through
   `light`, `dark`, and `sepia`. Persist the choice in `localStorage`.
   Re-derive every CSS token under each theme — no new hex colors.
 
-- [ ] **Extend `style.css` with dark and sepia token sets** under
+- [x] **Extend `style.css` with dark and sepia token sets** under
   `[data-theme="dark"]` and `[data-theme="sepia"]`, using the same
   `--variable` names. Dark: dark surfaces, light text. Sepia: warm paper
   background, muted ink.
 
-- [ ] **Add a theme-toggle button** in the topbar (lucide `sun` / `moon`
+- [x] **Add a theme-toggle button** in the topbar (lucide `sun` / `moon`
   / `coffee` icons), next to the export button.
 
-- [ ] **Inline hex audit** — move the renderer's `TRAFFIC_LIGHT_COLORS`
+- [x] **Inline hex audit** — move the renderer's `TRAFFIC_LIGHT_COLORS`
   into the theme palette (each theme defines its own traffic-light colors,
   or a fixed set is exposed as a CSS custom property). Move the canvas
   shadow `rgba` values in `style.css` into tokens. Add a CI grep step
@@ -230,6 +230,9 @@ should not be blinded by a white sidebar.
 
 **Acceptance:** three-theme toggle works; zero inline hex in CSS (CI enforced);
 perf baseline doc exists; favicon in `index.html`.
+
+> **Note:** Performance baseline (remaining item) deferred to a follow-up.
+> Theme toggle, token system, and hex audit are complete.
 
 ---
 
