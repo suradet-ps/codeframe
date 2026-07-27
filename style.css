@@ -51,7 +51,7 @@
     font-display: swap;
 }
 
-/* ---- Design tokens ---- */
+/* ---- Design tokens (light — default) ---- */
 :root {
     /* Brand & accent */
     --primary: #000000;
@@ -81,6 +81,10 @@
     --error-border: #fecaca;
     --error-text: #991b1b;
 
+    /* Preview canvas shadow */
+    --preview-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --preview-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+
     /* Spacing (8px grid) */
     --sp-xxs: 4px;
     --sp-xs: 8px;
@@ -90,6 +94,76 @@
     --sp-xl: 32px;
     --sp-xxl: 48px;
     --sp-section: 64px;
+}
+
+/* ---- Dark theme ---- */
+[data-theme="dark"] {
+    /* Brand & accent */
+    --primary: #ffffff;
+    --on-primary: #0a0a0a;
+    --accent: #e0e0e0;
+
+    /* Surfaces */
+    --canvas: #1a1a1a;
+    --canvas-warm: #222222;
+    --surface-cool: #282828;
+    --surface-elevated: #2e2e2e;
+    --hairline: #333333;
+    --hairline-soft: #2a2a2a;
+
+    /* Text */
+    --ink: #f0f0f0;
+    --ink-soft: #d0d0d0;
+    --graphite: #a0a0a0;
+    --slate: #888888;
+    --stone: #707070;
+    --ash: #555555;
+    --mute: #404040;
+
+    /* Semantic */
+    --warning: #f59e0b;
+    --error-bg: #2d1b1b;
+    --error-border: #5c2020;
+    --error-text: #fca5a5;
+
+    /* Preview canvas shadow */
+    --preview-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --preview-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- Sepia theme ---- */
+[data-theme="sepia"] {
+    /* Brand & accent */
+    --primary: #3d3427;
+    --on-primary: #faf5ed;
+    --accent: #5c4a36;
+
+    /* Surfaces */
+    --canvas: #f5f0e8;
+    --canvas-warm: #faf5ed;
+    --surface-cool: #ede8df;
+    --surface-elevated: #e8e2d8;
+    --hairline: #d4c9b8;
+    --hairline-soft: #e0d7ca;
+
+    /* Text */
+    --ink: #3d3427;
+    --ink-soft: #5c4a36;
+    --graphite: #7a6a55;
+    --slate: #958672;
+    --stone: #a89a87;
+    --ash: #bfb3a5;
+    --mute: #d4c9b8;
+
+    /* Semantic */
+    --warning: #92400e;
+    --error-bg: #fdf2f0;
+    --error-border: #f5c6c0;
+    --error-text: #991b1b;
+
+    /* Preview canvas shadow */
+    --preview-shadow-sm: 0 1px 3px rgba(61, 52, 39, 0.08);
+    --preview-shadow-lg: 0 8px 32px rgba(61, 52, 39, 0.12);
 }
 
 * {
@@ -397,7 +471,7 @@ input:focus {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--preview-shadow-sm), var(--preview-shadow-lg);
 }
 
 .error-banner {
