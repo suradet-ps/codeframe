@@ -1,2 +1,2 @@
 # Prevent CRLF conversion for Cargo.lock (keeps working tree clean)
-Cargo.lock -text
+Cargo.lock text=unset
