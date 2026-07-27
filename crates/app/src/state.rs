@@ -2,6 +2,74 @@
 
 use codeshot_models::{Background, ExportOptions, FontChoice, Language, RgbColor, ThemeChoice};
 use leptos::prelude::*;
+use web_sys::window;
+
+/// UI chrome theme — controls the sidebar/topbar appearance, independent of
+/// the canvas syntax theme.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum UiTheme {
+  #[default]
+  Light,
+  Dark,
+  Sepia,
+}
+
+impl UiTheme {
+  #[allow(dead_code)]
+  pub const ALL: [UiTheme; 3] = [UiTheme::Light, UiTheme::Dark, UiTheme::Sepia];
+
+  pub fn as_str(self) -> &'static str {
+    match self {
+      UiTheme::Light => "light",
+      UiTheme::Dark => "dark",
+      UiTheme::Sepia => "sepia",
+    }
+  }
+
+  pub fn from_str(s: &str) -> Self {
+    match s {
+      "dark" => UiTheme::Dark,
+      "sepia" => UiTheme::Sepia,
+      _ => UiTheme::Light,
+    }
+  }
+
+  /// Cycle to the next theme in the sequence: light → dark → sepia → light.
+  pub fn next(self) -> Self {
+    match self {
+      UiTheme::Light => UiTheme::Dark,
+      UiTheme::Dark => UiTheme::Sepia,
+      UiTheme::Sepia => UiTheme::Light,
+    }
+  }
+}
+
+const STORAGE_KEY: &str = "codeshot-ui-theme";
+
+/// Read the persisted theme from `localStorage`. Falls back to `Light`.
+fn load_theme_from_storage() -> UiTheme {
+  let Some(win) = window() else {
+    return UiTheme::Light;
+  };
+  let Some(storage) = win.local_storage().ok().flatten() else {
+    return UiTheme::Light;
+  };
+  let Some(value) = storage.get_item(STORAGE_KEY).ok().flatten() else {
+    return UiTheme::Light;
+  };
+  UiTheme::from_str(&value)
+}
+
+/// Persist the theme to `localStorage`.
+fn save_theme_to_storage(theme: UiTheme) {
+  let Some(win) = window() else {
+    return;
+  };
+  let Some(storage) = win.local_storage().ok().flatten() else {
+    return;
+  };
+  let _ = storage.set_item(STORAGE_KEY, theme.as_str());
+}
 
 /// Sample code shown on first load.
 pub const SAMPLE_CODE: &str = r#"fn main() {
@@ -26,10 +94,12 @@ pub struct Settings {
   pub window_frame: RwSignal<bool>,
   pub line_numbers: RwSignal<bool>,
   pub background: RwSignal<Background>,
+  pub ui_theme: RwSignal<UiTheme>,
 }
 
 impl Settings {
   pub fn new() -> Self {
+    let initial_ui_theme = load_theme_from_storage();
     Self {
       code: RwSignal::new(SAMPLE_CODE.to_string()),
       language: RwSignal::new(Language::Rust),
@@ -46,7 +116,13 @@ impl Settings {
         RgbColor::new(0xa8, 0x55, 0xf7),
         RgbColor::new(0xec, 0x48, 0x99),
       ])),
+      ui_theme: RwSignal::new(initial_ui_theme),
     }
+  }
+
+  /// Persist the current UI theme to localStorage.
+  pub fn persist_ui_theme(&self) {
+    save_theme_to_storage(self.ui_theme.get());
   }
 
   /// Snapshot of the current settings as renderer-ready options.
