@@ -99,6 +99,16 @@ CodeShot uses an editorial monochrome design system inspired by austere, restrai
 - Black pill buttons for primary actions (`border-radius: 9999px`)
 - 8px spacing grid with consistent token scale
 
+See [DESIGN.md](DESIGN.md) for the full specification.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, CI checks, and crate boundary rules.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the security posture, data flow, and vulnerability reporting.
+
 ## Known Limitations
 
 - **Font ligatures** — Canvas2D `fillText()` does not support ligature shaping. Sequences like `!=` or `=>` in ligature fonts (Fira Code, JetBrains Mono, Cascadia Code) render as separate glyphs. A warning is shown in the UI when a ligature font is selected.
