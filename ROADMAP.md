@@ -39,7 +39,7 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ## Current State (verified against the repo, not assumed)
 
 - **Stack**: Rust 2021 + Leptos 0.8 (CSR) + Trunk, `wasm32-unknown-unknown`,
-  deployed to Vercel as static assets behind security headers. Version `0.1.0`
+  deployed to Vercel as static assets behind security headers. Version `0.2.0`
   in `Cargo.toml`. No server — the browser does everything.
 - **Workspace**: 4 crates — `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
@@ -75,8 +75,8 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 
 ### Current status
 
-Phase 1 (Foundation + CI Hardening) is **complete**. PR #1 merged into `main`
-with all 7 CI jobs passing. The project now has:
+Phase 1 (Foundation + CI Hardening) is **complete**. Version bumped to `v0.2.0`.
+PR #1 on `main` with all 7 CI jobs passing. The project now has:
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
