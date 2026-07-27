@@ -39,7 +39,7 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ## Current State (verified against the repo, not assumed)
 
 - **Stack**: Rust 2021 + Leptos 0.8 (CSR) + Trunk, `wasm32-unknown-unknown`,
-  deployed to Vercel as static assets behind security headers. Version `0.2.0`
+  deployed to Vercel as static assets behind security headers. Version `0.4.0`
   in `Cargo.toml`. No server - the browser does everything.
 - **Workspace**: 4 crates - `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
@@ -52,8 +52,9 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Syntax highlighting**: `syntect` with `default-fancy` (fancy-regex backend,
   wasm32-compatible). 15 languages. Extra grammars: TypeScript (wrapper),
   TOML (vendored).
-- **Themes**: 4 bundled `.tmTheme` files - Dracula, One Dark, Nord, GitHub
-  Light. Embedded via `include_bytes!`, parsed lazily with `OnceLock`.
+- **Themes**: 7 bundled `.tmTheme` files - Dracula, One Dark, Nord, GitHub
+  Light, Tokyo Night, Catppuccin Mocha, Monokai. Embedded via `include_bytes!`,
+  parsed lazily with `OnceLock`.
 - **Fonts**: 3 bundled monospace fonts - JetBrains Mono, Fira Code, Cascadia
   Code (woff2/ttf). `@font-face` declarations in `style.css`.
 - **Rendering**: Canvas2D pixel-level control via `web-sys`. Preview canvas
@@ -77,6 +78,9 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 
 Phase 1 (Foundation + CI Hardening) is **complete**. Version bumped to `v0.2.0`.
 PR #1 on `main` with all 7 CI jobs passing. The project now has:
+
+Phase 2 (Visual Identity) is **complete**. Version bumped to `v0.4.0`.
+PR #3 on `main`. The project now has:
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
@@ -147,7 +151,7 @@ PR #1 on `main` with all 7 CI jobs passing. The project now has:
 | Milestone | Theme | What ships |
 |-----------|-------|------------|
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
-| **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured |
+| **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
 | **v0.6** | Export & UX | SVG export, copy to clipboard, new controls (line-height, tab-width, custom bg), keyboard shortcuts |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
@@ -223,16 +227,13 @@ should not be blinded by a white sidebar.
   shadow `rgba` values in `style.css` into tokens. Add a CI grep step
   that fails on raw `#rrggbb` in `.css` / `.rs` view code.
 
-- [ ] **Performance baseline** - measure WASM `.wasm` gzip size, cold
+- [x] **Performance baseline** - measure WASM `.wasm` gzip size, cold
   first-paint, preview render time, export time at 4x on a mid-tier
   device with throttled network. Record in `docs/perf-baseline.md`.
   This number becomes the reference for Phase 7 budgets.
 
 **Acceptance:** three-theme toggle works; zero inline hex in CSS (CI enforced);
-perf baseline doc exists; favicon in `index.html`.
-
-> **Note:** Performance baseline (remaining item) deferred to a follow-up.
-> Theme toggle, token system, and hex audit are complete.
+perf baseline doc exists; favicon in `index.html`. ✅ **All met.**
 
 ---
 

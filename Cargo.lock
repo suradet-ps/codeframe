@@ -174,7 +174,7 @@ dependencies = [
 
 [[package]]
 name = "codeshot-app"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "codeshot-highlighter",
  "codeshot-models",
@@ -190,7 +190,7 @@ dependencies = [
 
 [[package]]
 name = "codeshot-highlighter"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "codeshot-models",
  "syntect",
@@ -199,14 +199,14 @@ dependencies = [
 
 [[package]]
 name = "codeshot-models"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "codeshot-renderer"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "codeshot-models",
  "thiserror 2.0.19",
