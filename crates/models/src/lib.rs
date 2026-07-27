@@ -240,14 +240,20 @@ pub enum ThemeChoice {
   OneDark,
   Nord,
   GithubLight,
+  TokyoNight,
+  CatppuccinMocha,
+  Monokai,
 }
 
 impl ThemeChoice {
-  pub const ALL: [ThemeChoice; 4] = [
+  pub const ALL: [ThemeChoice; 7] = [
     ThemeChoice::Dracula,
     ThemeChoice::OneDark,
     ThemeChoice::Nord,
     ThemeChoice::GithubLight,
+    ThemeChoice::TokyoNight,
+    ThemeChoice::CatppuccinMocha,
+    ThemeChoice::Monokai,
   ];
 
   pub fn display_name(self) -> &'static str {
@@ -256,6 +262,9 @@ impl ThemeChoice {
       ThemeChoice::OneDark => "One Dark",
       ThemeChoice::Nord => "Nord",
       ThemeChoice::GithubLight => "GitHub Light",
+      ThemeChoice::TokyoNight => "Tokyo Night",
+      ThemeChoice::CatppuccinMocha => "Catppuccin Mocha",
+      ThemeChoice::Monokai => "Monokai",
     }
   }
 

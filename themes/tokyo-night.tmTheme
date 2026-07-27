@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>author</key>
+	<string>Folke Lemaitre (http://github.com/folke)</string>
+	<key>colorSpaceName</key>
+	<string>sRGB</string>
+	<key>name</key>
+	<string>TokyoNight</string>
+	<key>semanticClass</key>
+	<string>enki.theme.tokyo</string>
+	<key>settings</key>
+	<array>
+		<dict>
+			<key>settings</key>
+			<dict>
+				<key>activeGuide</key>
+				<string>#363b54</string>
+				<key>background</key>
+				<string>#1a1b26</string>
+				<key>caret</key>
+				<string>#DBC08A</string>
+				<key>findHighlight</key>
+				<string>#ffa300</string>
+				<key>findHighlightForeground</key>
+				<string>#000000</string>
+				<key>foreground</key>
+				<string>#c0caf5</string>
+				<key>guide</key>
+				<string>#4f4f5e40</string>
+				<key>gutterForeground</key>
+				<string>#3b415caa</string>
+				<key>inactiveSelection</key>
+				<string>#282833</string>
+				<key>invisibles</key>
+				<string>#4f4f5e</string>
+				<key>lineHighlight</key>
+				<string>#00000030</string>
+				<key>selection</key>
+				<string>#9D599D40</string>
+				<key>selectionBorder</key>
+				<string>#9D599D</string>
+				<key>shadow</key>
+				<string>#00000010</string>
+				<key>stackGuide</key>
+				<string>#4f4f5e60</string>
+				<key>tagsOptions</key>
+				<string>underline</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>comment, comment.block.documentation, punctuation.definition.comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#565f89</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Number, Boolean, Undefined, Null</string>
+			<key>scope</key>
+			<string>variable.other.constant, punctuation.definition.constant, constant.language, constant.numeric, support.constant</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff9e64</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>String</string>
+			<key>scope</key>
+			<string>string</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#9ece6a</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Storage Type</string>
+			<key>scope</key>
+			<string>storage.type</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#bb9af7</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword, keyword.control, keyword.other.important</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#bb9af7</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Operator, Misc</string>
+			<key>scope</key>
+			<string>keyword.operator, punctuation</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#89ddff</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Tag</string>
+			<key>scope</key>
+			<string>entity.name.tag</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#f7768e</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Variables</string>
+			<key>scope</key>
+			<string>variable, support.variable</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#c0caf5</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Function Definition</string>
+			<key>scope</key>
+			<string>entity.name.function, meta.function-call, variable.function</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#7aa2f7</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Function Argument</string>
+			<key>scope</key>
+			<string>variable.parameter</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#e0af68</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Class, Support, DOM, etc</string>
+			<key>scope</key>
+			<string>support.class, support.type, entity.name.class</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#0db9d7</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Object Key</string>
+			<key>scope</key>
+			<string>meta.object-literal.key, string.unquoted.graphql</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#73daca</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Escape Characters</string>
+			<key>scope</key>
+			<string>constant.character.escape</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#89ddff</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Invalid</string>
+			<key>scope</key>
+			<string>invalid, invalid.illegal</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#f7768e</string>
+			</dict>
+		</dict>
+	</array>
+	<key>uuid</key>
+	<string>06f855e3-9fb7-4fb1-b790-aef06065f34e</string>
+</dict>
+</plist>
