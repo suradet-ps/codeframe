@@ -1,4 +1,4 @@
-/* CodeShot UI styles — editorial monochrome design system. */
+/* CodeShot UI styles - editorial monochrome design system. */
 
 /* ---- Bundled fonts (served from /fonts, copied by Trunk) ---- */
 @font-face {
@@ -51,7 +51,7 @@
     font-display: swap;
 }
 
-/* ---- Design tokens (light — default) ---- */
+/* ---- Design tokens (light - default) ---- */
 :root {
     /* Brand & accent */
     --primary: #000000;
@@ -483,6 +483,26 @@ input:focus {
     border-radius: 0;
     max-width: 640px;
     font-size: 13px;
+}
+
+/* ---- Theme toggle ---- */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    background: var(--canvas-warm);
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.15s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--stone);
 }
 
 /* ---- Small screens ---- */

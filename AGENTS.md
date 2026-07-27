@@ -1,4 +1,4 @@
-# AGENTS.md — CodeShot (Code-to-PNG Web App)
+# AGENTS.md - CodeShot (Code-to-PNG Web App)
 
 > Architecture document for AI coding agents and humans, written before any implementation begins.
 > Read this file in full before touching any code.
@@ -10,7 +10,7 @@
 **Project name (working title):** CodeShot
 **Goal:** A web app that converts source code into high-resolution PNG images, in the style of carbon.now.sh / ray.so
 **Core selling point:** The highest possible export resolution achievable in-browser (not a DOM screenshot).
-**Deployment target:** Static site (CSR/WASM) — can be hosted on Cloudflare Pages / Vercel / GitHub Pages, no backend required.
+**Deployment target:** Static site (CSR/WASM) - can be hosted on Cloudflare Pages / Vercel / GitHub Pages, no backend required.
 
 ### Non-goals for v1
 - No user accounts / no cloud save
@@ -31,7 +31,7 @@
 | Build tool | Trunk | Standard tooling for Leptos CSR |
 | Font loading | Web Font Loading API (`document.fonts.ready`) via `web-sys` | Prevents drawing with a fallback font before the real font has finished loading |
 
-**Explicitly forbidden:** `html2canvas`, `dom-to-image`, or any DOM-screenshot-style library. This is a hard architectural constraint for this project — resolution would be capped by the browser's `devicePixelRatio`, and font rendering would not match what was intended.
+**Explicitly forbidden:** `html2canvas`, `dom-to-image`, or any DOM-screenshot-style library. This is a hard architectural constraint for this project - resolution would be capped by the browser's `devicePixelRatio`, and font rendering would not match what was intended.
 
 ---
 
@@ -40,11 +40,11 @@
 ```
 codeshot/
 ├── Cargo.toml                 (workspace root, virtual manifest)
-├── Trunk.toml                 # REQUIRED — see note below
+├── Trunk.toml                 # REQUIRED - see note below
 ├── index.html                 # Trunk entry; wires `rel="rust"` to crates/app/Cargo.toml
 ├── style.css                  # UI styles + @font-face for bundled fonts
 ├── crates/
-│   ├── app/                   # Leptos CSR UI — components, state, event handlers
+│   ├── app/                   # Leptos CSR UI - components, state, event handlers
 │   ├── highlighter/           # wraps syntect, exposes a framework-agnostic token stream
 │   ├── renderer/               # pure canvas-drawing logic, knows nothing about Leptos
 │   └── models/                # shared types: Theme, ExportOptions, Token, Language
@@ -68,10 +68,10 @@ no root package). Do not delete it.
 inheritance, replace the wrapper with the official grammar.
 
 ### Crate boundary rules
-- **`models`** has no dependencies beyond serde — it's the shared vocabulary.
-- **`highlighter`** depends only on `models` + `syntect` — takes `&str` + `Language`, returns `Vec<Token>` (knows nothing about canvas or Leptos).
-- **`renderer`** depends on `models` + `web-sys` + `wasm-bindgen` — takes `Vec<Token>` + `ExportOptions`, draws into a `CanvasRenderingContext2d` passed in by the caller (doesn't create its own canvas, doesn't know about Leptos).
-- **`app`** depends on all of the above — the only place with Leptos components, signals, and event handlers.
+- **`models`** has no dependencies beyond serde - it's the shared vocabulary.
+- **`highlighter`** depends only on `models` + `syntect` - takes `&str` + `Language`, returns `Vec<Token>` (knows nothing about canvas or Leptos).
+- **`renderer`** depends on `models` + `web-sys` + `wasm-bindgen` - takes `Vec<Token>` + `ExportOptions`, draws into a `CanvasRenderingContext2d` passed in by the caller (doesn't create its own canvas, doesn't know about Leptos).
+- **`app`** depends on all of the above - the only place with Leptos components, signals, and event handlers.
 
 **Why split this way:** `renderer` and `highlighter` need to be unit-testable without spinning up a full WASM test runner (except for the small handful of functions that touch web-sys directly).
 
@@ -100,10 +100,10 @@ renderer::draw(ctx: &CanvasRenderingContext2d, tokens: &[Token], options: &Expor
    canvas.set_height((logical_height * scale) as u32);
    ctx.scale(scale, scale)?; // draw using normal logical coordinates from here on
    ```
-2. **export_scale is user-selectable**, not capped at 2x — default options: 1x / 2x / 4x / 8x, plus a custom numeric input.
+2. **export_scale is user-selectable**, not capped at 2x - default options: 1x / 2x / 4x / 8x, plus a custom numeric input.
 3. **Preview canvas and export canvas are separate elements.** Preview renders at a screen-friendly scale (capped at, say, 2x for performance). Export creates a brand-new canvas at full scale only when the export button is pressed (prevents UI jank while typing).
-4. **Always await `document.fonts.ready` before drawing** — both preview and export must check this every time, not just on mount.
-5. **Use `toBlob("image/png")`, not `toDataURL`** — especially at high scale (8x): large files make `toDataURL` waste memory because it has to base64-encode the entire buffer in memory.
+4. **Always await `document.fonts.ready` before drawing** - both preview and export must check this every time, not just on mount.
+5. **Use `toBlob("image/png")`, not `toDataURL`** - especially at high scale (8x): large files make `toDataURL` waste memory because it has to base64-encode the entire buffer in memory.
 
 ---
 
@@ -115,10 +115,10 @@ Always draw in this order inside `renderer::draw`:
 2. Frame: rounded rect + drop shadow (if `window_frame: true`)
 3. Traffic-light dots (macOS style, if `window_frame: true`)
 4. Padding area (computed from `ExportOptions.padding`)
-5. Token text, drawn token-by-token with theme colors (`fillText` per token, manually advancing the x-cursor — do not rely on the browser's text wrapping)
+5. Token text, drawn token-by-token with theme colors (`fillText` per token, manually advancing the x-cursor - do not rely on the browser's text wrapping)
 6. Line numbers (if enabled)
 
-**Known limitation to plan around:** Canvas2D's `fillText` **does not support font ligatures** (e.g. `!=` → `≠` in Fira Code), because ligature shaping happens in the layout engine, not in canvas. This must be surfaced in the UI (e.g. a tooltip warning when a ligature font is selected). Do not attempt to "fix" this with manual character-pair substitution via regex — it breaks on too many edge cases.
+**Known limitation to plan around:** Canvas2D's `fillText` **does not support font ligatures** (e.g. `!=` → `≠` in Fira Code), because ligature shaping happens in the layout engine, not in canvas. This must be surfaced in the UI (e.g. a tooltip warning when a ligature font is selected). Do not attempt to "fix" this with manual character-pair substitution via regex - it breaks on too many edge cases.
 
 ---
 
@@ -146,13 +146,13 @@ pub struct ExportOptions {
 pub enum Language { Rust, Python, JavaScript, TypeScript, /* ... */ }
 ```
 
-**Rule:** Never introduce `web_sys::CanvasRenderingContext2d` or any Leptos type into `models` — this crate must compile even without the `wasm32` target.
+**Rule:** Never introduce `web_sys::CanvasRenderingContext2d` or any Leptos type into `models` - this crate must compile even without the `wasm32` target.
 
 ---
 
 ## 7. Coding Standards (aligned with the team's AGENTS-RUST.md baseline)
 
-- `#![deny(unsafe_code)]` in every crate, except where truly necessary — any exception must have a comment explaining why.
+- `#![deny(unsafe_code)]` in every crate, except where truly necessary - any exception must have a comment explaining why.
 - Every public function in `renderer` and `highlighter` needs a doc comment with a usage example.
 - Error handling: use `thiserror` for each crate's error type; no `unwrap()` on production code paths (except `main.rs` bootstrap).
 - Clippy: run `cargo clippy --all-targets --all-features -- -D warnings` before every commit.
@@ -163,14 +163,14 @@ pub enum Language { Rust, Python, JavaScript, TypeScript, /* ... */ }
 
 ## 8. Milestones (recommended implementation order)
 
-1. **M0** — Workspace scaffold: 4 empty crates compiling, `models` has all core types defined. ✅
-2. **M1** — `highlighter`: takes a code string, returns correct `Vec<Token>` (unit test against a single theme first). ✅
-3. **M2** — `renderer`: draws tokens onto a canvas at 1x scale (no frame/background yet). ✅
-4. **M3** — `app`: minimal Leptos UI — textarea → live preview canvas. ✅
-5. **M4** — Add background, window frame, padding, line numbers. ✅
-6. **M5** — Export flow: export button, separate high-scale canvas, `toBlob` → download. ✅
-7. **M6** — Font-loading guard (`document.fonts.ready`) + complete theme/font selector UI. ✅
-8. **M7** — Polish: ligature warning, custom scale input, responsive preview. ✅
+1. **M0** - Workspace scaffold: 4 empty crates compiling, `models` has all core types defined. ✅
+2. **M1** - `highlighter`: takes a code string, returns correct `Vec<Token>` (unit test against a single theme first). ✅
+3. **M2** - `renderer`: draws tokens onto a canvas at 1x scale (no frame/background yet). ✅
+4. **M3** - `app`: minimal Leptos UI - textarea → live preview canvas. ✅
+5. **M4** - Add background, window frame, padding, line numbers. ✅
+6. **M5** - Export flow: export button, separate high-scale canvas, `toBlob` → download. ✅
+7. **M6** - Font-loading guard (`document.fonts.ready`) + complete theme/font selector UI. ✅
+8. **M7** - Polish: ligature warning, custom scale input, responsive preview. ✅
 
 Status: **v1 complete (M0–M7).** Verified end-to-end in headless Chrome (WASM
 boot, live re-render on settings change, line-number gutter, theme switching,
@@ -178,7 +178,7 @@ boot, live re-render on settings change, line-number gutter, theme switching,
 
 ---
 
-## 9. Open Questions to Resolve Before M3 — RESOLVED
+## 9. Open Questions to Resolve Before M3 - RESOLVED
 
 - [x] How many fonts to bundle in v1? **3: JetBrains Mono, Fira Code, Cascadia Code** (woff2/ttf in `fonts/`, see `fonts/README.md` for sources & licenses). All three have ligatures → the ligature warning shows for any selection.
 - [x] How many themes to bundle? **4: Dracula, One Dark, GitHub Light, Nord** (hand-written `.tmTheme` files in `themes/` using the official palettes, embedded via `include_bytes!` and parsed lazily).
@@ -188,8 +188,8 @@ boot, live re-render on settings change, line-number gutter, theme switching,
 
 ## 10. Dev Commands
 
-- `trunk serve` — dev server on <http://localhost:8080> (rebuilds on change)
-- `trunk build --release` — optimized static site into `dist/` (wasm-opt `-Oz`)
-- `cargo test --workspace` — unit tests + doctests (no WASM runtime needed)
+- `trunk serve` - dev server on <http://localhost:8080> (rebuilds on change)
+- `trunk build --release` - optimized static site into `dist/` (wasm-opt `-Oz`)
+- `cargo test --workspace` - unit tests + doctests (no WASM runtime needed)
 - `cargo clippy --workspace --all-targets -- -D warnings` / `cargo fmt --all --check`
-- `cargo check -p codeshot-app --target wasm32-unknown-unknown` — fast WASM compile check
+- `cargo check -p codeshot-app --target wasm32-unknown-unknown` - fast WASM compile check

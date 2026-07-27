@@ -1,4 +1,4 @@
-//! Web Font Loading API guard — never draw before the real font is available
+//! Web Font Loading API guard - never draw before the real font is available
 //! (AGENTS.md §4, rule 4). Awaited before *every* draw, preview and export.
 
 use wasm_bindgen_futures::JsFuture;
@@ -18,7 +18,7 @@ pub async fn ensure_fonts_ready(family: &str) {
     format!("italic 700 14px \"{family}\""),
   ] {
     // A rejected future just means that variant doesn't exist (e.g.
-    // Fira Code has no italic) — canvas will synthesize it.
+    // Fira Code has no italic) - canvas will synthesize it.
     let _ = JsFuture::from(fonts.load(&spec)).await;
   }
   if let Ok(ready) = fonts.ready() {

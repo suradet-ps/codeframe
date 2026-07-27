@@ -1,5 +1,5 @@
 //! Live preview canvas. Renders on every state change at a screen-friendly
-//! scale (capped — AGENTS.md §4, rule 3); export uses a separate canvas.
+//! scale (capped - AGENTS.md §4, rule 3); export uses a separate canvas.
 
 use codeshot_highlighter::{highlight, theme_palette};
 use codeshot_renderer::render_to_canvas;

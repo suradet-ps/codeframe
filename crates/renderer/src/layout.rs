@@ -1,4 +1,4 @@
-//! Pure layout math — no browser APIs, fully unit-testable on any host.
+//! Pure layout math - no browser APIs, fully unit-testable on any host.
 
 use codeshot_models::{ExportOptions, Token};
 

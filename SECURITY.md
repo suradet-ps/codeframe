@@ -1,4 +1,4 @@
-# SECURITY.md — CodeShot
+# SECURITY.md - CodeShot
 
 > CodeShot's security posture. Read this before filing a vulnerability report.
 
@@ -48,7 +48,7 @@ At no point does the code leave the browser. There is no upload, no fetch,
 no WebSocket, no Server-Sent Events. The only network requests the app
 makes are:
 
-1. **Initial page load** — HTML, CSS, WASM, fonts, themes (all static assets).
+1. **Initial page load** - HTML, CSS, WASM, fonts, themes (all static assets).
 2. **Nothing else.** The app has no API calls after boot.
 
 ---
@@ -93,7 +93,7 @@ CSR rendering.
 ## Known Limitations
 
 - **Client-side only.** There is no server to enforce anything. A motivated
-  user could modify the WASM or DOM. This is by design — CodeShot is a
+  user could modify the WASM or DOM. This is by design - CodeShot is a
   tool, not a DRM system. The output image is what it is.
 - **No HTTPS enforcement on localhost.** During development (`trunk serve`),
   the app runs on `http://127.0.0.1:8080`. This is expected and only
