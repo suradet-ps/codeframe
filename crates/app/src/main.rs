@@ -1,4 +1,4 @@
-//! CodeShot — Leptos CSR frontend.
+//! CodeShot - Leptos CSR frontend.
 //!
 //! This is the only crate that knows about Leptos: components, signals, and
 //! event handlers live here (AGENTS.md §3).

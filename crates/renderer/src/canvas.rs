@@ -1,5 +1,5 @@
 //! Canvas2D drawing. Every function takes the canvas/context from the
-//! caller — this module never creates DOM elements itself and knows nothing
+//! caller - this module never creates DOM elements itself and knows nothing
 //! about Leptos.
 //!
 //! Drawing follows the layer order from AGENTS.md §5: background → card
@@ -30,7 +30,7 @@ pub enum RenderError {
   No2dContext,
   #[error(
     "image would be {width}x{height} device px, exceeding the {MAX_CANVAS_DIMENSION}px \
-         browser limit — pick a lower export scale"
+         browser limit - pick a lower export scale"
   )]
   CanvasTooLarge { width: u32, height: u32 },
   #[error("canvas API call failed: {0}")]
@@ -75,7 +75,7 @@ fn measure_char_width(ctx: &CanvasRenderingContext2d, family: &str, size_px: f64
 }
 
 /// Advance width of one token. ASCII takes the fast path (`len * char_width`
-/// — all bundled fonts are monospace); anything else is measured exactly.
+/// - all bundled fonts are monospace); anything else is measured exactly.
 ///
 /// Assumes the context font is already set (bold/italic do not change the
 /// advance of a monospace font).
@@ -128,7 +128,7 @@ fn rounded_rect_path(
 /// The canvas backing store is set to `logical_size * scale` and the context
 /// is pre-scaled, so all drawing from here on uses logical coordinates
 /// (AGENTS.md §4, rule 1). Note that resizing a canvas resets *all* context
-/// state — [`draw_prepared`] re-applies every style it needs.
+/// state - [`draw_prepared`] re-applies every style it needs.
 ///
 /// ```no_run
 /// use codeshot_models::{ExportOptions, FontStyle, RgbColor, Token};

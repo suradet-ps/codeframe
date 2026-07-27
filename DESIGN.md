@@ -1,4 +1,4 @@
-# DESIGN.md — CodeShot Design System
+# DESIGN.md - CodeShot Design System
 
 > The visual language of CodeShot: an editorial monochrome system built for
 > focus, restraint, and readability. This file is the single source of truth
@@ -11,8 +11,8 @@
 CodeShot is a tool for presenting code, not for decorating it. The design
 system follows three principles:
 
-1. **Restraint over expression.** The UI should disappear. The code — and
-   the image it becomes — is the only thing that matters. Every color,
+1. **Restraint over expression.** The UI should disappear. The code - and
+   the image it becomes - is the only thing that matters. Every color,
    every shadow, every border exists only to serve that goal.
 
 2. **Monochrome as a system, not a limitation.** Five tiers of grey handle
@@ -22,7 +22,7 @@ system follows three principles:
 
 3. **Hairline over shadow.** Depth is communicated through tonal surface
    shifts and 1px hairlines, not through drop shadows or heavy borders.
-   The only shadow in the entire UI is on the exported code card — and
+   The only shadow in the entire UI is on the exported code card - and
    that is part of the *output*, not the chrome.
 
 ---
@@ -31,7 +31,7 @@ system follows three principles:
 
 All tokens are CSS custom properties in `:root` (`style.css:55–93`). The
 same token names are reused across all three themes (`light`, `dark`,
-`sepia`) — only the values change.
+`sepia`) - only the values change.
 
 ### Brand & Accent
 
@@ -138,7 +138,7 @@ CodeShot uses tonal shifts, not shadows, for depth:
 |-------|---------|-----|
 | 0 | `--canvas` | Page background, topbar |
 | 1 | `--canvas-warm` | Textarea, selects, preview area background |
-| — | `--hairline` | Dividers between levels (1px) |
+| - | `--hairline` | Dividers between levels (1px) |
 
 The only shadow in the UI is on the **exported code card** (not the chrome):
 `0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12)` on
@@ -246,21 +246,21 @@ surfaces are warm grey, text is near-black.
 ### Dark (`[data-theme="dark"]`)
 
 Same token names, inverted values:
-- `--canvas`: `#1a1a1a` — near-black page background
-- `--canvas-warm`: `#222222` — slightly elevated surfaces
-- `--ink`: `#f0f0f0` — light text on dark background
-- `--hairline`: `#333333` — dark dividers
-- `--primary`: `#ffffff` — white export button (inverted from black)
+- `--canvas`: `#1a1a1a` - near-black page background
+- `--canvas-warm`: `#222222` - slightly elevated surfaces
+- `--ink`: `#f0f0f0` - light text on dark background
+- `--hairline`: `#333333` - dark dividers
+- `--primary`: `#ffffff` - white export button (inverted from black)
 - Preview shadow opacity increased (0.3/0.5) for visibility on dark surfaces
 
 ### Sepia (`[data-theme="sepia"]`)
 
 Warm reading mode with paper-like tones:
-- `--canvas`: `#f5f0e8` — warm paper background
-- `--canvas-warm`: `#faf5ed` — slightly warmer elevated surfaces
-- `--ink`: `#3d3427` — dark brown text
-- `--hairline`: `#d4c9b8` — warm divider
-- `--primary`: `#3d3427` — dark brown export button
+- `--canvas`: `#f5f0e8` - warm paper background
+- `--canvas-warm`: `#faf5ed` - slightly warmer elevated surfaces
+- `--ink`: `#3d3427` - dark brown text
+- `--hairline`: `#d4c9b8` - warm divider
+- `--primary`: `#3d3427` - dark brown export button
 - Preview shadow uses brown-tinted rgba for warmth
 
 ### Theme Toggle

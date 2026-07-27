@@ -1,8 +1,8 @@
 //! Canvas-drawing logic for CodeShot.
 //!
 //! Split into two layers (AGENTS.md §3):
-//! * [`layout`] — pure geometry math, no browser APIs, unit-testable anywhere.
-//! * [`canvas`] — Canvas2D drawing; takes the canvas from the caller, never
+//! * [`layout`] - pure geometry math, no browser APIs, unit-testable anywhere.
+//! * [`canvas`] - Canvas2D drawing; takes the canvas from the caller, never
 //!   creates DOM elements itself, and knows nothing about Leptos.
 #![deny(unsafe_code)]
 

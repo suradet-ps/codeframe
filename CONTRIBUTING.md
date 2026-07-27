@@ -1,4 +1,4 @@
-# CONTRIBUTING.md — CodeShot
+# CONTRIBUTING.md - CodeShot
 
 > How to set up, develop, and ship changes to CodeShot.
 
@@ -157,7 +157,7 @@ No exceptions in production code. If you truly need `unsafe`, it must:
 2. Make your changes, ensuring all CI checks pass locally.
 3. Open a PR against `main`.
 4. CI runs automatically. All 7 jobs must pass.
-5. Squash-merge (or regular merge — team preference).
+5. Squash-merge (or regular merge - team preference).
 
 ---
 

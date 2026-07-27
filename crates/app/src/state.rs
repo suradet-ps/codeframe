@@ -4,7 +4,7 @@ use codeshot_models::{Background, ExportOptions, FontChoice, Language, RgbColor,
 use leptos::prelude::*;
 use web_sys::window;
 
-/// UI chrome theme — controls the sidebar/topbar appearance, independent of
+/// UI chrome theme - controls the sidebar/topbar appearance, independent of
 /// the canvas syntax theme.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum UiTheme {
@@ -73,7 +73,7 @@ fn save_theme_to_storage(theme: UiTheme) {
 
 /// Sample code shown on first load.
 pub const SAMPLE_CODE: &str = r#"fn main() {
-    // CodeShot — turn code into beautiful images
+    // CodeShot - turn code into beautiful images
     let message = "Hello, world!";
     println!("{message}");
 }

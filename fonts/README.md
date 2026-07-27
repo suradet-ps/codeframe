@@ -9,4 +9,4 @@ Downloaded at build time and served as static assets (declared via `@font-face` 
 | `cascadia-code.ttf` | Cascadia Code (variable weight) | microsoft/cascadia-code release v2407.24 | SIL OFL 1.1 |
 
 Note: all three fonts contain ligature glyphs, but Canvas2D `fillText` does not
-shape ligatures — the UI surfaces this as a warning (see AGENTS.md §5).
+shape ligatures - the UI surfaces this as a warning (see AGENTS.md §5).

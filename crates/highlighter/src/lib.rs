@@ -1,5 +1,5 @@
 //! Syntax highlighting via `syntect`, exposed as a framework-agnostic token
-//! stream. Depends only on `codeshot-models` + `syntect` — it knows nothing
+//! stream. Depends only on `codeshot-models` + `syntect` - it knows nothing
 //! about canvas or Leptos (AGENTS.md §3).
 //!
 //! The bundled `.tmTheme` files from the workspace `themes/` directory are

@@ -1,4 +1,4 @@
-//! UI theme toggle button — cycles through light / dark / sepia.
+//! UI theme toggle button - cycles through light / dark / sepia.
 
 use leptos::prelude::*;
 
@@ -11,7 +11,7 @@ pub fn ThemeToggle(settings: Settings) -> impl IntoView {
   view! {
       <button
           class="theme-toggle"
-          title=move || format!("Theme: {} — click to cycle", settings.ui_theme.get().as_str())
+          title=move || format!("Theme: {} - click to cycle", settings.ui_theme.get().as_str())
           aria-label=move || format!("Current theme: {}. Click to cycle themes.", settings.ui_theme.get().as_str())
           on:click=move |_| {
               let next = settings.ui_theme.get().next();

@@ -44,7 +44,7 @@ async fn do_export(settings: Settings) -> Result<(), String> {
   let document = window
     .document()
     .ok_or_else(|| "no document object".to_string())?;
-  // A brand-new canvas at full scale — never the preview element.
+  // A brand-new canvas at full scale - never the preview element.
   let canvas: HtmlCanvasElement = document
     .create_element("canvas")
     .map_err(|e| format!("{e:?}"))?
