@@ -1,6 +1,6 @@
 //! Shared vocabulary types for CodeShot.
 //!
-//! This crate intentionally has no dependencies beyond `serde` — it must
+//! This crate intentionally has no dependencies beyond `serde` - it must
 //! compile on any target (including non-wasm hosts) and knows nothing about
 //! Leptos, syntect, or the Canvas2D API (see AGENTS.md §6).
 #![deny(unsafe_code)]
@@ -41,7 +41,7 @@ pub struct FontStyle {
 
 /// A run of highlighted text sharing one color and style.
 ///
-/// Token text may contain `'\n'` — splitting into lines is the renderer's job
+/// Token text may contain `'\n'` - splitting into lines is the renderer's job
 /// (`layout::split_tokens_into_lines`).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Token {
@@ -240,14 +240,20 @@ pub enum ThemeChoice {
   OneDark,
   Nord,
   GithubLight,
+  TokyoNight,
+  CatppuccinMocha,
+  Monokai,
 }
 
 impl ThemeChoice {
-  pub const ALL: [ThemeChoice; 4] = [
+  pub const ALL: [ThemeChoice; 7] = [
     ThemeChoice::Dracula,
     ThemeChoice::OneDark,
     ThemeChoice::Nord,
     ThemeChoice::GithubLight,
+    ThemeChoice::TokyoNight,
+    ThemeChoice::CatppuccinMocha,
+    ThemeChoice::Monokai,
   ];
 
   pub fn display_name(self) -> &'static str {
@@ -256,6 +262,9 @@ impl ThemeChoice {
       ThemeChoice::OneDark => "One Dark",
       ThemeChoice::Nord => "Nord",
       ThemeChoice::GithubLight => "GitHub Light",
+      ThemeChoice::TokyoNight => "Tokyo Night",
+      ThemeChoice::CatppuccinMocha => "Catppuccin Mocha",
+      ThemeChoice::Monokai => "Monokai",
     }
   }
 

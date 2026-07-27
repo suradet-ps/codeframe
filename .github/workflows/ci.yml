@@ -97,9 +97,35 @@ jobs:
       - run: cargo install cargo-deny --locked
       - run: cargo deny check
 
+  hex-audit:
+    name: Hex Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Fail on raw hex outside CSS token definitions
+        run: |
+          # Find hex colors (#rrggbb) in style.css, excluding:
+          #   - lines that define CSS custom properties (--var-name)
+          #   - lines inside token definition blocks (:root, [data-theme])
+          #   - rgba() values (used inside token definitions)
+          matches=$(grep -nE '#[0-9a-fA-F]{6}' style.css \
+            | grep -v '\-\-' \
+            | grep -v 'rgba(' || true)
+          if [ -n "$matches" ]; then
+            echo "::error::Raw hex colors found outside CSS token definitions:"
+            echo "$matches"
+            echo ""
+            echo "All hex values must live inside :root or [data-theme] token definitions."
+            echo "Use CSS custom properties (var(--token-name)) in component styles."
+            exit 1
+          fi
+          echo "No raw hex leakage found in style.css"
+
   build:
     name: Build
-    needs: [check, clippy, fmt, test, audit, deny]
+    needs: [check, clippy, fmt, test, audit, deny, hex-audit]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

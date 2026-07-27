@@ -1,4 +1,4 @@
-//! CodeShot — Leptos CSR frontend.
+//! CodeShot - Leptos CSR frontend.
 //!
 //! This is the only crate that knows about Leptos: components, signals, and
 //! event handlers live here (AGENTS.md §3).
@@ -9,19 +9,33 @@ mod export;
 mod fonts;
 mod preview;
 mod state;
+mod theme;
 
 use leptos::mount::mount_to_body;
 use leptos::prelude::*;
+use web_sys::window;
 
 use crate::controls::Controls;
 use crate::preview::Preview;
 use crate::state::Settings;
+use crate::theme::ThemeToggle;
 
 #[component]
 fn App() -> impl IntoView {
   let settings = Settings::new();
   let (exporting, set_exporting) = signal(false);
   let (export_error, set_export_error) = signal(Option::<String>::None);
+
+  // Sync the data-theme attribute on <html> whenever ui_theme changes.
+  Effect::new(move |_| {
+    let theme = settings.ui_theme.get();
+    if let Some(html) = window()
+      .and_then(|w| w.document())
+      .and_then(|d| d.document_element())
+    {
+      let _ = html.set_attribute("data-theme", theme.as_str());
+    }
+  });
 
   view! {
       <div class="app">
@@ -36,6 +50,7 @@ fn App() -> impl IntoView {
                           <span class="export-error">{message}</span>
                       })
                   }}
+                  <ThemeToggle settings />
                   <button
                       class="export-btn"
                       disabled=move || exporting.get()

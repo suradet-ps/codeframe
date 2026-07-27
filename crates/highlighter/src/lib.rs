@@ -1,5 +1,5 @@
 //! Syntax highlighting via `syntect`, exposed as a framework-agnostic token
-//! stream. Depends only on `codeshot-models` + `syntect` — it knows nothing
+//! stream. Depends only on `codeshot-models` + `syntect` - it knows nothing
 //! about canvas or Leptos (AGENTS.md §3).
 //!
 //! The bundled `.tmTheme` files from the workspace `themes/` directory are
@@ -56,6 +56,9 @@ const DRACULA: &[u8] = include_bytes!("../../../themes/dracula.tmTheme");
 const ONE_DARK: &[u8] = include_bytes!("../../../themes/one-dark.tmTheme");
 const NORD: &[u8] = include_bytes!("../../../themes/nord.tmTheme");
 const GITHUB_LIGHT: &[u8] = include_bytes!("../../../themes/github-light.tmTheme");
+const TOKYO_NIGHT: &[u8] = include_bytes!("../../../themes/tokyo-night.tmTheme");
+const CATPPUCCIN_MOCHA: &[u8] = include_bytes!("../../../themes/catppuccin-mocha.tmTheme");
+const MONOKAI: &[u8] = include_bytes!("../../../themes/monokai.tmTheme");
 
 fn theme_bytes(choice: ThemeChoice) -> &'static [u8] {
   match choice {
@@ -63,6 +66,9 @@ fn theme_bytes(choice: ThemeChoice) -> &'static [u8] {
     ThemeChoice::OneDark => ONE_DARK,
     ThemeChoice::Nord => NORD,
     ThemeChoice::GithubLight => GITHUB_LIGHT,
+    ThemeChoice::TokyoNight => TOKYO_NIGHT,
+    ThemeChoice::CatppuccinMocha => CATPPUCCIN_MOCHA,
+    ThemeChoice::Monokai => MONOKAI,
   }
 }
 
@@ -72,6 +78,9 @@ fn theme_index(choice: ThemeChoice) -> usize {
     ThemeChoice::OneDark => 1,
     ThemeChoice::Nord => 2,
     ThemeChoice::GithubLight => 3,
+    ThemeChoice::TokyoNight => 4,
+    ThemeChoice::CatppuccinMocha => 5,
+    ThemeChoice::Monokai => 6,
   }
 }
 
@@ -83,7 +92,7 @@ fn parse_theme(choice: ThemeChoice) -> Result<Theme, HighlightError> {
 /// Returns the parsed `syntect` theme for `choice`, parsed and cached on
 /// first use.
 pub fn theme(choice: ThemeChoice) -> Result<&'static Theme, HighlightError> {
-  static THEMES: [OnceLock<Theme>; 4] = [const { OnceLock::new() }; 4];
+  static THEMES: [OnceLock<Theme>; 7] = [const { OnceLock::new() }; 7];
   if let Some(theme) = THEMES[theme_index(choice)].get() {
     return Ok(theme);
   }
@@ -224,6 +233,12 @@ mod tests {
       (ThemeChoice::OneDark, RgbColor::new(0x28, 0x2c, 0x34)),
       (ThemeChoice::Nord, RgbColor::new(0x2e, 0x34, 0x40)),
       (ThemeChoice::GithubLight, RgbColor::new(0xff, 0xff, 0xff)),
+      (ThemeChoice::TokyoNight, RgbColor::new(0x1a, 0x1b, 0x26)),
+      (
+        ThemeChoice::CatppuccinMocha,
+        RgbColor::new(0x1e, 0x1e, 0x2e),
+      ),
+      (ThemeChoice::Monokai, RgbColor::new(0x24, 0x24, 0x24)),
     ];
     for (choice, expected_bg) in cases {
       let palette = theme_palette(choice).unwrap();

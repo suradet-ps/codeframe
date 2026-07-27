@@ -1,4 +1,4 @@
-# DESIGN.md — CodeShot Design System
+# DESIGN.md - CodeShot Design System
 
 > The visual language of CodeShot: an editorial monochrome system built for
 > focus, restraint, and readability. This file is the single source of truth
@@ -11,8 +11,8 @@
 CodeShot is a tool for presenting code, not for decorating it. The design
 system follows three principles:
 
-1. **Restraint over expression.** The UI should disappear. The code — and
-   the image it becomes — is the only thing that matters. Every color,
+1. **Restraint over expression.** The UI should disappear. The code - and
+   the image it becomes - is the only thing that matters. Every color,
    every shadow, every border exists only to serve that goal.
 
 2. **Monochrome as a system, not a limitation.** Five tiers of grey handle
@@ -22,7 +22,7 @@ system follows three principles:
 
 3. **Hairline over shadow.** Depth is communicated through tonal surface
    shifts and 1px hairlines, not through drop shadows or heavy borders.
-   The only shadow in the entire UI is on the exported code card — and
+   The only shadow in the entire UI is on the exported code card - and
    that is part of the *output*, not the chrome.
 
 ---
@@ -31,47 +31,54 @@ system follows three principles:
 
 All tokens are CSS custom properties in `:root` (`style.css:55–93`). The
 same token names are reused across all three themes (`light`, `dark`,
-`sepia`) — only the values change.
+`sepia`) - only the values change.
 
 ### Brand & Accent
 
-| Token | Light | Purpose |
-|-------|-------|---------|
-| `--primary` | `#000000` | Primary action background (export button) |
-| `--on-primary` | `#ffffff` | Text on primary action |
-| `--accent` | `#111111` | Subtle accent (hover states, active borders) |
+| Token | Light | Dark | Sepia | Purpose |
+|-------|-------|------|-------|---------|
+| `--primary` | `#000000` | `#ffffff` | `#3d3427` | Primary action background |
+| `--on-primary` | `#ffffff` | `#0a0a0a` | `#faf5ed` | Text on primary action |
+| `--accent` | `#111111` | `#e0e0e0` | `#5c4a36` | Subtle accent (hover, active borders) |
 
 ### Surfaces
 
-| Token | Light | Purpose |
-|-------|-------|---------|
-| `--canvas` | `#ffffff` | Page background |
-| `--canvas-warm` | `#fafafa` | Slightly warm surface (textarea, inputs, preview area) |
-| `--surface-cool` | `#f5f5f5` | Cool surface (unused in v1, reserved) |
-| `--surface-elevated` | `#f0f0f0` | Elevated surface (unused in v1, reserved) |
-| `--hairline` | `#e5e5e5` | 1px dividers, borders |
-| `--hairline-soft` | `#eeeeee` | Softer dividers (unused in v1, reserved) |
+| Token | Light | Dark | Sepia | Purpose |
+|-------|-------|------|-------|---------|
+| `--canvas` | `#ffffff` | `#1a1a1a` | `#f5f0e8` | Page background |
+| `--canvas-warm` | `#fafafa` | `#222222` | `#faf5ed` | Textarea, inputs, preview area |
+| `--surface-cool` | `#f5f5f5` | `#282828` | `#ede8df` | Cool surface (reserved) |
+| `--surface-elevated` | `#f0f0f0` | `#2e2e2e` | `#e8e2d8` | Elevated surface (reserved) |
+| `--hairline` | `#e5e5e5` | `#333333` | `#d4c9b8` | 1px dividers, borders |
+| `--hairline-soft` | `#eeeeee` | `#2a2a2a` | `#e0d7ca` | Softer dividers (reserved) |
 
 ### Text
 
-| Token | Light | Purpose |
-|-------|-------|---------|
-| `--ink` | `#0a0a0a` | Primary text, headings |
-| `--ink-soft` | `#333333` | Secondary text |
-| `--graphite` | `#555555` | Tertiary text |
-| `--slate` | `#777777` | Muted text (slider values) |
-| `--stone` | `#999999` | Labels, placeholders |
-| `--ash` | `#bbbbbb` | Disabled text |
-| `--mute` | `#dddddd` | Very muted (borders on disabled) |
+| Token | Light | Dark | Sepia | Purpose |
+|-------|-------|------|-------|---------|
+| `--ink` | `#0a0a0a` | `#f0f0f0` | `#3d3427` | Primary text, headings |
+| `--ink-soft` | `#333333` | `#d0d0d0` | `#5c4a36` | Secondary text |
+| `--graphite` | `#555555` | `#a0a0a0` | `#7a6a55` | Tertiary text |
+| `--slate` | `#777777` | `#888888` | `#958672` | Muted text (slider values) |
+| `--stone` | `#999999` | `#707070` | `#a89a87` | Labels, placeholders |
+| `--ash` | `#bbbbbb` | `#555555` | `#bfb3a5` | Disabled text |
+| `--mute` | `#dddddd` | `#404040` | `#d4c9b8` | Very muted (disabled borders) |
 
 ### Semantic
 
-| Token | Light | Purpose |
-|-------|-------|---------|
-| `--warning` | `#b45309` | Warning text (ligature hint) |
-| `--error-bg` | `#fef2f2` | Error banner background |
-| `--error-border` | `#fecaca` | Error banner border |
-| `--error-text` | `#991b1b` | Error banner text |
+| Token | Light | Dark | Sepia | Purpose |
+|-------|-------|------|-------|---------|
+| `--warning` | `#b45309` | `#f59e0b` | `#92400e` | Warning text (ligature hint) |
+| `--error-bg` | `#fef2f2` | `#2d1b1b` | `#fdf2f0` | Error banner background |
+| `--error-border` | `#fecaca` | `#5c2020` | `#f5c6c0` | Error banner border |
+| `--error-text` | `#991b1b` | `#fca5a5` | `#991b1b` | Error banner text |
+
+### Preview Canvas Shadow
+
+| Token | Light | Dark | Sepia | Purpose |
+|-------|-------|------|-------|---------|
+| `--preview-shadow-sm` | `0 1px 3px rgba(0,0,0,0.08)` | `0 1px 3px rgba(0,0,0,0.3)` | `0 1px 3px rgba(61,52,39,0.08)` | Small canvas shadow |
+| `--preview-shadow-lg` | `0 8px 32px rgba(0,0,0,0.12)` | `0 8px 32px rgba(0,0,0,0.5)` | `0 8px 32px rgba(61,52,39,0.12)` | Large canvas shadow |
 
 ### Spacing (8px grid)
 
@@ -131,7 +138,7 @@ CodeShot uses tonal shifts, not shadows, for depth:
 |-------|---------|-----|
 | 0 | `--canvas` | Page background, topbar |
 | 1 | `--canvas-warm` | Textarea, selects, preview area background |
-| — | `--hairline` | Dividers between levels (1px) |
+| - | `--hairline` | Dividers between levels (1px) |
 
 The only shadow in the UI is on the **exported code card** (not the chrome):
 `0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12)` on
@@ -239,19 +246,32 @@ surfaces are warm grey, text is near-black.
 ### Dark (`[data-theme="dark"]`)
 
 Same token names, inverted values:
-- `--canvas`: dark grey (~`#1a1a1a`)
-- `--canvas-warm`: slightly lighter (~`#222222`)
-- `--ink`: light (~`#f0f0f0`)
-- `--hairline`: dark divider (~`#333333`)
-- All text tokens shift to lighter greys
+- `--canvas`: `#1a1a1a` - near-black page background
+- `--canvas-warm`: `#222222` - slightly elevated surfaces
+- `--ink`: `#f0f0f0` - light text on dark background
+- `--hairline`: `#333333` - dark dividers
+- `--primary`: `#ffffff` - white export button (inverted from black)
+- Preview shadow opacity increased (0.3/0.5) for visibility on dark surfaces
 
 ### Sepia (`[data-theme="sepia"]`)
 
-Warm reading mode:
-- `--canvas`: warm paper (~`#f5f0e8`)
-- `--canvas-warm`: slightly warmer (~`#faf5ed`)
-- `--ink`: dark brown (~`#3d3427`)
-- `--hairline`: warm divider (~`#d4c9b8`)
+Warm reading mode with paper-like tones:
+- `--canvas`: `#f5f0e8` - warm paper background
+- `--canvas-warm`: `#faf5ed` - slightly warmer elevated surfaces
+- `--ink`: `#3d3427` - dark brown text
+- `--hairline`: `#d4c9b8` - warm divider
+- `--primary`: `#3d3427` - dark brown export button
+- Preview shadow uses brown-tinted rgba for warmth
+
+### Theme Toggle
+
+The UI theme is controlled by a `data-theme` attribute on `<html>`, cycled
+through `light` → `dark` → `sepia` → `light` by the `ThemeToggle` button
+in the topbar. The choice is persisted to `localStorage` under the key
+`codeshot-ui-theme` and restored on page load.
+
+This is independent of the **canvas syntax theme** (Dracula, One Dark, etc.)
+which only affects the exported code image.
 
 ---
 
