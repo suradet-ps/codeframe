@@ -5,7 +5,7 @@ use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 
-use crate::state::{Settings, SAMPLE_CODE};
+use crate::state::{CustomBgMode, Settings, SAMPLE_CODE};
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
 const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
@@ -285,15 +285,73 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                           view! {
                               <button
                                   class="swatch"
-                                  class:active=move || settings.background.get() == bg_for_class
+                                  class:active=move || !settings.custom_bg_enabled.get() && settings.background.get() == bg_for_class
                                   title=name
                                   style=css
-                                  on:click=move |_| settings.background.set(background.clone())
+                                  on:click=move |_| {
+                                      settings.custom_bg_enabled.set(false);
+                                      settings.background.set(background.clone());
+                                  }
                               ></button>
                           }
                       })
                       .collect_view()}
               </div>
+          </section>
+
+          <section>
+              <label class="toggle">
+                  <input
+                      type="checkbox"
+                      prop:checked=move || settings.custom_bg_enabled.get()
+                      on:change=move |ev| settings.custom_bg_enabled.set(event_target_checked(&ev))
+                  />
+                  "Custom background"
+              </label>
+              {move || {
+                  settings.custom_bg_enabled.get().then(|| view! {
+                      <div class="custom-bg-controls">
+                          <div class="segmented">
+                              <button
+                                  class="seg"
+                                  class:active=move || settings.custom_bg_mode.get() == CustomBgMode::Solid
+                                  on:click=move |_| settings.custom_bg_mode.set(CustomBgMode::Solid)
+                              >
+                                  "Solid"
+                              </button>
+                              <button
+                                  class="seg"
+                                  class:active=move || settings.custom_bg_mode.get() == CustomBgMode::Gradient
+                                  on:click=move |_| settings.custom_bg_mode.set(CustomBgMode::Gradient)
+                              >
+                                  "Gradient"
+                              </button>
+                          </div>
+                          <div class="color-pickers">
+                              <label class="color-pick">
+                                  <span class="control-label">"Color 1"</span>
+                                  <input
+                                      type="color"
+                                      prop:value=move || settings.custom_color_1.get()
+                                      on:input=move |ev| settings.custom_color_1.set(event_target_value(&ev))
+                                  />
+                              </label>
+                              {move || {
+                                  (settings.custom_bg_mode.get() == CustomBgMode::Gradient).then(|| view! {
+                                      <label class="color-pick">
+                                          <span class="control-label">"Color 2"</span>
+                                          <input
+                                              type="color"
+                                              prop:value=move || settings.custom_color_2.get()
+                                              on:input=move |ev| settings.custom_color_2.set(event_target_value(&ev))
+                                          />
+                                      </label>
+                                  })
+                              }}
+                          </div>
+                      </div>
+                  })
+              }}
           </section>
       </aside>
   }
