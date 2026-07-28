@@ -39,7 +39,7 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ## Current State (verified against the repo, not assumed)
 
 - **Stack**: Rust 2021 + Leptos 0.8 (CSR) + Trunk, `wasm32-unknown-unknown`,
-  deployed to Vercel as static assets behind security headers. Version `0.4.0`
+  deployed to Vercel as static assets behind security headers. Version `0.6.0`
   in `Cargo.toml`. No server - the browser does everything.
 - **Workspace**: 4 crates - `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
@@ -79,10 +79,13 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ### Current status
 
 Phase 1 (Foundation + CI Hardening) is **complete**. Version bumped to `v0.2.0`.
-PR #1 on `main` with all 7 CI jobs passing. The project now has:
+PR #1 on `main` with all 7 CI jobs passing.
 
 Phase 2 (Visual Identity) is **complete**. Version bumped to `v0.4.0`.
-PR #3 on `main`. The project now has:
+PR #3 on `main`.
+
+Phase 3 (Export & UX Depth) is **complete** (except split-screen). Version bumped to `v0.6.0`.
+PRs #7, #8 on `main`. The project now has:
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
@@ -100,12 +103,14 @@ PR #3 on `main`. The project now has:
 | Window frame (macOS traffic lights) | Working |
 | Line numbers | Working |
 | Background presets (6) | Working |
+| Custom background color picker (solid/gradient) | Working |
 | Font-size / padding / corner-radius controls | Working |
 | Line-height slider (1.0–2.5) | Working |
 | Tab-width control (2/4/8) | Working |
 | Copy to clipboard | Working |
 | Keyboard shortcuts (Ctrl/Cmd+Enter) | Working |
 | Export filename template | Working |
+| Custom export dimensions (target width) | Working |
 | Responsive layout (controls move below on small screens) | Working |
 | Ligature warning | Working |
 | Font loading guard (`document.fonts.ready`) | Working |
@@ -123,17 +128,13 @@ PR #3 on `main`. The project now has:
 
 ### Gaps found while reading the repo
 
-1. **No SVG export.** The token stream is generic enough to support it, but
-   no implementation exists. The README explicitly marks this as a known
-   limitation.
-
-2. **No undo/redo for the code editor.** The `<textarea>` has native undo,
+1. **No undo/redo for the code editor.** The `<textarea>` has native undo,
    but there is no history for the full settings state (theme, scale, etc.).
 
-3. **No URL sharing of settings.** Each page load starts from the same
+2. **No URL sharing of settings.** Each page load starts from the same
    defaults. There is no way to bookmark a specific configuration.
 
-4. **No offline story.** The app is a static site, but there is no service
+3. **No offline story.** The app is a static site, but there is no service
    worker, no manifest, no PWA support. It could work offline trivially
    (it's already CSR + static), but doesn't yet.
 
