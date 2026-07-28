@@ -95,6 +95,8 @@ pub struct Settings {
   pub line_numbers: RwSignal<bool>,
   pub background: RwSignal<Background>,
   pub ui_theme: RwSignal<UiTheme>,
+  pub line_height: RwSignal<f64>,
+  pub tab_width: RwSignal<usize>,
 }
 
 impl Settings {
@@ -117,6 +119,8 @@ impl Settings {
         RgbColor::new(0xec, 0x48, 0x99),
       ])),
       ui_theme: RwSignal::new(initial_ui_theme),
+      line_height: RwSignal::new(1.5),
+      tab_width: RwSignal::new(4),
     }
   }
 
@@ -135,8 +139,9 @@ impl Settings {
       line_numbers: self.line_numbers.get(),
       font_family: self.font.get(),
       font_size: self.font_size.get(),
-      line_height: 1.5,
+      line_height: self.line_height.get(),
       corner_radius: self.corner_radius.get(),
+      tab_width: self.tab_width.get(),
     }
   }
 }

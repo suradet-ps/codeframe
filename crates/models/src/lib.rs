@@ -300,6 +300,8 @@ pub struct ExportOptions {
   /// Multiple of `font_size`.
   pub line_height: f64,
   pub corner_radius: f64,
+  /// Number of spaces a tab character expands to.
+  pub tab_width: usize,
 }
 
 impl Default for ExportOptions {
@@ -314,6 +316,7 @@ impl Default for ExportOptions {
       font_size: 14.0,
       line_height: 1.5,
       corner_radius: 12.0,
+      tab_width: 4,
     }
   }
 }
