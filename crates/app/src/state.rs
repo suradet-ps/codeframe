@@ -72,12 +72,7 @@ fn save_theme_to_storage(theme: UiTheme) {
 }
 
 /// Sample code shown on first load.
-pub const SAMPLE_CODE: &str = r#"fn main() {
-    // CodeFrame - turn code into beautiful images
-    let message = "Hello, world!";
-    println!("{message}");
-}
-"#;
+pub const SAMPLE_CODE: &str = "fn main() {\n\t// CodeFrame \u{2014} turn code into beautiful images\n\tlet message = \"Hello, world!\";\n\tprintln!(\"{message}\");\n}\n";
 
 /// Every user-tweakable input, as fine-grained signals (cheap to copy and
 /// hand to child components).
