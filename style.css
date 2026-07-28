@@ -306,6 +306,7 @@ body {
 .controls {
     grid-area: controls;
     overflow-y: auto;
+    overflow-x: hidden;
     border-right: 1px solid var(--hairline);
     background: var(--canvas);
     padding: var(--sp-lg);
@@ -407,10 +408,12 @@ input:focus {
 .segmented {
     display: flex;
     gap: var(--sp-xs);
+    flex-wrap: wrap;
 }
 
 .seg {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     background: var(--canvas-warm);
     color: var(--ink);
     border: none;
@@ -428,7 +431,8 @@ input:focus {
 
 .scale-custom {
     width: 68px;
-    flex: none;
+    flex: 0 1 68px;
+    min-width: 0;
 }
 
 /* ---- Toggles ---- */
