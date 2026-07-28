@@ -3,6 +3,7 @@
 
 use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
+use wasm_bindgen::JsCast;
 
 use crate::state::{Settings, SAMPLE_CODE};
 
@@ -111,6 +112,22 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   spellcheck="false"
                   autocomplete="off"
                   on:input=move |ev| settings.code.set(event_target_value(&ev))
+                  on:keydown=move |ev| {
+                      if ev.key() == "Tab" {
+                          ev.prevent_default();
+                          let target = ev.target().unwrap();
+                          let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                          let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                          let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                          let value = textarea.value();
+                          let spaces = " ".repeat(settings.tab_width.get());
+                          let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                          settings.code.set(new_value.clone());
+                          textarea.set_value(&new_value);
+                          let pos = (start + spaces.len()) as u32;
+                          let _ = textarea.set_selection_range(pos, pos);
+                      }
+                  }
               >{SAMPLE_CODE}</textarea>
           </section>
 
