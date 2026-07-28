@@ -210,8 +210,14 @@ body {
 
 .brand {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: var(--sp-sm);
+}
+
+.brand-logo {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
 }
 
 .brand-name {

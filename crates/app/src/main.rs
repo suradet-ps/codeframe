@@ -41,6 +41,25 @@ fn App() -> impl IntoView {
       <div class="app">
           <header class="topbar">
               <div class="brand">
+                  <svg class="brand-logo" viewBox="0 0 512 512" width="32" height="32">
+                    <defs>
+                      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#09090b" />
+                        <stop offset="100%" stop-color="#18181b" />
+                      </linearGradient>
+                    </defs>
+                    <rect x="8" y="8" width="496" height="496" rx="116" fill="url(#bgGrad)" />
+                    <rect x="88" y="64" width="336" height="384" rx="20" fill="#ffffff" />
+                    <rect x="116" y="92" width="280" height="240" rx="12" fill="#0f172a" />
+                    <circle cx="144" cy="118" r="6" fill="#ef4444" />
+                    <circle cx="164" cy="118" r="6" fill="#f59e0b" />
+                    <circle cx="184" cy="118" r="6" fill="#10b981" />
+                    <rect x="144" y="152" width="125" height="11" rx="5.5" fill="#38bdf8" />
+                    <rect x="144" y="182" width="200" height="11" rx="5.5" fill="#cbd5e1" />
+                    <rect x="144" y="212" width="150" height="11" rx="5.5" fill="#c084fc" />
+                    <rect x="144" y="242" width="105" height="11" rx="5.5" fill="#34d399" />
+                    <circle cx="256" cy="392" r="18" fill="#71717a" />
+                  </svg>
                   <span class="brand-name">"CodeFrame"</span>
                   <span class="brand-tag">"code → png"</span>
               </div>
