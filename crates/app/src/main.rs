@@ -25,6 +25,7 @@ fn App() -> impl IntoView {
   let settings = Settings::new();
   let (exporting, set_exporting) = signal(false);
   let (export_error, set_export_error) = signal(Option::<String>::None);
+  let (copied, set_copied) = signal(false);
 
   // Sync the data-theme attribute on <html> whenever ui_theme changes.
   Effect::new(move |_| {
@@ -71,6 +72,17 @@ fn App() -> impl IntoView {
                   }}
                   <ThemeToggle settings />
                   <button
+                      class="copy-btn"
+                      disabled=move || exporting.get()
+                      on:click=move |_| {
+                          set_export_error.set(None);
+                          export::copy_to_clipboard(settings, set_copied, set_export_error);
+                      }
+                  >
+                      <CopyIcon />
+                      {move || if copied.get() { "Copied!" } else { "Copy" }}
+                  </button>
+                  <button
                       class="export-btn"
                       disabled=move || exporting.get()
                       on:click=move |_| {
@@ -109,6 +121,27 @@ fn DownloadIcon() -> impl IntoView {
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" x2="12" y1="15" y2="3" />
+      </svg>
+  }
+}
+
+/// lucide `clipboard` icon.
+#[component]
+fn CopyIcon() -> impl IntoView {
+  view! {
+      <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+      >
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
       </svg>
   }
 }

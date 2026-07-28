@@ -9,7 +9,7 @@ use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::{spawn_local, JsFuture};
-use web_sys::{Blob, HtmlAnchorElement, HtmlCanvasElement, Url};
+use web_sys::{Blob, ClipboardItem, HtmlAnchorElement, HtmlCanvasElement, Url};
 
 use crate::fonts::ensure_fonts_ready;
 use crate::state::Settings;
@@ -26,6 +26,27 @@ pub fn export_png(
     let result = do_export(settings).await;
     set_exporting.set(false);
     set_error.set(result.err());
+  });
+}
+
+/// Kick off a clipboard copy with the current settings.
+pub fn copy_to_clipboard(
+  settings: Settings,
+  set_copied: WriteSignal<bool>,
+  set_error: WriteSignal<Option<String>>,
+) {
+  set_copied.set(false);
+  spawn_local(async move {
+    let result = do_copy(settings).await;
+    if result.is_ok() {
+      set_copied.set(true);
+      // Reset after 2 seconds.
+      let handle = gloo_timers::future::TimeoutFuture::new(2000);
+      handle.await;
+      set_copied.set(false);
+    } else {
+      set_error.set(result.err());
+    }
   });
 }
 
@@ -92,4 +113,48 @@ async fn canvas_to_blob(canvas: &HtmlCanvasElement) -> Result<Blob, String> {
   value
     .dyn_into::<Blob>()
     .map_err(|_| "canvas.toBlob returned no data".to_string())
+}
+
+/// Render to an off-screen canvas and copy the PNG blob to the clipboard.
+async fn do_copy(settings: Settings) -> Result<(), String> {
+  let code = settings.code.get_untracked();
+  let language = settings.language.get_untracked();
+  let theme = settings.theme.get_untracked();
+  let options = settings.export_options();
+
+  ensure_fonts_ready(options.font_family.css_family()).await;
+
+  let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
+  let palette = theme_palette(theme).map_err(|e| e.to_string())?;
+
+  let window = web_sys::window().ok_or_else(|| "no window object".to_string())?;
+  let document = window
+    .document()
+    .ok_or_else(|| "no document object".to_string())?;
+  let canvas: HtmlCanvasElement = document
+    .create_element("canvas")
+    .map_err(|e| format!("{e:?}"))?
+    .unchecked_into();
+
+  render_to_canvas(&canvas, &tokens, &palette, &options).map_err(|e| e.to_string())?;
+
+  let blob = canvas_to_blob(&canvas).await?;
+
+  // Build a Record<string, Blob> for ClipboardItem.
+  let record = js_sys::Object::new();
+  js_sys::Reflect::set(&record, &"image/png".into(), &blob)
+    .map_err(|e| format!("{e:?}"))?;
+
+  let item = ClipboardItem::new_with_record_from_str_to_blob_promise(&record.into())
+    .map_err(|e| format!("{e:?}"))?;
+  let item_array = js_sys::Array::new();
+  item_array.push(&item);
+
+  let navigator = window.navigator();
+  let clipboard = navigator.clipboard();
+  let promise = clipboard.write(&item_array.into());
+  JsFuture::from(promise)
+    .await
+    .map_err(|e| format!("{e:?}"))?;
+  Ok(())
 }
