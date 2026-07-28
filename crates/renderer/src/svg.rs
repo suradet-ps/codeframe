@@ -166,8 +166,7 @@ pub fn render_svg(
 
     let center_y = layout.card_y + layout.header_height / 2.0;
     for (i, color) in TRAFFIC_LIGHT_COLORS.iter().enumerate() {
-      let cx =
-        layout.card_x + TRAFFIC_LIGHT_OFFSET_X + i as f64 * TRAFFIC_LIGHT_PITCH;
+      let cx = layout.card_x + TRAFFIC_LIGHT_OFFSET_X + i as f64 * TRAFFIC_LIGHT_PITCH;
       svg.push_str(&format!(
         "<circle cx=\"{cx}\" cy=\"{center_y}\" r=\"{r}\" fill=\"{color}\"/>",
         r = TRAFFIC_LIGHT_RADIUS,
