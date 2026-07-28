@@ -66,26 +66,26 @@ fn App() -> impl IntoView {
           <header class="topbar">
               <div class="brand">
                   <svg class="brand-logo" viewBox="0 0 512 512" width="32" height="32">
-                    <defs>
-                      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#09090b" />
-                        <stop offset="100%" stop-color="#18181b" />
-                      </linearGradient>
-                    </defs>
-                    <rect x="8" y="8" width="496" height="496" rx="116" fill="url(#bgGrad)" />
-                    <rect x="88" y="64" width="336" height="384" rx="20" fill="#ffffff" />
-                    <rect x="116" y="92" width="280" height="240" rx="12" fill="#0f172a" />
-                    <circle cx="144" cy="118" r="6" fill="#ef4444" />
-                    <circle cx="164" cy="118" r="6" fill="#f59e0b" />
-                    <circle cx="184" cy="118" r="6" fill="#10b981" />
-                    <rect x="144" y="152" width="125" height="11" rx="5.5" fill="#38bdf8" />
-                    <rect x="144" y="182" width="200" height="11" rx="5.5" fill="#cbd5e1" />
-                    <rect x="144" y="212" width="150" height="11" rx="5.5" fill="#c084fc" />
-                    <rect x="144" y="242" width="105" height="11" rx="5.5" fill="#34d399" />
-                    <circle cx="256" cy="392" r="18" fill="#71717a" />
+                      <defs>
+                          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#09090b" />
+                              <stop offset="100%" stop-color="#18181b" />
+                          </linearGradient>
+                      </defs>
+                      <rect x="8" y="8" width="496" height="496" rx="116" fill="url(#bgGrad)" />
+                      <rect x="88" y="64" width="336" height="384" rx="20" fill="#ffffff" />
+                      <rect x="116" y="92" width="280" height="240" rx="12" fill="#0f172a" />
+                      <circle cx="144" cy="118" r="6" fill="#ef4444" />
+                      <circle cx="164" cy="118" r="6" fill="#f59e0b" />
+                      <circle cx="184" cy="118" r="6" fill="#10b981" />
+                      <rect x="144" y="152" width="125" height="11" rx="5.5" fill="#38bdf8" />
+                      <rect x="144" y="182" width="200" height="11" rx="5.5" fill="#cbd5e1" />
+                      <rect x="144" y="212" width="150" height="11" rx="5.5" fill="#c084fc" />
+                      <rect x="144" y="242" width="105" height="11" rx="5.5" fill="#34d399" />
+                      <circle cx="256" cy="392" r="18" fill="#71717a" />
                   </svg>
                   <span class="brand-name">"CodeFrame"</span>
-                  <span class="brand-tag">"code → png"</span>
+                  <span class="brand-tag">"code → image"</span>
               </div>
               <div class="topbar-actions">
                   {move || {
@@ -104,6 +104,17 @@ fn App() -> impl IntoView {
                   >
                       <CopyIcon />
                       {move || if copied.get() { "Copied!" } else { "Copy" }}
+                  </button>
+                  <button
+                      class="export-btn export-btn-secondary"
+                      disabled=move || exporting.get()
+                      on:click=move |_| {
+                          set_export_error.set(None);
+                          export::export_svg(settings, set_exporting, set_export_error);
+                      }
+                  >
+                      <SvgIcon />
+                      {move || if exporting.get() { "Exporting…" } else { "Export SVG" }}
                   </button>
                   <button
                       class="export-btn"
@@ -165,6 +176,29 @@ fn CopyIcon() -> impl IntoView {
       >
           <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
           <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </svg>
+  }
+}
+
+/// lucide `file-code` icon for SVG export.
+#[component]
+fn SvgIcon() -> impl IntoView {
+  view! {
+      <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+      >
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+          <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+          <path d="m10 13-2 2 2 2" />
+          <path d="m14 17 2-2-2-2" />
       </svg>
   }
 }

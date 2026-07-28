@@ -93,6 +93,19 @@ pub struct Settings {
   pub line_height: RwSignal<f64>,
   pub tab_width: RwSignal<usize>,
   pub filename_template: RwSignal<String>,
+  pub custom_bg_enabled: RwSignal<bool>,
+  pub custom_bg_mode: RwSignal<CustomBgMode>,
+  pub custom_color_1: RwSignal<String>,
+  pub custom_color_2: RwSignal<String>,
+  /// When `Some(px)`, export width is clamped to this value and scale is
+  /// computed automatically. `None` means use the manual scale slider.
+  pub target_width: RwSignal<Option<f64>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CustomBgMode {
+  Solid,
+  Gradient,
 }
 
 impl Settings {
@@ -118,6 +131,11 @@ impl Settings {
       line_height: RwSignal::new(1.5),
       tab_width: RwSignal::new(4),
       filename_template: RwSignal::new("codeframe-{scale}x".to_string()),
+      custom_bg_enabled: RwSignal::new(false),
+      custom_bg_mode: RwSignal::new(CustomBgMode::Gradient),
+      custom_color_1: RwSignal::new("#6366f1".to_string()),
+      custom_color_2: RwSignal::new("#ec4899".to_string()),
+      target_width: RwSignal::new(None),
     }
   }
 
@@ -128,10 +146,15 @@ impl Settings {
 
   /// Snapshot of the current settings as renderer-ready options.
   pub fn export_options(&self) -> ExportOptions {
+    let background = if self.custom_bg_enabled.get() {
+      self.custom_background()
+    } else {
+      self.background.get()
+    };
     ExportOptions {
       scale: self.scale.get(),
       padding: self.padding.get(),
-      background: self.background.get(),
+      background,
       window_frame: self.window_frame.get(),
       line_numbers: self.line_numbers.get(),
       font_family: self.font.get(),
@@ -139,6 +162,16 @@ impl Settings {
       line_height: self.line_height.get(),
       corner_radius: self.corner_radius.get(),
       tab_width: self.tab_width.get(),
+    }
+  }
+
+  /// Build a `Background` from the custom color inputs.
+  pub fn custom_background(&self) -> Background {
+    let c1 = parse_hex(&self.custom_color_1.get());
+    let c2 = parse_hex(&self.custom_color_2.get());
+    match self.custom_bg_mode.get() {
+      CustomBgMode::Solid => Background::Solid(c1),
+      CustomBgMode::Gradient => Background::Gradient(vec![c1, c2]),
     }
   }
 
@@ -162,4 +195,20 @@ impl Settings {
       .replace("{theme}", &theme)
       .replace("{timestamp}", &date)
   }
+}
+
+/// Parse a `#rrggbb` hex string into an `RgbColor`. Falls back to black on
+/// invalid input.
+fn parse_hex(hex: &str) -> RgbColor {
+  let hex = hex.trim_start_matches('#');
+  if hex.len() == 6 {
+    if let (Ok(r), Ok(g), Ok(b)) = (
+      u8::from_str_radix(&hex[0..2], 16),
+      u8::from_str_radix(&hex[2..4], 16),
+      u8::from_str_radix(&hex[4..6], 16),
+    ) {
+      return RgbColor::new(r, g, b);
+    }
+  }
+  RgbColor::new(0, 0, 0)
 }

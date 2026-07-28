@@ -25,6 +25,11 @@ pub fn Preview(settings: Settings) -> impl IntoView {
     let code = settings.code.get();
     let language = settings.language.get();
     let theme = settings.theme.get();
+    // Track custom background signals so preview updates when they change.
+    let _ = settings.custom_bg_enabled.get();
+    let _ = settings.custom_bg_mode.get();
+    let _ = settings.custom_color_1.get();
+    let _ = settings.custom_color_2.get();
     let mut options = settings.export_options();
 
     let device_pixel_ratio = web_sys::window()

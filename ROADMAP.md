@@ -39,7 +39,7 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ## Current State (verified against the repo, not assumed)
 
 - **Stack**: Rust 2021 + Leptos 0.8 (CSR) + Trunk, `wasm32-unknown-unknown`,
-  deployed to Vercel as static assets behind security headers. Version `0.4.0`
+  deployed to Vercel as static assets behind security headers. Version `0.6.0`
   in `Cargo.toml`. No server - the browser does everything.
 - **Workspace**: 4 crates - `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
@@ -64,10 +64,12 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
   dividers, tonal surface shifts, black pill buttons, 8px spacing grid. All
   colors route through CSS custom properties in `:root`.
 - **Controls**: Code textarea, language/theme/font selects, font-size/padding/
-  corner-radius sliders, segmented scale selector (1x/2x/4x/8x + custom),
-  window-frame and line-number toggles, 6 background presets (solid + gradient).
-- **Tests**: 25 unit tests across `models` (4), `highlighter` (7), `renderer`
-  (8 in `layout.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
+  corner-radius/line-height sliders, segmented scale selector (1x/2x/4x/8x + custom),
+  target-width input, tab-width selector, window-frame and line-number toggles,
+  6 background presets + custom color picker (solid/gradient), filename template.
+  Keyboard: Ctrl/Cmd+Enter to export, Tab inserts spaces.
+- **Tests**: 30 unit tests across `models` (4), `highlighter` (7), `renderer`
+  (13 in `layout.rs` + `svg.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
 - **Deployment**: Vercel with SPA rewrite, security headers (X-Content-Type-Options,
   X-Frame-Options, Referrer-Policy, Permissions-Policy), immutable caching for
   static assets.
@@ -77,10 +79,13 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ### Current status
 
 Phase 1 (Foundation + CI Hardening) is **complete**. Version bumped to `v0.2.0`.
-PR #1 on `main` with all 7 CI jobs passing. The project now has:
+PR #1 on `main` with all 7 CI jobs passing.
 
 Phase 2 (Visual Identity) is **complete**. Version bumped to `v0.4.0`.
-PR #3 on `main`. The project now has:
+PR #3 on `main`.
+
+Phase 3 (Export & UX Depth) is **complete** (except split-screen). Version bumped to `v0.6.0`.
+PRs #7, #8 on `main`. The project now has:
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
@@ -94,15 +99,18 @@ PR #3 on `main`. The project now has:
 | 3 bundled fonts | Working |
 | Live preview (reactive, capped scale) | Working |
 | High-res PNG export (1–12x) | Working |
+| SVG export | Working |
 | Window frame (macOS traffic lights) | Working |
 | Line numbers | Working |
 | Background presets (6) | Working |
+| Custom background color picker (solid/gradient) | Working |
 | Font-size / padding / corner-radius controls | Working |
 | Line-height slider (1.0–2.5) | Working |
 | Tab-width control (2/4/8) | Working |
 | Copy to clipboard | Working |
 | Keyboard shortcuts (Ctrl/Cmd+Enter) | Working |
 | Export filename template | Working |
+| Custom export dimensions (target width) | Working |
 | Responsive layout (controls move below on small screens) | Working |
 | Ligature warning | Working |
 | Font loading guard (`document.fonts.ready`) | Working |
@@ -120,17 +128,13 @@ PR #3 on `main`. The project now has:
 
 ### Gaps found while reading the repo
 
-1. **No SVG export.** The token stream is generic enough to support it, but
-   no implementation exists. The README explicitly marks this as a known
-   limitation.
-
-2. **No undo/redo for the code editor.** The `<textarea>` has native undo,
+1. **No undo/redo for the code editor.** The `<textarea>` has native undo,
    but there is no history for the full settings state (theme, scale, etc.).
 
-3. **No URL sharing of settings.** Each page load starts from the same
+2. **No URL sharing of settings.** Each page load starts from the same
    defaults. There is no way to bookmark a specific configuration.
 
-4. **No offline story.** The app is a static site, but there is no service
+3. **No offline story.** The app is a static site, but there is no service
    worker, no manifest, no PWA support. It could work offline trivially
    (it's already CSR + static), but doesn't yet.
 
@@ -143,7 +147,8 @@ PR #3 on `main`. The project now has:
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
 | **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
-| **v0.6** | Export & UX | SVG export, custom bg color picker, custom export dimensions, split-screen comparison |
+| **v0.6** | Export & UX | SVG export, custom bg color picker, custom export dimensions ✅ |
+| **v0.7** | Export & UX | Split-screen comparison |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
@@ -233,7 +238,7 @@ perf baseline doc exists; favicon in `index.html`. ✅ **All met.**
 The current controls are functional but minimal. This phase adds the
 adjustments that make the output *yours*, plus export formats beyond PNG.
 
-- [ ] **SVG export** - walk the same `Token` + `Layout` data, emit SVG
+- [x] **SVG export** - walk the same `Token` + `Layout` data, emit SVG
   `<text>` elements with `<tspan>` per token (color, font-style). The
   layout math in `layout.rs` is already pure and testable - reuse it
   directly. Offer SVG as a second download option (button or dropdown).
@@ -250,7 +255,7 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   `layout.rs`. Expose as a select (2 / 4 / 8) so users can match their
   editor's settings.
 
-- [ ] **Custom background color picker** - beyond the 6 presets, allow
+- [x] **Custom background color picker** - beyond the 6 presets, allow
   the user to pick a solid color or define a two-stop gradient via a
   simple color input. The `Background` enum in `models` already supports
   `Solid(RgbColor)` and `Gradient(Vec<RgbColor>)`.
@@ -267,7 +272,7 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   undo (native textarea), `Ctrl/Cmd+Shift+Z` redo. Document in the UI
   with a subtle hint or a `?` help overlay.
 
-- [ ] **Custom export dimensions** - let the user set a target width
+- [x] **Custom export dimensions** - let the user set a target width
   (e.g. 1200px for Twitter, 1920 for a slide) and compute the scale
   from that, instead of always starting from logical size × scale.
 
