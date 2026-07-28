@@ -97,6 +97,7 @@ pub struct Settings {
   pub ui_theme: RwSignal<UiTheme>,
   pub line_height: RwSignal<f64>,
   pub tab_width: RwSignal<usize>,
+  pub filename_template: RwSignal<String>,
 }
 
 impl Settings {
@@ -121,6 +122,7 @@ impl Settings {
       ui_theme: RwSignal::new(initial_ui_theme),
       line_height: RwSignal::new(1.5),
       tab_width: RwSignal::new(4),
+      filename_template: RwSignal::new("codeframe-{scale}x".to_string()),
     }
   }
 
@@ -143,5 +145,25 @@ impl Settings {
       corner_radius: self.corner_radius.get(),
       tab_width: self.tab_width.get(),
     }
+  }
+
+  /// Expand the filename template with current settings.
+  pub fn expanded_filename(&self) -> String {
+    let template = self.filename_template.get();
+    let scale = self.scale.get();
+    let language = self.language.get().display_name().to_lowercase();
+    let theme = self.theme.get().display_name().to_lowercase().replace(' ', "-");
+    let timestamp: String = js_sys::Date::new_0().to_iso_string().into();
+    // Extract date part (YYYY-MM-DD) from ISO string.
+    let date = timestamp
+      .split('T')
+      .next()
+      .unwrap_or("unknown")
+      .to_string();
+    template
+      .replace("{scale}", &format!("{}", scale as u32))
+      .replace("{language}", &language)
+      .replace("{theme}", &theme)
+      .replace("{timestamp}", &date)
   }
 }

@@ -80,7 +80,7 @@ async fn do_export(settings: Settings) -> Result<(), String> {
     .map_err(|e| format!("{e:?}"))?
     .unchecked_into();
   anchor.set_href(&url);
-  anchor.set_download(&format!("codeframe-{}x.png", options.scale));
+  anchor.set_download(&format!("{}.png", settings.expanded_filename()));
   anchor.click();
   let _ = Url::revoke_object_url(&url);
   Ok(())

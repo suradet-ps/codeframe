@@ -263,6 +263,18 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
+              <label class="control-label">"Filename template"</label>
+              <input
+                  class="filename-input"
+                  type="text"
+                  prop:value=move || settings.filename_template.get()
+                  on:input=move |ev| settings.filename_template.set(event_target_value(&ev))
+                  title="Placeholders: {scale}, {language}, {theme}, {timestamp}"
+              />
+              <p class="hint">"Preview: " {move || format!("{}.png", settings.expanded_filename())}</p>
+          </section>
+
+          <section>
               <label class="control-label">"Background"</label>
               <div class="swatches">
                   {Background::presets()
