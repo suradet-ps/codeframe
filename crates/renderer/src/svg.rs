@@ -4,7 +4,7 @@
 //! to produce a standalone SVG string. Fonts are referenced by name
 //! (system fonts or bundled via the app's `@font-face`).
 
-use codeframe_models::{Background, ExportOptions, FontStyle, ThemePalette, Token};
+use codeframe_models::{Background, ExportOptions, FontStyle, GradientDir, ThemePalette, Token};
 
 use crate::layout::{
   compute_layout, split_tokens_into_lines, Layout, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH,
@@ -14,19 +14,14 @@ use crate::layout::{
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
-/// Convert a CSS angle (degrees) to SVG linearGradient x1/y1/x2/y2 percentages.
-/// CSS convention: 0° = bottom→top, 90° = left→right, 180° = top→bottom,
-/// 270° = right→left.
-fn angle_to_svg_coords(angle: f64) -> (f64, f64, f64, f64) {
-  let rad = angle.to_radians();
-  let dx = rad.sin();
-  let dy = -rad.cos();
-  (
-    50.0 - dx * 50.0,
-    50.0 - dy * 50.0,
-    50.0 + dx * 50.0,
-    50.0 + dy * 50.0,
-  )
+/// Map a [`GradientDir`] to SVG linearGradient x1/y1/x2/y2 percentages.
+fn dir_to_svg_coords(dir: GradientDir) -> (f64, f64, f64, f64) {
+  match dir {
+    GradientDir::ToBottom => (50.0, 0.0, 50.0, 100.0),
+    GradientDir::ToTop => (50.0, 100.0, 50.0, 0.0),
+    GradientDir::ToRight => (0.0, 50.0, 100.0, 50.0),
+    GradientDir::ToLeft => (100.0, 50.0, 0.0, 50.0),
+  }
 }
 
 /// Escape special XML characters.
@@ -107,8 +102,8 @@ pub fn render_svg(
   }
   // Background gradient defs.
   match &options.background {
-    Background::LinearGradient { colors, angle } if colors.len() >= 2 => {
-      let (x1, y1, x2, y2) = angle_to_svg_coords(*angle);
+    Background::LinearGradient { colors, dir } if colors.len() >= 2 => {
+      let (x1, y1, x2, y2) = dir_to_svg_coords(*dir);
       svg.push_str(&format!(
         "<linearGradient id=\"bg\" x1=\"{x1:.1}%\" y1=\"{y1:.1}%\" x2=\"{x2:.1}%\" y2=\"{y2:.1}%\">"
       ));
@@ -305,8 +300,8 @@ pub fn render_split_svg(
     );
   }
   match &options.background {
-    Background::LinearGradient { colors, angle } if colors.len() >= 2 => {
-      let (x1, y1, x2, y2) = angle_to_svg_coords(*angle);
+    Background::LinearGradient { colors, dir } if colors.len() >= 2 => {
+      let (x1, y1, x2, y2) = dir_to_svg_coords(*dir);
       svg.push_str(&format!(
         "<linearGradient id=\"bg\" x1=\"{x1:.1}%\" y1=\"{y1:.1}%\" x2=\"{x2:.1}%\" y2=\"{y2:.1}%\">"
       ));

@@ -6,7 +6,7 @@
 //! (rounded rect, optional drop shadow) → traffic lights → tokens →
 //! line numbers.
 
-use codeframe_models::{Background, ExportOptions, FontStyle, ThemePalette, Token};
+use codeframe_models::{Background, ExportOptions, FontStyle, GradientDir, ThemePalette, Token};
 use thiserror::Error;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
@@ -23,16 +23,14 @@ pub const MAX_CANVAS_DIMENSION: f64 = 16384.0;
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
-/// Convert a CSS angle (degrees) to canvas linear-gradient coordinates.
-/// CSS convention: 0° = bottom→top, 90° = left→right, 180° = top→bottom,
-/// 270° = right→left.
-fn angle_to_coords(angle: f64, w: f64, h: f64) -> (f64, f64, f64, f64) {
-  let rad = angle.to_radians();
-  let dx = rad.sin();
-  let dy = -rad.cos();
-  let cx = w / 2.0;
-  let cy = h / 2.0;
-  (cx - dx * cx, cy - dy * cy, cx + dx * cx, cy + dy * cy)
+/// Map a [`GradientDir`] to canvas linear-gradient start/end coordinates.
+fn dir_to_coords(dir: GradientDir, w: f64, h: f64) -> (f64, f64, f64, f64) {
+  match dir {
+    GradientDir::ToBottom => (w / 2.0, 0.0, w / 2.0, h),
+    GradientDir::ToTop => (w / 2.0, h, w / 2.0, 0.0),
+    GradientDir::ToRight => (0.0, h / 2.0, w, h / 2.0),
+    GradientDir::ToLeft => (w, h / 2.0, 0.0, h / 2.0),
+  }
 }
 
 /// Errors that can occur while measuring, sizing, or drawing the canvas.
@@ -223,8 +221,8 @@ pub fn draw_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
     }
-    Background::LinearGradient { colors, angle } => {
-      let (x1, y1, x2, y2) = angle_to_coords(*angle, layout.canvas_width, layout.canvas_height);
+    Background::LinearGradient { colors, dir } => {
+      let (x1, y1, x2, y2) = dir_to_coords(*dir, layout.canvas_width, layout.canvas_height);
       let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
       let last = colors.len() - 1;
       for (index, color) in colors.iter().enumerate() {
@@ -490,8 +488,8 @@ pub fn draw_split_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
     }
-    Background::LinearGradient { colors, angle } => {
-      let (x1, y1, x2, y2) = angle_to_coords(*angle, split.canvas_width, split.canvas_height);
+    Background::LinearGradient { colors, dir } => {
+      let (x1, y1, x2, y2) = dir_to_coords(*dir, split.canvas_width, split.canvas_height);
       let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
       let last = colors.len() - 1;
       for (index, color) in colors.iter().enumerate() {

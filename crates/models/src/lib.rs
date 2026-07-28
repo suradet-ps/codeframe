@@ -50,14 +50,34 @@ pub struct Token {
   pub font_style: FontStyle,
 }
 
+/// Direction for a linear gradient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum GradientDir {
+  ToBottom,
+  ToTop,
+  ToRight,
+  ToLeft,
+}
+
+impl GradientDir {
+  /// CSS angle in degrees for this direction.
+  pub fn css_angle(self) -> f64 {
+    match self {
+      GradientDir::ToBottom => 180.0,
+      GradientDir::ToTop => 0.0,
+      GradientDir::ToRight => 90.0,
+      GradientDir::ToLeft => 270.0,
+    }
+  }
+}
+
 /// Canvas backdrop painted behind the code card.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Background {
   Solid(RgbColor),
   LinearGradient {
     colors: Vec<RgbColor>,
-    /// Angle in degrees: 0 = left→right, 90 = top→bottom, 180 = right→left, etc.
-    angle: f64,
+    dir: GradientDir,
   },
   RadialGradient {
     colors: Vec<RgbColor>,
@@ -76,28 +96,28 @@ impl Background {
         "Top Glow",
         Background::LinearGradient {
           colors: vec![white, black],
-          angle: 180.0,
+          dir: GradientDir::ToBottom,
         },
       ),
       (
         "Bottom Glow",
         Background::LinearGradient {
           colors: vec![black, white],
-          angle: 0.0,
+          dir: GradientDir::ToTop,
         },
       ),
       (
         "Left Beam",
         Background::LinearGradient {
           colors: vec![white, black],
-          angle: 90.0,
+          dir: GradientDir::ToRight,
         },
       ),
       (
         "Right Beam",
         Background::LinearGradient {
           colors: vec![black, white],
-          angle: 270.0,
+          dir: GradientDir::ToLeft,
         },
       ),
       (

@@ -14,9 +14,13 @@ const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
 fn background_css(background: &Background) -> String {
   match background {
     Background::Solid(color) => color.to_css(),
-    Background::LinearGradient { colors, angle } => {
+    Background::LinearGradient { colors, dir } => {
       let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
-      format!("linear-gradient({angle}deg, {})", stops.join(", "))
+      format!(
+        "linear-gradient({}deg, {})",
+        dir.css_angle(),
+        stops.join(", ")
+      )
     }
     Background::RadialGradient { colors } => {
       let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
