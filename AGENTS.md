@@ -192,4 +192,4 @@ boot, live re-render on settings change, line-number gutter, theme switching,
 - `trunk build --release` - optimized static site into `dist/` (wasm-opt `-Oz`)
 - `cargo test --workspace` - unit tests + doctests (no WASM runtime needed)
 - `cargo clippy --workspace --all-targets -- -D warnings` / `cargo fmt --all --check`
-- `cargo check -p CodeFrame-app --target wasm32-unknown-unknown` - fast WASM compile check
+- `cargo check -p codeframe-app --target wasm32-unknown-unknown` - fast WASM compile check

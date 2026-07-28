@@ -28,7 +28,7 @@ Every PR must pass these 5 jobs (defined in `.github/workflows/ci.yml`):
 
 | Job | Command | What it catches |
 |-----|---------|-----------------|
-| Check | `cargo check -p CodeFrame-app --target wasm32-unknown-unknown` | Compile errors in the WASM target |
+| Check | `cargo check -p codeframe-app --target wasm32-unknown-unknown` | Compile errors in the WASM target |
 | Clippy | `cargo clippy --workspace --all-targets -- -D clippy::correctness -D clippy::suspicious` | Correctness and suspicious lints |
 | Format | `cargo fmt --all --check` | Formatting drift |
 | Test | `cargo test --lib` | Unit test failures |
@@ -43,7 +43,7 @@ Run all checks locally before pushing:
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D clippy::correctness -D clippy::suspicious
 cargo test --lib
-cargo check -p CodeFrame-app --target wasm32-unknown-unknown
+cargo check -p codeframe-app --target wasm32-unknown-unknown
 trunk build --release
 ```
 
