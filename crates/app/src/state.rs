@@ -152,14 +152,15 @@ impl Settings {
     let template = self.filename_template.get();
     let scale = self.scale.get();
     let language = self.language.get().display_name().to_lowercase();
-    let theme = self.theme.get().display_name().to_lowercase().replace(' ', "-");
+    let theme = self
+      .theme
+      .get()
+      .display_name()
+      .to_lowercase()
+      .replace(' ', "-");
     let timestamp: String = js_sys::Date::new_0().to_iso_string().into();
     // Extract date part (YYYY-MM-DD) from ISO string.
-    let date = timestamp
-      .split('T')
-      .next()
-      .unwrap_or("unknown")
-      .to_string();
+    let date = timestamp.split('T').next().unwrap_or("unknown").to_string();
     template
       .replace("{scale}", &format!("{}", scale as u32))
       .replace("{language}", &language)

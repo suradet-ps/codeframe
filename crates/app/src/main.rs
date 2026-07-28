@@ -50,19 +50,12 @@ fn App() -> impl IntoView {
       if ctrl && ev.key() == "Enter" {
         ev.prevent_default();
         set_export_error_kbd.set(None);
-        export::export_png(
-          settings_kbd,
-          set_exporting_kbd,
-          set_export_error_kbd,
-        );
+        export::export_png(settings_kbd, set_exporting_kbd, set_export_error_kbd);
       }
     }) as Box<dyn FnMut(_)>);
     if let Some(win) = window() {
       if let Some(doc) = win.document() {
-        let _ = doc.add_event_listener_with_callback(
-          "keydown",
-          listener.as_ref().unchecked_ref(),
-        );
+        let _ = doc.add_event_listener_with_callback("keydown", listener.as_ref().unchecked_ref());
         listener.forget();
       }
     }

@@ -142,10 +142,9 @@ async fn do_copy(settings: Settings) -> Result<(), String> {
 
   // Build a Record<string, Blob> for ClipboardItem.
   let record = js_sys::Object::new();
-  js_sys::Reflect::set(&record, &"image/png".into(), &blob)
-    .map_err(|e| format!("{e:?}"))?;
+  js_sys::Reflect::set(&record, &"image/png".into(), &blob).map_err(|e| format!("{e:?}"))?;
 
-  let item = ClipboardItem::new_with_record_from_str_to_blob_promise(&record.into())
+  let item = ClipboardItem::new_with_record_from_str_to_blob_promise(&record)
     .map_err(|e| format!("{e:?}"))?;
   let item_array = js_sys::Array::new();
   item_array.push(&item);
