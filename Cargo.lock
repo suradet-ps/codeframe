@@ -173,12 +173,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "codeshot-app"
+name = "codeframe-app"
 version = "0.4.0"
 dependencies = [
- "codeshot-highlighter",
- "codeshot-models",
- "codeshot-renderer",
+ "codeframe-highlighter",
+ "codeframe-models",
+ "codeframe-renderer",
  "console_error_panic_hook",
  "js-sys",
  "leptos",
@@ -189,26 +189,26 @@ dependencies = [
 ]
 
 [[package]]
-name = "codeshot-highlighter"
+name = "codeframe-highlighter"
 version = "0.4.0"
 dependencies = [
- "codeshot-models",
+ "codeframe-models",
  "syntect",
  "thiserror 2.0.19",
 ]
 
 [[package]]
-name = "codeshot-models"
+name = "codeframe-models"
 version = "0.4.0"
 dependencies = [
  "serde",
 ]
 
 [[package]]
-name = "codeshot-renderer"
+name = "codeframe-renderer"
 version = "0.4.0"
 dependencies = [
- "codeshot-models",
+ "codeframe-models",
  "thiserror 2.0.19",
  "wasm-bindgen",
  "web-sys",

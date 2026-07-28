@@ -1,6 +1,6 @@
 [package]
-name = "codeshot-models"
-description = "Shared vocabulary types for CodeShot (no platform dependencies beyond serde)"
+name = "codeframe-models"
+description = "Shared vocabulary types for CodeFrame (no platform dependencies beyond serde)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

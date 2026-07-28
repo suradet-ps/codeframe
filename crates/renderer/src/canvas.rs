@@ -6,7 +6,7 @@
 //! (rounded rect, optional drop shadow) → traffic lights → tokens →
 //! line numbers.
 
-use codeshot_models::{Background, ExportOptions, FontStyle, ThemePalette, Token};
+use codeframe_models::{Background, ExportOptions, FontStyle, ThemePalette, Token};
 use thiserror::Error;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
@@ -131,15 +131,15 @@ fn rounded_rect_path(
 /// state - [`draw_prepared`] re-applies every style it needs.
 ///
 /// ```no_run
-/// use codeshot_models::{ExportOptions, FontStyle, RgbColor, Token};
-/// # fn f(canvas: web_sys::HtmlCanvasElement) -> Result<(), codeshot_renderer::RenderError> {
+/// use codeframe_models::{ExportOptions, FontStyle, RgbColor, Token};
+/// # fn f(canvas: web_sys::HtmlCanvasElement) -> Result<(), codeframe_renderer::RenderError> {
 /// let tokens = vec![Token {
 ///     text: "fn main() {}".to_string(),
 ///     color: RgbColor::new(0xf8, 0xf8, 0xf2),
 ///     font_style: FontStyle::default(),
 /// }];
 /// let options = ExportOptions::default();
-/// let (ctx, prepared) = codeshot_renderer::canvas::prepare(&canvas, &tokens, &options)?;
+/// let (ctx, prepared) = codeframe_renderer::canvas::prepare(&canvas, &tokens, &options)?;
 /// # Ok(())
 /// # }
 /// ```
@@ -329,8 +329,8 @@ pub fn draw_prepared(
 /// layout (useful for CSS-sizing a preview canvas).
 ///
 /// ```no_run
-/// use codeshot_models::{ExportOptions, FontStyle, RgbColor, ThemePalette, Token};
-/// # fn f(canvas: web_sys::HtmlCanvasElement) -> Result<(), codeshot_renderer::RenderError> {
+/// use codeframe_models::{ExportOptions, FontStyle, RgbColor, ThemePalette, Token};
+/// # fn f(canvas: web_sys::HtmlCanvasElement) -> Result<(), codeframe_renderer::RenderError> {
 /// let tokens = vec![Token {
 ///     text: "fn main() {}".to_string(),
 ///     color: RgbColor::new(0xf8, 0xf8, 0xf2),
@@ -340,7 +340,7 @@ pub fn draw_prepared(
 ///     background: RgbColor::new(0x28, 0x2a, 0x36),
 ///     foreground: RgbColor::new(0xf8, 0xf8, 0xf2),
 /// };
-/// let layout = codeshot_renderer::canvas::render_to_canvas(
+/// let layout = codeframe_renderer::canvas::render_to_canvas(
 ///     &canvas, &tokens, &palette, &ExportOptions::default(),
 /// )?;
 /// # Ok(())

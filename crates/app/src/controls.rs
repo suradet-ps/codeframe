@@ -1,7 +1,7 @@
 //! Sidebar with every user control: code input, language/theme/font pickers,
 //! sliders, scale selector, toggles, and background swatches.
 
-use codeshot_models::{Background, FontChoice, Language, ThemeChoice};
+use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
 
 use crate::state::{Settings, SAMPLE_CODE};

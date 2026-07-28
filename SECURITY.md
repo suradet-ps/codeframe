@@ -1,10 +1,10 @@
-# SECURITY.md - CodeShot
+# SECURITY.md - CodeFrame
 
-> CodeShot's security posture. Read this before filing a vulnerability report.
+> CodeFrame's security posture. Read this before filing a vulnerability report.
 
 ---
 
-## What CodeShot Is
+## What CodeFrame Is
 
 A **static website** deployed to Vercel. The entire application is:
 
@@ -19,7 +19,7 @@ server-side logic** of any kind. The browser does everything.
 
 ---
 
-## What CodeShot Does Not Collect
+## What CodeFrame Does Not Collect
 
 - **No cookies.** Zero. The app sets no cookies and reads no cookies.
 - **No localStorage beyond theme preference.** The only thing stored in
@@ -93,7 +93,7 @@ CSR rendering.
 ## Known Limitations
 
 - **Client-side only.** There is no server to enforce anything. A motivated
-  user could modify the WASM or DOM. This is by design - CodeShot is a
+  user could modify the WASM or DOM. This is by design - CodeFrame is a
   tool, not a DRM system. The output image is what it is.
 - **No HTTPS enforcement on localhost.** During development (`trunk serve`),
   the app runs on `http://127.0.0.1:8080`. This is expected and only
@@ -128,6 +128,6 @@ in the release notes.
 
 ## Summary
 
-CodeShot is one of the simplest possible web applications: a static site
+CodeFrame is one of the simplest possible web applications: a static site
 that converts text to pixels in the browser. There is no attack surface
 beyond what the browser itself provides. Your code never leaves your machine.

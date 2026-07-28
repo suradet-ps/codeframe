@@ -1,4 +1,4 @@
-# ROADMAP.md - CodeShot
+# ROADMAP.md - CodeFrame
 
 > Architecture document for the project's direction, written from reading its
 > own code - not from assumptions. Read this file in full before planning work.
@@ -7,7 +7,7 @@
 
 ## North Star
 
-**CodeShot will be the fastest, most private code-to-image tool that works
+**CodeFrame will be the fastest, most private code-to-image tool that works
 everywhere - offline, on any device, with zero data leaving the browser.**
 
 Not a code editor. Not a snippet manager. Not a collaboration platform. A
@@ -16,19 +16,19 @@ code into a beautiful, high-resolution image in under a second. The image
 is yours. The code is yours. Nothing is tracked. Nothing is stored. Nothing
 leaves your machine.
 
-If you can describe CodeShot in one sentence, it should be:
+If you can describe CodeFrame in one sentence, it should be:
 > *Open. Paste. Screenshot. Done.*
 
 ---
 
-## What CodeShot is
+## What CodeFrame is
 
 A **quiet, focused tool** that turns source code into beautiful PNG images,
 entirely in the browser. No server. No tracking. No watermarks. You type (or
 paste) code, tweak a few knobs, and get a high-resolution image ready for
 slides, docs, or sharing.
 
-**What CodeShot is not.** Not a code editor. Not a snippet manager. Not a
+**What CodeFrame is not.** Not a code editor. Not a snippet manager. Not a
 collaboration tool. It does one thing - code to image - and does it with
 precision. The single-function, zero-server, privacy-first shape is the
 product, not a stepping stone to something larger. Features that break that
@@ -165,7 +165,7 @@ The project already references `DESIGN.md`, `CONTRIBUTING.md`, and
 security should be enforced from day one, not bolted on later. This
 phase does both: writes the missing docs *and* tightens CI.
 
-- [x] **Write `DESIGN.md`** - an authoritative spec for CodeShot's visual
+- [x] **Write `DESIGN.md`** - an authoritative spec for CodeFrame's visual
   identity: the editorial monochrome system, palette tokens, type scale,
   spacing grid, elevation model, and the *why* behind each choice. Reference
   the existing `:root` tokens in `style.css` as the source of truth. This
@@ -269,7 +269,7 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   "paste from clipboard" button for quick import.
 
 - [ ] **Export filename template** - allow the user to set a pattern
-  (default: `codeshot-{scale}x.png`). Simple string interpolation:
+  (default: `CodeFrame-{scale}x.png`). Simple string interpolation:
   `{language}`, `{theme}`, `{timestamp}`.
 
 - [ ] **Keyboard shortcuts** - `Ctrl/Cmd+Enter` to export, `Ctrl/Cmd+Z`
@@ -327,7 +327,7 @@ elements; contrast ratios pass AA in all three themes.
 
 ## Phase 5: Offline-First (PWA)
 
-CodeShot is already a static site with no server dependency. Making it
+CodeFrame is already a static site with no server dependency. Making it
 a PWA is a natural fit - and it means the tool works on planes, trains,
 and bad café wifi.
 
@@ -339,10 +339,10 @@ and bad café wifi.
   The app has no dynamic API calls, so this is straightforward.
 
 - [ ] **Install prompt** - detect `beforeinstallprompt`, show an
-  "Install CodeShot" button in the topbar. Dismiss after install.
+  "Install CodeFrame" button in the topbar. Dismiss after install.
 
 - [ ] **Offline indicator** - a calm banner when the network is offline
-  ("You're offline - CodeShot still works"). Dismiss when back online.
+  ("You're offline - CodeFrame still works"). Dismiss when back online.
 
 **Acceptance:** `trunk build --release` + deploy to any static host; the app
 loads and fully functions with network disabled; installable on Chrome/Edge/
@@ -454,31 +454,31 @@ Phase 7 (security hardening)
 Phase 8 (v1.0.0)
 ```
 
-Phase 1 comes first on purpose: CodeShot cannot ship without the documents
+Phase 1 comes first on purpose: CodeFrame cannot ship without the documents
 it already references, and `cargo audit`/`cargo deny` should catch
 vulnerabilities from day one - not after they've accumulated. Phase 2 follows
 with the visual identity (dark mode) because users notice a white sidebar at
-2 AM immediately. Everything after deepens the one thing CodeShot does:
+2 AM immediately. Everything after deepens the one thing CodeFrame does:
 turning code into beautiful images.
 
 ---
 
 ## Out of Scope (drawn on purpose, to stay a focused tool)
 
-Each of these is valuable *for a different product*. CodeShot stays small
+Each of these is valuable *for a different product*. CodeFrame stays small
 and single-purpose on purpose:
 
-- **Cloud storage / user accounts** - CodeShot is stateless by design.
+- **Cloud storage / user accounts** - CodeFrame is stateless by design.
   There is no user data to store server-side. The moment you add accounts,
   you add a server, a privacy surface, and a maintenance burden. Out of
   scope.
 
-- **Collaboration / sharing** - CodeShot generates images for sharing;
+- **Collaboration / sharing** - CodeFrame generates images for sharing;
   it is not a platform for sharing code. No team features, no shared
   workspaces, no comments.
 
 - **Code editing features** - autocomplete, linting, multi-file support,
-  git integration. CodeShot has a textarea, not an editor. That is
+  git integration. CodeFrame has a textarea, not an editor. That is
   intentional.
 
 - **Server-side rendering / headless browser export** - defeats the
@@ -494,7 +494,7 @@ and single-purpose on purpose:
   Adds a network dependency, a cost surface, and a privacy concern that
   a quiet offline tool should not carry.
 
-## Future / Ecosystem (post-1.0, if they keep CodeShot focused)
+## Future / Ecosystem (post-1.0, if they keep CodeFrame focused)
 
 - **Theme editor** - a visual tool to create custom `.tmTheme` files
   within the app, with live preview on the current code. Still single-
@@ -521,7 +521,7 @@ and single-purpose on purpose:
 
 ## Vision After v1.0.0
 
-CodeShot's North Star does not change after v1.0. It gets sharper.
+CodeFrame's North Star does not change after v1.0. It gets sharper.
 
 **The goal is to be the default code-screenshot tool** - the one people reach
 for instinctively, the way they reach for `curl` or `jq`. Not because it has
@@ -546,7 +546,7 @@ Post-1.0, the priorities are:
    appears, does its job, and gets out of the way. That quietness is the
    feature, and it is non-negotiable.
 
-If CodeShot ships v1.0 with these four properties intact, it will have
+If CodeFrame ships v1.0 with these four properties intact, it will have
 earned its place - not by being the biggest tool, but by being the one
 that respects the user's time, attention, and privacy more than any
 alternative.

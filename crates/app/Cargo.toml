@@ -1,18 +1,18 @@
 [package]
-name = "codeshot-app"
-description = "Leptos CSR frontend for CodeShot"
+name = "codeframe-app"
+description = "Leptos CSR frontend for CodeFrame"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "codeshot"
+name = "codeframe"
 path = "src/main.rs"
 
 [dependencies]
-codeshot-models = { path = "../models" }
-codeshot-highlighter = { path = "../highlighter" }
-codeshot-renderer = { path = "../renderer" }
+codeframe-models = { path = "../models" }
+codeframe-highlighter = { path = "../highlighter" }
+codeframe-renderer = { path = "../renderer" }
 leptos = { version = "0.8", features = ["csr"] }
 console_error_panic_hook = "0.1"
 thiserror = "2"
