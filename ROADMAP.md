@@ -66,8 +66,8 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Controls**: Code textarea, language/theme/font selects, font-size/padding/
   corner-radius sliders, segmented scale selector (1x/2x/4x/8x + custom),
   window-frame and line-number toggles, 6 background presets (solid + gradient).
-- **Tests**: 19 unit tests across `models` (4), `highlighter` (7), `renderer`
-  (8 in `layout.rs`). All pure Rust, no WASM runtime needed.
+- **Tests**: 25 unit tests across `models` (4), `highlighter` (7), `renderer`
+  (8 in `layout.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
 - **Deployment**: Vercel with SPA rewrite, security headers (X-Content-Type-Options,
   X-Frame-Options, Referrer-Policy, Permissions-Policy), immutable caching for
   static assets.
@@ -90,7 +90,7 @@ PR #3 on `main`. The project now has:
 | Feature | Status |
 |---------|--------|
 | Syntax highlighting (15 languages) | Working |
-| 4 themes (dark + light) | Working |
+| 7 syntax themes | Working |
 | 3 bundled fonts | Working |
 | Live preview (reactive, capped scale) | Working |
 | High-res PNG export (1–12x) | Working |
@@ -98,6 +98,11 @@ PR #3 on `main`. The project now has:
 | Line numbers | Working |
 | Background presets (6) | Working |
 | Font-size / padding / corner-radius controls | Working |
+| Line-height slider (1.0–2.5) | Working |
+| Tab-width control (2/4/8) | Working |
+| Copy to clipboard | Working |
+| Keyboard shortcuts (Ctrl/Cmd+Enter) | Working |
+| Export filename template | Working |
 | Responsive layout (controls move below on small screens) | Working |
 | Ligature warning | Working |
 | Font loading guard (`document.fonts.ready`) | Working |
@@ -109,38 +114,23 @@ PR #3 on `main`. The project now has:
 | CONTRIBUTING.md | Exists |
 | SECURITY.md | Exists |
 | Favicon (SVG) | Exists |
+| Navbar logo (SVG) | Exists |
 | `cargo audit` | Passes |
 | `cargo deny` | Passes |
 
 ### Gaps found while reading the repo
 
-1. **No dark/light theme toggle for the UI itself.** The canvas output has
-   4 themes, but the controls and chrome are always light. A user working in
-   Dracula at 2 AM stares at a white sidebar.
-
-2. **Inline hex colors leak past the token system.** The renderer's
-   `TRAFFIC_LIGHT_COLORS` array in `canvas.rs` uses `["#ff5f57", "#febc2e",
-   "#28c840"]` - hardcoded, not routable through the design system. The
-   preview canvas shadow in `style.css` uses `rgba(0, 0, 0, 0.08)` and
-   `rgba(0, 0, 0, 0.12)` inline.
-
-3. **No SVG export.** The token stream is generic enough to support it, but
+1. **No SVG export.** The token stream is generic enough to support it, but
    no implementation exists. The README explicitly marks this as a known
    limitation.
 
-4. **No clipboard integration.** Users must use the file-download flow
-   even when they just want to paste the image into Slack or a slide.
-
-5. **No undo/redo for the code editor.** The `<textarea>` has native undo,
+2. **No undo/redo for the code editor.** The `<textarea>` has native undo,
    but there is no history for the full settings state (theme, scale, etc.).
 
-6. **No URL sharing of settings.** Each page load starts from the same
+3. **No URL sharing of settings.** Each page load starts from the same
    defaults. There is no way to bookmark a specific configuration.
 
-7. **`line_height` is hardcoded to 1.5** in `Settings::export_options()`.
-   Not exposed as a user control, not documented as intentional.
-
-8. **No offline story.** The app is a static site, but there is no service
+4. **No offline story.** The app is a static site, but there is no service
    worker, no manifest, no PWA support. It could work offline trivially
    (it's already CSR + static), but doesn't yet.
 
@@ -152,7 +142,8 @@ PR #3 on `main`. The project now has:
 |-----------|-------|------------|
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
-| **v0.6** | Export & UX | SVG export, copy to clipboard, new controls (line-height, tab-width, custom bg), keyboard shortcuts, split-screen comparison |
+| **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
+| **v0.6** | Export & UX | SVG export, custom bg color picker, custom export dimensions, split-screen comparison |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
@@ -247,15 +238,15 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   layout math in `layout.rs` is already pure and testable - reuse it
   directly. Offer SVG as a second download option (button or dropdown).
 
-- [ ] **Copy to clipboard** - `navigator.clipboard.write()` with a
+- [x] **Copy to clipboard** - `navigator.clipboard.write()` with a
   `ClipboardItem` holding the PNG blob. A "Copy" button next to the
   "Export" button. Show a brief "Copied!" confirmation.
 
-- [ ] **Line-height control** - expose `line_height` as a slider (range
+- [x] **Line-height control** - expose `line_height` as a slider (range
   1.0–2.5, step 0.1, default 1.5). Currently hardcoded in
   `state.rs:63`.
 
-- [ ] **Tab-width control** - the renderer hardcodes `TAB_WIDTH = 4` in
+- [x] **Tab-width control** - the renderer hardcodes `TAB_WIDTH = 4` in
   `layout.rs`. Expose as a select (2 / 4 / 8) so users can match their
   editor's settings.
 
@@ -264,15 +255,15 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   simple color input. The `Background` enum in `models` already supports
   `Solid(RgbColor)` and `Gradient(Vec<RgbColor>)`.
 
-- [ ] **Code input improvements** - tab key inserts spaces (not focus-
+- [x] **Code input improvements** - tab key inserts spaces (not focus-
   trap), line numbers in the textarea gutter (CSS counter), and a
   "paste from clipboard" button for quick import.
 
-- [ ] **Export filename template** - allow the user to set a pattern
+- [x] **Export filename template** - allow the user to set a pattern
   (default: `CodeFrame-{scale}x.png`). Simple string interpolation:
   `{language}`, `{theme}`, `{timestamp}`.
 
-- [ ] **Keyboard shortcuts** - `Ctrl/Cmd+Enter` to export, `Ctrl/Cmd+Z`
+- [x] **Keyboard shortcuts** - `Ctrl/Cmd+Enter` to export, `Ctrl/Cmd+Z`
   undo (native textarea), `Ctrl/Cmd+Shift+Z` redo. Document in the UI
   with a subtle hint or a `?` help overlay.
 

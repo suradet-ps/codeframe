@@ -152,7 +152,7 @@ pub fn prepare(
   let family = options.font_family.css_family();
   let char_width = measure_char_width(&ctx, family, options.font_size);
 
-  let lines = split_tokens_into_lines(tokens);
+  let lines = split_tokens_into_lines(tokens, options.tab_width);
   let mut widths = Vec::with_capacity(lines.len());
   let mut max_line_width = 0.0_f64;
   for line in &lines {

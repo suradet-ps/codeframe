@@ -276,10 +276,37 @@ body {
     cursor: wait;
 }
 
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    border: 1px solid var(--hairline);
+    border-radius: 9999px;
+    padding: 0 var(--sp-md);
+    height: 40px;
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    background: var(--surface-cool);
+    white-space: nowrap;
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.copy-btn:hover:not(:disabled) {
+    background: var(--surface-elevated);
+}
+
+.copy-btn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
 /* ---- Controls sidebar ---- */
 .controls {
     grid-area: controls;
     overflow-y: auto;
+    overflow-x: hidden;
     border-right: 1px solid var(--hairline);
     background: var(--canvas);
     padding: var(--sp-lg);
@@ -381,10 +408,12 @@ input:focus {
 .segmented {
     display: flex;
     gap: var(--sp-xs);
+    flex-wrap: wrap;
 }
 
 .seg {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     background: var(--canvas-warm);
     color: var(--ink);
     border: none;
@@ -402,7 +431,8 @@ input:focus {
 
 .scale-custom {
     width: 68px;
-    flex: none;
+    flex: 0 1 68px;
+    min-width: 0;
 }
 
 /* ---- Toggles ---- */

@@ -3,10 +3,12 @@
 
 use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
+use wasm_bindgen::JsCast;
 
 use crate::state::{Settings, SAMPLE_CODE};
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
+const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
 
 /// CSS value used to paint a background swatch button.
 fn background_css(background: &Background) -> String {
@@ -110,6 +112,22 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   spellcheck="false"
                   autocomplete="off"
                   on:input=move |ev| settings.code.set(event_target_value(&ev))
+                  on:keydown=move |ev| {
+                      if ev.key() == "Tab" {
+                          ev.prevent_default();
+                          let target = ev.target().unwrap();
+                          let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                          let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                          let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                          let value = textarea.value();
+                          let spaces = " ".repeat(settings.tab_width.get());
+                          let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                          settings.code.set(new_value.clone());
+                          textarea.set_value(&new_value);
+                          let pos = (start + spaces.len()) as u32;
+                          let _ = textarea.set_selection_range(pos, pos);
+                      }
+                  }
               >{SAMPLE_CODE}</textarea>
           </section>
 
@@ -167,6 +185,31 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
+              <label class="control-label">"Line height"</label>
+              <Slider value=settings.line_height min=1.0 max=2.5 step=0.1 format=|v| format!("{v:.1}") />
+          </section>
+
+          <section>
+              <label class="control-label">"Tab width"</label>
+              <div class="segmented">
+                  {TAB_WIDTH_PRESETS
+                      .into_iter()
+                      .map(|preset| {
+                          view! {
+                              <button
+                                  class="seg"
+                                  class:active=move || settings.tab_width.get() == preset
+                                  on:click=move |_| settings.tab_width.set(preset)
+                              >
+                                  {format!("{preset}")}
+                              </button>
+                          }
+                      })
+                      .collect_view()}
+              </div>
+          </section>
+
+          <section>
               <label class="control-label">"Export scale"</label>
               <div class="segmented">
                   {SCALE_PRESETS
@@ -217,6 +260,18 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   />
                   "Line numbers"
               </label>
+          </section>
+
+          <section>
+              <label class="control-label">"Filename template"</label>
+              <input
+                  class="filename-input"
+                  type="text"
+                  prop:value=move || settings.filename_template.get()
+                  on:input=move |ev| settings.filename_template.set(event_target_value(&ev))
+                  title="Placeholders: {scale}, {language}, {theme}, {timestamp}"
+              />
+              <p class="hint">"Preview: " {move || format!("{}.png", settings.expanded_filename())}</p>
           </section>
 
           <section>

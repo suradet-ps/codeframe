@@ -45,13 +45,13 @@ pub fn expand_tabs(text: &str, tab_width: usize) -> String {
 ///     Token { text: "a\nb".into(), color, font_style: FontStyle::default() },
 ///     Token { text: "\nc".into(), color, font_style: FontStyle::default() },
 /// ];
-/// let lines = codeframe_renderer::layout::split_tokens_into_lines(&tokens);
+/// let lines = codeframe_renderer::layout::split_tokens_into_lines(&tokens, 4);
 /// assert_eq!(lines.len(), 3);
 /// assert_eq!(lines[0][0].text, "a");
 /// assert_eq!(lines[1][0].text, "b");
 /// assert_eq!(lines[2][0].text, "c");
 /// ```
-pub fn split_tokens_into_lines(tokens: &[Token]) -> Vec<Vec<Token>> {
+pub fn split_tokens_into_lines(tokens: &[Token], tab_width: usize) -> Vec<Vec<Token>> {
   let mut lines: Vec<Vec<Token>> = vec![Vec::new()];
   for token in tokens {
     for (part_index, part) in token.text.split('\n').enumerate() {
@@ -62,7 +62,7 @@ pub fn split_tokens_into_lines(tokens: &[Token]) -> Vec<Vec<Token>> {
         // `lines` is never empty: it starts with one line and only grows.
         if let Some(line) = lines.last_mut() {
           line.push(Token {
-            text: expand_tabs(part, TAB_WIDTH),
+            text: expand_tabs(part, tab_width),
             color: token.color,
             font_style: token.font_style,
           });
@@ -162,7 +162,7 @@ mod tests {
 
   #[test]
   fn split_handles_empty_input() {
-    let lines = split_tokens_into_lines(&[]);
+    let lines = split_tokens_into_lines(&[], 4);
     assert_eq!(lines.len(), 1);
     assert!(lines[0].is_empty());
   }
@@ -176,7 +176,7 @@ mod tests {
       color,
       font_style: FontStyle::default(),
     }];
-    let lines = split_tokens_into_lines(&tokens);
+    let lines = split_tokens_into_lines(&tokens, 4);
     assert_eq!(lines.len(), 3);
     assert_eq!(lines[0][0].text, "a");
     assert!(lines[1].is_empty());

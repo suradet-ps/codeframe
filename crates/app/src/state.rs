@@ -72,12 +72,7 @@ fn save_theme_to_storage(theme: UiTheme) {
 }
 
 /// Sample code shown on first load.
-pub const SAMPLE_CODE: &str = r#"fn main() {
-    // CodeFrame - turn code into beautiful images
-    let message = "Hello, world!";
-    println!("{message}");
-}
-"#;
+pub const SAMPLE_CODE: &str = "fn main() {\n\t// CodeFrame \u{2014} turn code into beautiful images\n\tlet message = \"Hello, world!\";\n\tprintln!(\"{message}\");\n}\n";
 
 /// Every user-tweakable input, as fine-grained signals (cheap to copy and
 /// hand to child components).
@@ -95,6 +90,9 @@ pub struct Settings {
   pub line_numbers: RwSignal<bool>,
   pub background: RwSignal<Background>,
   pub ui_theme: RwSignal<UiTheme>,
+  pub line_height: RwSignal<f64>,
+  pub tab_width: RwSignal<usize>,
+  pub filename_template: RwSignal<String>,
 }
 
 impl Settings {
@@ -117,6 +115,9 @@ impl Settings {
         RgbColor::new(0xec, 0x48, 0x99),
       ])),
       ui_theme: RwSignal::new(initial_ui_theme),
+      line_height: RwSignal::new(1.5),
+      tab_width: RwSignal::new(4),
+      filename_template: RwSignal::new("codeframe-{scale}x".to_string()),
     }
   }
 
@@ -135,8 +136,30 @@ impl Settings {
       line_numbers: self.line_numbers.get(),
       font_family: self.font.get(),
       font_size: self.font_size.get(),
-      line_height: 1.5,
+      line_height: self.line_height.get(),
       corner_radius: self.corner_radius.get(),
+      tab_width: self.tab_width.get(),
     }
+  }
+
+  /// Expand the filename template with current settings.
+  pub fn expanded_filename(&self) -> String {
+    let template = self.filename_template.get();
+    let scale = self.scale.get();
+    let language = self.language.get().display_name().to_lowercase();
+    let theme = self
+      .theme
+      .get()
+      .display_name()
+      .to_lowercase()
+      .replace(' ', "-");
+    let timestamp: String = js_sys::Date::new_0().to_iso_string().into();
+    // Extract date part (YYYY-MM-DD) from ISO string.
+    let date = timestamp.split('T').next().unwrap_or("unknown").to_string();
+    template
+      .replace("{scale}", &format!("{}", scale as u32))
+      .replace("{language}", &language)
+      .replace("{theme}", &theme)
+      .replace("{timestamp}", &date)
   }
 }
