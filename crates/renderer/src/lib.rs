@@ -11,5 +11,8 @@ pub mod canvas;
 pub mod layout;
 pub mod svg;
 
-pub use canvas::{draw_prepared, prepare, render_to_canvas, PreparedImage, RenderError};
+pub use canvas::{
+  draw_prepared, prepare, render_split_to_canvas, render_to_canvas, PreparedImage, RenderError,
+  SplitLayout,
+};
 pub use layout::{compute_layout, split_tokens_into_lines, Layout};

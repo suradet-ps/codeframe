@@ -148,7 +148,7 @@ PRs #7, #8 on `main`. The project now has:
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
 | **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
 | **v0.6** | Export & UX | SVG export, custom bg color picker, custom export dimensions ✅ |
-| **v0.7** | Export & UX | Split-screen comparison |
+| **v0.7** | Export & UX | Split-screen comparison ✅ |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
@@ -276,7 +276,7 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   (e.g. 1200px for Twitter, 1920 for a slide) and compute the scale
   from that, instead of always starting from logical size × scale.
 
-- [ ] **Split-screen comparison** - side-by-side view showing two code
+- [x] **Split-screen comparison** - side-by-side view showing two code
   snippets (or the same snippet with different themes/settings) in a
   single exported image. The rendering layer already supports drawing
   at arbitrary canvas positions (`render_to_canvas` is pure), so the

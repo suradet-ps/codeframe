@@ -383,6 +383,42 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   })
               }}
           </section>
+
+          <section>
+              <label class="toggle">
+                  <input
+                      type="checkbox"
+                      prop:checked=move || settings.split_enabled.get()
+                      on:change=move |ev| settings.split_enabled.set(event_target_checked(&ev))
+                  />
+                  "Split-screen comparison"
+              </label>
+              {move || {
+                  settings.split_enabled.get().then(|| view! {
+                      <div class="split-controls">
+                          <div class="control-row">
+                              <section>
+                                  <label class="control-label">"Right panel theme"</label>
+                                  <EnumSelect
+                                      value=settings.split_theme
+                                      options=&ThemeChoice::ALL
+                                      label=ThemeChoice::display_name
+                                  />
+                              </section>
+                              <section>
+                                  <label class="control-label">"Right panel language"</label>
+                                  <EnumSelect
+                                      value=settings.split_language
+                                      options=&Language::ALL
+                                      label=Language::display_name
+                                  />
+                              </section>
+                          </div>
+                          <p class="hint">"Left panel uses the main theme/language above."</p>
+                      </div>
+                  })
+              }}
+          </section>
       </aside>
   }
 }

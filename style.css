@@ -521,6 +521,14 @@ input:focus {
     background: none;
 }
 
+/* ---- Split-screen controls ---- */
+.split-controls {
+    margin-top: var(--sp-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+}
+
 /* ---- Preview ---- */
 .main {
     grid-area: main;

@@ -100,6 +100,12 @@ pub struct Settings {
   /// When `Some(px)`, export width is clamped to this value and scale is
   /// computed automatically. `None` means use the manual scale slider.
   pub target_width: RwSignal<Option<f64>>,
+  /// Split-screen mode: show two code cards side by side.
+  pub split_enabled: RwSignal<bool>,
+  /// Theme for the right panel in split-screen mode.
+  pub split_theme: RwSignal<ThemeChoice>,
+  /// Language for the right panel in split-screen mode.
+  pub split_language: RwSignal<Language>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -136,6 +142,9 @@ impl Settings {
       custom_color_1: RwSignal::new("#6366f1".to_string()),
       custom_color_2: RwSignal::new("#ec4899".to_string()),
       target_width: RwSignal::new(None),
+      split_enabled: RwSignal::new(false),
+      split_theme: RwSignal::new(ThemeChoice::OneDark),
+      split_language: RwSignal::new(Language::Rust),
     }
   }
 

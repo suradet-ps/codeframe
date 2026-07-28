@@ -2,6 +2,7 @@
 //! scale (capped - AGENTS.md §4, rule 3); export uses a separate canvas.
 
 use codeframe_highlighter::{highlight, theme_palette};
+use codeframe_renderer::canvas::render_split_to_canvas;
 use codeframe_renderer::render_to_canvas;
 use leptos::html::Canvas;
 use leptos::prelude::*;
@@ -25,6 +26,9 @@ pub fn Preview(settings: Settings) -> impl IntoView {
     let code = settings.code.get();
     let language = settings.language.get();
     let theme = settings.theme.get();
+    let split_enabled = settings.split_enabled.get();
+    let split_theme = settings.split_theme.get();
+    let split_language = settings.split_language.get();
     // Track custom background signals so preview updates when they change.
     let _ = settings.custom_bg_enabled.get();
     let _ = settings.custom_bg_mode.get();
@@ -48,20 +52,46 @@ pub fn Preview(settings: Settings) -> impl IntoView {
       let Some(canvas) = canvas_ref.get() else {
         return;
       };
-      let result: Result<codeframe_renderer::Layout, String> = (|| {
-        let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
-        let palette = theme_palette(theme).map_err(|e| e.to_string())?;
-        render_to_canvas(&canvas, &tokens, &palette, &options).map_err(|e| e.to_string())
-      })();
-      match result {
-        Ok(layout) => {
-          error.set(None);
-          // CSS-size the canvas to logical px; `max-width` + `height:
-          // auto` in the stylesheet keep the aspect ratio when the
-          // panel is narrower than the image.
-          let _ = canvas.set_attribute("style", &format!("width:{}px", layout.canvas_width));
+
+      if split_enabled {
+        // Split-screen: two panels side by side.
+        let result: Result<codeframe_renderer::SplitLayout, String> = (|| {
+          let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
+          let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
+          let tokens_right =
+            highlight(&code, split_language, split_theme).map_err(|e| e.to_string())?;
+          let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
+          render_split_to_canvas(
+            &canvas,
+            &tokens_left,
+            &palette_left,
+            &tokens_right,
+            &palette_right,
+            &options,
+          )
+          .map_err(|e| e.to_string())
+        })();
+        match result {
+          Ok(split) => {
+            error.set(None);
+            let _ = canvas.set_attribute("style", &format!("width:{}px", split.canvas_width));
+          }
+          Err(message) => error.set(Some(message)),
         }
-        Err(message) => error.set(Some(message)),
+      } else {
+        // Single panel.
+        let result: Result<codeframe_renderer::Layout, String> = (|| {
+          let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
+          let palette = theme_palette(theme).map_err(|e| e.to_string())?;
+          render_to_canvas(&canvas, &tokens, &palette, &options).map_err(|e| e.to_string())
+        })();
+        match result {
+          Ok(layout) => {
+            error.set(None);
+            let _ = canvas.set_attribute("style", &format!("width:{}px", layout.canvas_width));
+          }
+          Err(message) => error.set(Some(message)),
+        }
       }
     });
   });
