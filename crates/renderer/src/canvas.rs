@@ -357,6 +357,291 @@ pub fn render_to_canvas(
   Ok(prepared.layout)
 }
 
+/// Gap between the two panels in split-screen mode (logical px).
+const SPLIT_GAP: f64 = 6.0;
+
+/// Fully-resolved geometry for a split-screen render.
+#[derive(Clone, Debug)]
+pub struct SplitLayout {
+  pub left: Layout,
+  pub right: Layout,
+  /// Total canvas width (left.width + gap + right.width).
+  pub canvas_width: f64,
+  /// Total canvas height (max of both panels).
+  pub canvas_height: f64,
+}
+
+/// Prepare a split-screen render: measure both panels and compute combined
+/// geometry. The canvas is not touched — call [`draw_split_prepared`] after.
+pub fn prepare_split(
+  canvas: &HtmlCanvasElement,
+  tokens_left: &[Token],
+  tokens_right: &[Token],
+  options: &ExportOptions,
+) -> Result<(SplitLayout, PreparedImage, PreparedImage), RenderError> {
+  let ctx = get_2d_context(canvas)?;
+  let family = options.font_family.css_family();
+  let cw = measure_char_width(&ctx, family, options.font_size);
+
+  // Measure left panel.
+  let lines_left = split_tokens_into_lines(tokens_left, options.tab_width);
+  let mut widths_left = Vec::with_capacity(lines_left.len());
+  let mut max_left = 0.0_f64;
+  for line in &lines_left {
+    let mut lw = Vec::with_capacity(line.len());
+    let mut line_w = 0.0;
+    for token in line {
+      let w = token_width(&ctx, token, cw);
+      line_w += w;
+      lw.push(w);
+    }
+    max_left = max_left.max(line_w);
+    widths_left.push(lw);
+  }
+  let layout_left = compute_layout(options, lines_left.len(), max_left, cw);
+
+  // Measure right panel.
+  let lines_right = split_tokens_into_lines(tokens_right, options.tab_width);
+  let mut widths_right = Vec::with_capacity(lines_right.len());
+  let mut max_right = 0.0_f64;
+  for line in &lines_right {
+    let mut lw = Vec::with_capacity(line.len());
+    let mut line_w = 0.0;
+    for token in line {
+      let w = token_width(&ctx, token, cw);
+      line_w += w;
+      lw.push(w);
+    }
+    max_right = max_right.max(line_w);
+    widths_right.push(lw);
+  }
+  let layout_right = compute_layout(options, lines_right.len(), max_right, cw);
+
+  let canvas_width = layout_left.canvas_width + SPLIT_GAP + layout_right.canvas_width;
+  let canvas_height = layout_left.canvas_height.max(layout_right.canvas_height);
+
+  let split = SplitLayout {
+    left: layout_left,
+    right: layout_right,
+    canvas_width,
+    canvas_height,
+  };
+
+  // Size the backing store.
+  let device_width = (canvas_width * options.scale).round();
+  let device_height = (canvas_height * options.scale).round();
+  if device_width > MAX_CANVAS_DIMENSION || device_height > MAX_CANVAS_DIMENSION {
+    return Err(RenderError::CanvasTooLarge {
+      width: device_width as u32,
+      height: device_height as u32,
+    });
+  }
+  canvas.set_width(device_width as u32);
+  canvas.set_height(device_height as u32);
+  ctx.scale(options.scale, options.scale)?;
+
+  let prepared_left = PreparedImage {
+    lines: lines_left,
+    widths: widths_left,
+    layout: layout_left,
+  };
+  let prepared_right = PreparedImage {
+    lines: lines_right,
+    widths: widths_right,
+    layout: layout_right,
+  };
+
+  Ok((split, prepared_left, prepared_right))
+}
+
+/// Draw a split-screen render: background → left panel → divider → right panel.
+///
+/// Both `prepared_left` and `prepared_right` share the same `options` but
+/// have independent token data and palettes.
+pub fn draw_split_prepared(
+  ctx: &CanvasRenderingContext2d,
+  split: &SplitLayout,
+  prepared_left: &PreparedImage,
+  palette_left: &ThemePalette,
+  prepared_right: &PreparedImage,
+  palette_right: &ThemePalette,
+  options: &ExportOptions,
+) -> Result<(), RenderError> {
+  // 1. Background (full canvas).
+  match &options.background {
+    Background::Solid(color) => {
+      ctx.set_fill_style_str(&color.to_css());
+      ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    }
+    Background::Gradient(colors) => match colors.as_slice() {
+      [] => {}
+      [single] => {
+        ctx.set_fill_style_str(&single.to_css());
+        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+      }
+      many => {
+        let gradient =
+          ctx.create_linear_gradient(0.0, 0.0, split.canvas_width, split.canvas_height);
+        let last = many.len() - 1;
+        for (index, color) in many.iter().enumerate() {
+          gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
+        }
+        ctx.set_fill_style_canvas_gradient(&gradient);
+        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+      }
+    },
+  }
+
+  // 2. Left panel (at origin).
+  draw_panel(ctx, prepared_left, palette_left, options, 0.0, 0.0)?;
+
+  // 3. Divider line (subtle vertical line between panels).
+  let divider_x = split.left.canvas_width + SPLIT_GAP / 2.0;
+  ctx.set_fill_style_str("rgba(128, 128, 128, 0.3)");
+  ctx.fill_rect(
+    divider_x,
+    options.padding,
+    1.0,
+    split.canvas_height - 2.0 * options.padding,
+  );
+
+  // 4. Right panel (offset by left width + gap).
+  let offset_x = split.left.canvas_width + SPLIT_GAP;
+  draw_panel(ctx, prepared_right, palette_right, options, offset_x, 0.0)?;
+
+  Ok(())
+}
+
+/// Draw a single code panel at the given offset. This is the core drawing
+/// logic shared between single and split-screen modes.
+fn draw_panel(
+  ctx: &CanvasRenderingContext2d,
+  prepared: &PreparedImage,
+  palette: &ThemePalette,
+  options: &ExportOptions,
+  offset_x: f64,
+  _offset_y: f64,
+) -> Result<(), RenderError> {
+  let layout = &prepared.layout;
+  let family = options.font_family.css_family();
+
+  // Card rounded rect with optional shadow.
+  let cx = layout.card_x + offset_x;
+  ctx.save();
+  rounded_rect_path(
+    ctx,
+    cx,
+    layout.card_y,
+    layout.card_width,
+    layout.card_height,
+    options.corner_radius,
+  )?;
+  if options.window_frame {
+    ctx.set_shadow_color("rgba(0, 0, 0, 0.35)");
+    ctx.set_shadow_blur(20.0);
+    ctx.set_shadow_offset_y(10.0);
+  }
+  ctx.set_fill_style_str(&palette.background.to_css());
+  ctx.fill();
+  ctx.restore();
+
+  // Window-frame header band + traffic lights.
+  if options.window_frame {
+    ctx.save();
+    rounded_rect_path(
+      ctx,
+      cx,
+      layout.card_y,
+      layout.card_width,
+      layout.card_height,
+      options.corner_radius,
+    )?;
+    ctx.clip();
+    ctx.set_fill_style_str(if palette.is_dark() {
+      "rgba(255, 255, 255, 0.06)"
+    } else {
+      "rgba(0, 0, 0, 0.05)"
+    });
+    ctx.fill_rect(cx, layout.card_y, layout.card_width, layout.header_height);
+    ctx.restore();
+
+    let center_y = layout.card_y + layout.header_height / 2.0;
+    for (index, color) in TRAFFIC_LIGHT_COLORS.iter().enumerate() {
+      let center_x = cx + TRAFFIC_LIGHT_OFFSET_X + index as f64 * TRAFFIC_LIGHT_PITCH;
+      ctx.begin_path();
+      ctx.arc(
+        center_x,
+        center_y,
+        TRAFFIC_LIGHT_RADIUS,
+        0.0,
+        std::f64::consts::TAU,
+      )?;
+      ctx.set_fill_style_str(color);
+      ctx.fill();
+    }
+  }
+
+  // Token text.
+  ctx.set_text_baseline("top");
+  let mut y = layout.code_origin_y;
+  let code_x = layout.code_origin_x + offset_x;
+  for (line, line_widths) in prepared.lines.iter().zip(&prepared.widths) {
+    let mut x = code_x;
+    for (token, width) in line.iter().zip(line_widths) {
+      ctx.set_font(&font_string(&token.font_style, family, options.font_size));
+      ctx.set_fill_style_str(&token.color.to_css());
+      ctx.fill_text(&token.text, x, y)?;
+      x += width;
+    }
+    y += layout.line_height_px;
+  }
+
+  // Line numbers.
+  if options.line_numbers {
+    ctx.set_font(&font_string(
+      &FontStyle::default(),
+      family,
+      options.font_size,
+    ));
+    ctx.set_fill_style_str(&palette.foreground.to_css_with_alpha(0.45));
+    ctx.set_text_align("right");
+    let mut y = layout.code_origin_y;
+    let gutter_x = layout.gutter_right_x + offset_x;
+    for number in 1..=layout.line_count {
+      ctx.fill_text(&number.to_string(), gutter_x, y)?;
+      y += layout.line_height_px;
+    }
+    ctx.set_text_align("left");
+  }
+
+  Ok(())
+}
+
+/// Full pipeline for split-screen: measure → size the canvas → draw both
+/// panels. Returns the combined layout.
+pub fn render_split_to_canvas(
+  canvas: &HtmlCanvasElement,
+  tokens_left: &[Token],
+  palette_left: &ThemePalette,
+  tokens_right: &[Token],
+  palette_right: &ThemePalette,
+  options: &ExportOptions,
+) -> Result<SplitLayout, RenderError> {
+  let (split, prepared_left, prepared_right) =
+    prepare_split(canvas, tokens_left, tokens_right, options)?;
+  let ctx = get_2d_context(canvas)?;
+  draw_split_prepared(
+    &ctx,
+    &split,
+    &prepared_left,
+    palette_left,
+    &prepared_right,
+    palette_right,
+    options,
+  )?;
+  Ok(split)
+}
+
 /// Helper for the header-band tint: dark themes get a light overlay, light
 /// themes a dark one.
 trait PaletteDarkness {

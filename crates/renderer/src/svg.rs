@@ -208,6 +208,219 @@ pub fn render_svg(
   (svg, layout)
 }
 
+/// Gap between panels in split-screen SVG (logical px).
+const SPLIT_GAP: f64 = 6.0;
+
+/// Render two code panels side by side as a single SVG.
+pub fn render_split_svg(
+  tokens_left: &[Token],
+  palette_left: &ThemePalette,
+  tokens_right: &[Token],
+  palette_right: &ThemePalette,
+  options: &ExportOptions,
+) -> (String, f64, f64) {
+  let family = options.font_family.css_family();
+  let cw = estimate_char_width(options.font_size);
+
+  // Measure left panel.
+  let lines_left = split_tokens_into_lines(tokens_left, options.tab_width);
+  let mut max_left = 0.0_f64;
+  for line in &lines_left {
+    let mut w = 0.0;
+    for token in line {
+      w += token.text.len() as f64 * cw;
+    }
+    max_left = max_left.max(w);
+  }
+  let layout_left = compute_layout(options, lines_left.len(), max_left, cw);
+
+  // Measure right panel.
+  let lines_right = split_tokens_into_lines(tokens_right, options.tab_width);
+  let mut max_right = 0.0_f64;
+  for line in &lines_right {
+    let mut w = 0.0;
+    for token in line {
+      w += token.text.len() as f64 * cw;
+    }
+    max_right = max_right.max(w);
+  }
+  let layout_right = compute_layout(options, lines_right.len(), max_right, cw);
+
+  let total_w = layout_left.canvas_width + SPLIT_GAP + layout_right.canvas_width;
+  let total_h = layout_left.canvas_height.max(layout_right.canvas_height);
+
+  let mut svg = String::with_capacity(8192);
+  svg.push_str(&format!(
+    r#"<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{total_h}" viewBox="0 0 {total_w} {total_h}">"#,
+  ));
+
+  // Defs.
+  svg.push_str("<defs>");
+  if options.window_frame {
+    svg.push_str(
+      r#"<filter id="shadow" x="-10%" y="-5%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,0.35)"/>
+      </filter>"#,
+    );
+  }
+  if let Background::Gradient(colors) = &options.background {
+    if colors.len() >= 2 {
+      svg.push_str("<linearGradient id=\"bg\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">");
+      let last = colors.len() - 1;
+      for (i, c) in colors.iter().enumerate() {
+        let offset = i as f32 / last as f32 * 100.0;
+        svg.push_str(&format!(
+          "<stop offset=\"{offset:.0}%\" stop-color=\"{}\"/>",
+          c.to_css()
+        ));
+      }
+      svg.push_str("</linearGradient>");
+    }
+  }
+  svg.push_str("</defs>");
+
+  // Background.
+  match &options.background {
+    Background::Solid(color) => {
+      svg.push_str(&format!(
+        "<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"{}\"/>",
+        color.to_css()
+      ));
+    }
+    Background::Gradient(colors) => {
+      if colors.len() == 1 {
+        svg.push_str(&format!(
+          "<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"{}\"/>",
+          colors[0].to_css()
+        ));
+      } else if !colors.is_empty() {
+        svg.push_str("<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"url(#bg)\"/>");
+      }
+    }
+  }
+
+  // Left panel.
+  render_panel_svg(
+    &mut svg,
+    &lines_left,
+    palette_left,
+    options,
+    &layout_left,
+    family,
+    cw,
+    0.0,
+  );
+
+  // Divider.
+  let divider_x = layout_left.canvas_width + SPLIT_GAP / 2.0;
+  svg.push_str(&format!(
+    "<rect x=\"{divider_x}\" y=\"{y}\" width=\"1\" height=\"{h}\" fill=\"rgba(128,128,128,0.3)\"/>",
+    y = options.padding,
+    h = total_h - 2.0 * options.padding,
+  ));
+
+  // Right panel.
+  let offset_x = layout_left.canvas_width + SPLIT_GAP;
+  render_panel_svg(
+    &mut svg,
+    &lines_right,
+    palette_right,
+    options,
+    &layout_right,
+    family,
+    cw,
+    offset_x,
+  );
+
+  svg.push_str("</svg>");
+  (svg, total_w, total_h)
+}
+
+/// Render a single panel's SVG elements at the given x offset.
+#[allow(clippy::too_many_arguments)]
+fn render_panel_svg(
+  svg: &mut String,
+  lines: &[Vec<Token>],
+  palette: &ThemePalette,
+  options: &ExportOptions,
+  layout: &Layout,
+  family: &str,
+  cw: f64,
+  offset_x: f64,
+) {
+  let rx = options.corner_radius;
+  let cx = layout.card_x + offset_x;
+  let filter = if options.window_frame {
+    " filter=\"url(#shadow)\""
+  } else {
+    ""
+  };
+
+  // Card rect.
+  svg.push_str(&format!(
+    "<rect x=\"{cx}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"{rx}\" fill=\"{fill}\"{filter}/>",
+    y = layout.card_y,
+    w = layout.card_width,
+    h = layout.card_height,
+    fill = palette.background.to_css(),
+  ));
+
+  // Header.
+  if options.window_frame {
+    let header_fill = if is_dark(palette) {
+      "rgba(255,255,255,0.06)"
+    } else {
+      "rgba(0,0,0,0.05)"
+    };
+    svg.push_str(&format!(
+      "<rect x=\"{cx}\" y=\"{y}\" width=\"{w}\" height=\"{hh}\" rx=\"{rx}\" fill=\"{header_fill}\"/>",
+      y = layout.card_y,
+      w = layout.card_width,
+      hh = layout.header_height,
+    ));
+
+    let center_y = layout.card_y + layout.header_height / 2.0;
+    for (i, color) in TRAFFIC_LIGHT_COLORS.iter().enumerate() {
+      let tcx = cx + TRAFFIC_LIGHT_OFFSET_X + i as f64 * TRAFFIC_LIGHT_PITCH;
+      svg.push_str(&format!(
+        "<circle cx=\"{tcx}\" cy=\"{center_y}\" r=\"{r}\" fill=\"{color}\"/>",
+        r = TRAFFIC_LIGHT_RADIUS,
+      ));
+    }
+  }
+
+  // Tokens.
+  let mut y = layout.code_origin_y;
+  let code_x = layout.code_origin_x + offset_x;
+  for line in lines {
+    let mut x = code_x;
+    for token in line {
+      let font = font_css(&token.font_style, family, options.font_size);
+      let fill = token.color.to_css();
+      let text = esc(&token.text);
+      svg.push_str(&format!(
+        "<text x=\"{x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" dominant-baseline=\"hanging\">{text}</text>",
+      ));
+      x += token.text.len() as f64 * cw;
+    }
+    y += layout.line_height_px;
+  }
+
+  // Line numbers.
+  if options.line_numbers {
+    let fill = palette.foreground.to_css_with_alpha(0.45);
+    let font = font_css(&FontStyle::default(), family, options.font_size);
+    let mut y = layout.code_origin_y;
+    let gutter_x = layout.gutter_right_x + offset_x;
+    for number in 1..=layout.line_count {
+      svg.push_str(&format!(
+        "<text x=\"{gutter_x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" text-anchor=\"end\" dominant-baseline=\"hopping\">{number}</text>",
+      ));
+      y += layout.line_height_px;
+    }
+  }
+}
+
 fn is_dark(palette: &ThemePalette) -> bool {
   (palette.background.r as u32 + palette.background.g as u32 + palette.background.b as u32) < 384
 }

@@ -190,7 +190,7 @@ body {
 .app {
     display: grid;
     grid-template-rows: 64px minmax(0, 1fr);
-    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-columns: 360px minmax(0, 1fr);
     grid-template-areas:
         "header header"
         "controls main";
@@ -300,6 +300,11 @@ body {
 .copy-btn:disabled {
     opacity: 0.5;
     cursor: wait;
+}
+
+.split-label {
+    color: var(--accent);
+    font-weight: 700;
 }
 
 .export-btn-secondary {
@@ -519,6 +524,14 @@ input:focus {
     padding: 0;
     cursor: pointer;
     background: none;
+}
+
+/* ---- Split-screen controls ---- */
+.split-controls {
+    margin-top: var(--sp-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
 }
 
 /* ---- Preview ---- */

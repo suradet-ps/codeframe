@@ -104,7 +104,7 @@ pub fn Controls(settings: Settings) -> impl IntoView {
   view! {
       <aside class="controls">
           <section>
-              <label class="control-label" for="code-input">"Code"</label>
+              <label class="control-label" for="code-input">{move || if settings.split_enabled.get() { "Left panel code" } else { "Code" }}</label>
               <textarea
                   id="code-input"
                   class="code-input"
@@ -130,6 +130,41 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   }
               >{SAMPLE_CODE}</textarea>
           </section>
+
+          {move || {
+              settings.split_enabled.get().then(|| {
+                  let code_signal = settings.split_code;
+                  view! {
+                      <section>
+                          <label class="control-label split-label">"Right panel code"</label>
+                          <textarea
+                              class="code-input"
+                              rows="12"
+                              spellcheck="false"
+                              autocomplete="off"
+                              prop:value=move || code_signal.get()
+                              on:input=move |ev| code_signal.set(event_target_value(&ev))
+                              on:keydown=move |ev| {
+                                  if ev.key() == "Tab" {
+                                      ev.prevent_default();
+                                      let target = ev.target().unwrap();
+                                      let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                                      let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                                      let value = textarea.value();
+                                      let spaces = " ".repeat(settings.tab_width.get());
+                                      let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                                      code_signal.set(new_value.clone());
+                                      textarea.set_value(&new_value);
+                                      let pos = (start + spaces.len()) as u32;
+                                      let _ = textarea.set_selection_range(pos, pos);
+                                  }
+                              }
+                          ></textarea>
+                      </section>
+                  }
+              })
+          }}
 
           <div class="control-row">
               <section>
@@ -379,6 +414,42 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                                   })
                               }}
                           </div>
+                      </div>
+                  })
+              }}
+          </section>
+
+          <section>
+              <label class="toggle">
+                  <input
+                      type="checkbox"
+                      prop:checked=move || settings.split_enabled.get()
+                      on:change=move |ev| settings.split_enabled.set(event_target_checked(&ev))
+                  />
+                  "Split-screen comparison"
+              </label>
+              {move || {
+                  settings.split_enabled.get().then(|| view! {
+                      <div class="split-controls">
+                          <div class="control-row">
+                              <section>
+                                  <label class="control-label">"Right panel theme"</label>
+                                  <EnumSelect
+                                      value=settings.split_theme
+                                      options=&ThemeChoice::ALL
+                                      label=ThemeChoice::display_name
+                                  />
+                              </section>
+                              <section>
+                                  <label class="control-label">"Right panel language"</label>
+                                  <EnumSelect
+                                      value=settings.split_language
+                                      options=&Language::ALL
+                                      label=Language::display_name
+                                  />
+                              </section>
+                          </div>
+                          <p class="hint">"Left panel uses the main theme/language above."</p>
                       </div>
                   })
               }}
