@@ -97,6 +97,9 @@ pub struct Settings {
   pub custom_bg_mode: RwSignal<CustomBgMode>,
   pub custom_color_1: RwSignal<String>,
   pub custom_color_2: RwSignal<String>,
+  /// When `Some(px)`, export width is clamped to this value and scale is
+  /// computed automatically. `None` means use the manual scale slider.
+  pub target_width: RwSignal<Option<f64>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -132,6 +135,7 @@ impl Settings {
       custom_bg_mode: RwSignal::new(CustomBgMode::Gradient),
       custom_color_1: RwSignal::new("#6366f1".to_string()),
       custom_color_2: RwSignal::new("#ec4899".to_string()),
+      target_width: RwSignal::new(None),
     }
   }
 

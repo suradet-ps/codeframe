@@ -243,6 +243,36 @@ pub fn Controls(settings: Settings) -> impl IntoView {
               </div>
           </section>
 
+          <section>
+              <label class="control-label">"Target width"</label>
+              <div class="slider-row">
+                  <input
+                      type="number"
+                      min="320"
+                      max="3840"
+                      step="10"
+                      placeholder="auto"
+                      title="Lock export width in pixels (scale computed automatically)"
+                      prop:value=move || {
+                          settings.target_width
+                              .get()
+                              .map(|w| format!("{w:.0}"))
+                              .unwrap_or_default()
+                      }
+                      on:input=move |ev| {
+                          let val = event_target_value(&ev);
+                          if val.is_empty() {
+                              settings.target_width.set(None);
+                          } else if let Ok(px) = val.parse::<f64>() {
+                              settings.target_width.set(Some(px.clamp(320.0, 3840.0)));
+                          }
+                      }
+                  />
+                  <span class="slider-value">"px"</span>
+              </div>
+              <p class="hint">"Overrides scale. Leave empty for manual scale."</p>
+          </section>
+
           <section class="toggles">
               <label class="toggle">
                   <input

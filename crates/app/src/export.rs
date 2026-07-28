@@ -69,12 +69,17 @@ async fn do_export_png(settings: Settings) -> Result<(), String> {
   let code = settings.code.get_untracked();
   let language = settings.language.get_untracked();
   let theme = settings.theme.get_untracked();
-  let options = settings.export_options();
+  let mut options = settings.export_options();
 
   ensure_fonts_ready(options.font_family.css_family()).await;
 
   let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
   let palette = theme_palette(theme).map_err(|e| e.to_string())?;
+
+  // If target_width is set, compute scale to fit that width.
+  if let Some(target) = settings.target_width.get_untracked() {
+    options.scale = compute_scale_for_width(&tokens, &options, target);
+  }
 
   let window = web_sys::window().ok_or_else(|| "no window object".to_string())?;
   let document = window
@@ -104,12 +109,17 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   let code = settings.code.get_untracked();
   let language = settings.language.get_untracked();
   let theme = settings.theme.get_untracked();
-  let options = settings.export_options();
+  let mut options = settings.export_options();
 
   ensure_fonts_ready(options.font_family.css_family()).await;
 
   let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
   let palette = theme_palette(theme).map_err(|e| e.to_string())?;
+
+  // If target_width is set, compute scale to fit that width.
+  if let Some(target) = settings.target_width.get_untracked() {
+    options.scale = compute_scale_for_width(&tokens, &options, target);
+  }
 
   let (svg_string, _layout) = render_svg(&tokens, &palette, &options);
 
@@ -135,6 +145,32 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   anchor.click();
   let _ = Url::revoke_object_url(&url);
   Ok(())
+}
+
+/// Compute the export scale needed to make the output image `target_width`
+/// pixels wide. Uses a 1x measurement pass to find the logical width.
+fn compute_scale_for_width(
+  tokens: &[codeframe_models::Token],
+  options: &codeframe_models::ExportOptions,
+  target_width: f64,
+) -> f64 {
+  use codeframe_renderer::layout::split_tokens_into_lines;
+
+  // Approximate char width (monospace heuristic).
+  let char_width = options.font_size * 0.602;
+  let lines = split_tokens_into_lines(tokens, options.tab_width);
+  let mut max_line_width = 0.0_f64;
+  for line in &lines {
+    let mut w = 0.0;
+    for token in line {
+      w += token.text.len() as f64 * char_width;
+    }
+    max_line_width = max_line_width.max(w);
+  }
+
+  let layout = codeframe_renderer::compute_layout(options, lines.len(), max_line_width, char_width);
+  // Scale = target / logical. Clamp to sensible range.
+  (target_width / layout.canvas_width).clamp(0.5, 12.0)
 }
 
 /// Wrap `canvas.toBlob` (callback-based) in a future.
