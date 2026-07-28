@@ -102,7 +102,7 @@ impl Background {
       (
         "Bottom Glow",
         Background::LinearGradient {
-          colors: vec![black, white],
+          colors: vec![white, black],
           dir: GradientDir::ToTop,
         },
       ),
@@ -116,7 +116,7 @@ impl Background {
       (
         "Right Beam",
         Background::LinearGradient {
-          colors: vec![black, white],
+          colors: vec![white, black],
           dir: GradientDir::ToLeft,
         },
       ),

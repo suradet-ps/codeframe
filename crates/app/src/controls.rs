@@ -16,11 +16,13 @@ fn background_css(background: &Background) -> String {
     Background::Solid(color) => color.to_css(),
     Background::LinearGradient { colors, dir } => {
       let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
-      format!(
-        "linear-gradient({}deg, {})",
-        dir.css_angle(),
-        stops.join(", ")
-      )
+      let kw = match dir {
+        codeframe_models::GradientDir::ToBottom => "to bottom",
+        codeframe_models::GradientDir::ToTop => "to top",
+        codeframe_models::GradientDir::ToRight => "to right",
+        codeframe_models::GradientDir::ToLeft => "to left",
+      };
+      format!("linear-gradient({kw}, {})", stops.join(", "))
     }
     Background::RadialGradient { colors } => {
       let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
