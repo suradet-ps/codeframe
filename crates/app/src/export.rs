@@ -2,8 +2,8 @@
 //! export scale, draw once, then `toBlob("image/png")` → object URL →
 //! download (AGENTS.md §4, rules 3 and 5).
 
-use codeshot_highlighter::{highlight, theme_palette};
-use codeshot_renderer::render_to_canvas;
+use codeframe_highlighter::{highlight, theme_palette};
+use codeframe_renderer::render_to_canvas;
 use js_sys::{Function, Promise};
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
@@ -59,7 +59,7 @@ async fn do_export(settings: Settings) -> Result<(), String> {
     .map_err(|e| format!("{e:?}"))?
     .unchecked_into();
   anchor.set_href(&url);
-  anchor.set_download(&format!("codeshot-{}x.png", options.scale));
+  anchor.set_download(&format!("codeframe-{}x.png", options.scale));
   anchor.click();
   let _ = Url::revoke_object_url(&url);
   Ok(())

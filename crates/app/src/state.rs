@@ -1,6 +1,6 @@
 //! Shared application state: one struct of signals passed to all components.
 
-use codeshot_models::{Background, ExportOptions, FontChoice, Language, RgbColor, ThemeChoice};
+use codeframe_models::{Background, ExportOptions, FontChoice, Language, RgbColor, ThemeChoice};
 use leptos::prelude::*;
 use web_sys::window;
 
@@ -44,7 +44,7 @@ impl UiTheme {
   }
 }
 
-const STORAGE_KEY: &str = "codeshot-ui-theme";
+const STORAGE_KEY: &str = "codeframe-ui-theme";
 
 /// Read the persisted theme from `localStorage`. Falls back to `Light`.
 fn load_theme_from_storage() -> UiTheme {
@@ -73,7 +73,7 @@ fn save_theme_to_storage(theme: UiTheme) {
 
 /// Sample code shown on first load.
 pub const SAMPLE_CODE: &str = r#"fn main() {
-    // CodeShot - turn code into beautiful images
+    // CodeFrame - turn code into beautiful images
     let message = "Hello, world!";
     println!("{message}");
 }

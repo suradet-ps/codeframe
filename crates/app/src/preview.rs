@@ -1,8 +1,8 @@
 //! Live preview canvas. Renders on every state change at a screen-friendly
 //! scale (capped - AGENTS.md §4, rule 3); export uses a separate canvas.
 
-use codeshot_highlighter::{highlight, theme_palette};
-use codeshot_renderer::render_to_canvas;
+use codeframe_highlighter::{highlight, theme_palette};
+use codeframe_renderer::render_to_canvas;
 use leptos::html::Canvas;
 use leptos::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -43,7 +43,7 @@ pub fn Preview(settings: Settings) -> impl IntoView {
       let Some(canvas) = canvas_ref.get() else {
         return;
       };
-      let result: Result<codeshot_renderer::Layout, String> = (|| {
+      let result: Result<codeframe_renderer::Layout, String> = (|| {
         let tokens = highlight(&code, language, theme).map_err(|e| e.to_string())?;
         let palette = theme_palette(theme).map_err(|e| e.to_string())?;
         render_to_canvas(&canvas, &tokens, &palette, &options).map_err(|e| e.to_string())

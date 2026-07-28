@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-# Lightweight TypeScript grammar for CodeShot.
+# Lightweight TypeScript grammar for CodeFrame.
 #
 # Why this exists: the official Sublime TypeScript grammar uses `extends:`
 # (syntax inheritance) and `version: 2` branching, which syntect cannot parse.

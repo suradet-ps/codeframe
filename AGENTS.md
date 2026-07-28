@@ -1,4 +1,4 @@
-# AGENTS.md - CodeShot (Code-to-PNG Web App)
+# AGENTS.md - CodeFrame (Code-to-PNG Web App)
 
 > Architecture document for AI coding agents and humans, written before any implementation begins.
 > Read this file in full before touching any code.
@@ -7,7 +7,7 @@
 
 ## 1. Project Overview
 
-**Project name (working title):** CodeShot
+**Project name (working title):** CodeFrame
 **Goal:** A web app that converts source code into high-resolution PNG images, in the style of carbon.now.sh / ray.so
 **Core selling point:** The highest possible export resolution achievable in-browser (not a DOM screenshot).
 **Deployment target:** Static site (CSR/WASM) - can be hosted on Cloudflare Pages / Vercel / GitHub Pages, no backend required.
@@ -38,7 +38,7 @@
 ## 3. Architecture: Cargo Workspace (lightweight hexagonal / "ports-lite")
 
 ```
-codeshot/
+CodeFrame/
 ├── Cargo.toml                 (workspace root, virtual manifest)
 ├── Trunk.toml                 # REQUIRED - see note below
 ├── index.html                 # Trunk entry; wires `rel="rust"` to crates/app/Cargo.toml
@@ -192,4 +192,4 @@ boot, live re-render on settings change, line-number gutter, theme switching,
 - `trunk build --release` - optimized static site into `dist/` (wasm-opt `-Oz`)
 - `cargo test --workspace` - unit tests + doctests (no WASM runtime needed)
 - `cargo clippy --workspace --all-targets -- -D warnings` / `cargo fmt --all --check`
-- `cargo check -p codeshot-app --target wasm32-unknown-unknown` - fast WASM compile check
+- `cargo check -p CodeFrame-app --target wasm32-unknown-unknown` - fast WASM compile check

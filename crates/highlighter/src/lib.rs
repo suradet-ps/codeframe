@@ -1,5 +1,5 @@
 //! Syntax highlighting via `syntect`, exposed as a framework-agnostic token
-//! stream. Depends only on `codeshot-models` + `syntect` - it knows nothing
+//! stream. Depends only on `codeframe-models` + `syntect` - it knows nothing
 //! about canvas or Leptos (AGENTS.md §3).
 //!
 //! The bundled `.tmTheme` files from the workspace `themes/` directory are
@@ -9,7 +9,7 @@
 use std::io::Cursor;
 use std::sync::OnceLock;
 
-use codeshot_models::{FontStyle, Language, RgbColor, ThemeChoice, ThemePalette, Token};
+use codeframe_models::{FontStyle, Language, RgbColor, ThemeChoice, ThemePalette, Token};
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{FontStyle as SyntectFontStyle, Theme, ThemeSet};
 use syntect::parsing::{SyntaxDefinition, SyntaxSet};
@@ -104,11 +104,11 @@ pub fn theme(choice: ThemeChoice) -> Result<&'static Theme, HighlightError> {
 ///
 /// # Example
 /// ```
-/// use codeshot_models::{RgbColor, ThemeChoice};
-/// let palette = codeshot_highlighter::theme_palette(ThemeChoice::Dracula)?;
+/// use codeframe_models::{RgbColor, ThemeChoice};
+/// let palette = codeframe_highlighter::theme_palette(ThemeChoice::Dracula)?;
 /// assert_eq!(palette.background, RgbColor::new(0x28, 0x2a, 0x36));
 /// assert_eq!(palette.foreground, RgbColor::new(0xf8, 0xf8, 0xf2));
-/// # Ok::<(), codeshot_highlighter::HighlightError>(())
+/// # Ok::<(), codeframe_highlighter::HighlightError>(())
 /// ```
 pub fn theme_palette(choice: ThemeChoice) -> Result<ThemePalette, HighlightError> {
   let theme = theme(choice)?;
@@ -136,12 +136,12 @@ pub fn theme_palette(choice: ThemeChoice) -> Result<ThemePalette, HighlightError
 ///
 /// # Example
 /// ```
-/// use codeshot_models::{Language, RgbColor, ThemeChoice};
-/// let tokens = codeshot_highlighter::highlight("fn main() {}", Language::Rust, ThemeChoice::Dracula)?;
+/// use codeframe_models::{Language, RgbColor, ThemeChoice};
+/// let tokens = codeframe_highlighter::highlight("fn main() {}", Language::Rust, ThemeChoice::Dracula)?;
 /// // Dracula colors keywords pink (#ff79c6).
 /// let pink = RgbColor::new(0xff, 0x79, 0xc6);
 /// assert!(tokens.iter().any(|t| t.text.contains("fn") && t.color == pink));
-/// # Ok::<(), codeshot_highlighter::HighlightError>(())
+/// # Ok::<(), codeframe_highlighter::HighlightError>(())
 /// ```
 pub fn highlight(
   code: &str,

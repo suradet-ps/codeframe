@@ -1,6 +1,6 @@
 //! Pure layout math - no browser APIs, fully unit-testable on any host.
 
-use codeshot_models::{ExportOptions, Token};
+use codeframe_models::{ExportOptions, Token};
 
 /// Tab stops are expanded to this many spaces before measuring and drawing
 /// (Canvas2D text has no tab stops).
@@ -28,7 +28,7 @@ pub const GUTTER_GAP_CELLS: f64 = 1.5;
 ///
 /// # Example
 /// ```
-/// assert_eq!(codeshot_renderer::layout::expand_tabs("a\tb", 4), "a    b");
+/// assert_eq!(codeframe_renderer::layout::expand_tabs("a\tb", 4), "a    b");
 /// ```
 pub fn expand_tabs(text: &str, tab_width: usize) -> String {
   text.replace('\t', &" ".repeat(tab_width))
@@ -39,13 +39,13 @@ pub fn expand_tabs(text: &str, tab_width: usize) -> String {
 ///
 /// # Example
 /// ```
-/// use codeshot_models::{FontStyle, RgbColor, Token};
+/// use codeframe_models::{FontStyle, RgbColor, Token};
 /// let color = RgbColor::new(1, 2, 3);
 /// let tokens = vec![
 ///     Token { text: "a\nb".into(), color, font_style: FontStyle::default() },
 ///     Token { text: "\nc".into(), color, font_style: FontStyle::default() },
 /// ];
-/// let lines = codeshot_renderer::layout::split_tokens_into_lines(&tokens);
+/// let lines = codeframe_renderer::layout::split_tokens_into_lines(&tokens);
 /// assert_eq!(lines.len(), 3);
 /// assert_eq!(lines[0][0].text, "a");
 /// assert_eq!(lines[1][0].text, "b");
@@ -169,7 +169,7 @@ mod tests {
 
   #[test]
   fn split_preserves_empty_lines_and_expands_tabs() {
-    use codeshot_models::{FontStyle, RgbColor};
+    use codeframe_models::{FontStyle, RgbColor};
     let color = RgbColor::new(0, 0, 0);
     let tokens = vec![Token {
       text: "a\n\n\tb".to_string(),

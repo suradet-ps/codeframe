@@ -1,4 +1,4 @@
-# CodeShot
+# CodeFrame
 
 **Code → PNG, entirely in your browser.**
 
@@ -11,9 +11,9 @@ No server. No tracking. No watermarks.
 
 ---
 
-## What is CodeShot?
+## What is CodeFrame?
 
-CodeShot converts source code into high-resolution PNG images, running entirely in the browser via WebAssembly. There is no backend - every highlight, every pixel, every export happens locally on your machine.
+CodeFrame converts source code into high-resolution PNG images, running entirely in the browser via WebAssembly. There is no backend - every highlight, every pixel, every export happens locally on your machine.
 
 Built as a lightweight alternative to carbon.now.sh and ray.so, with one differentiator: **export resolution is not capped by your screen's devicePixelRatio**. You can export at 4x, 8x, or even 12x scale for print-quality output.
 
@@ -54,7 +54,7 @@ Outputs a static site to `dist/` - deployable to Cloudflare Pages, Vercel, GitHu
 ## Project Structure
 
 ```
-codeshot/
+CodeFrame/
 ├── crates/
 │   ├── app/          # Leptos CSR UI - components, signals, event handlers
 │   ├── highlighter/  # syntect wrapper, framework-agnostic token stream
@@ -80,7 +80,7 @@ codeshot/
 
 ## Architecture
 
-CodeShot follows a workspace-based architecture with clear crate boundaries:
+CodeFrame follows a workspace-based architecture with clear crate boundaries:
 
 - **`models`** - Shared vocabulary (Token, ExportOptions, Language, Theme). No web-sys or Leptos dependency.
 - **`highlighter`** - Takes source code + language, returns a colored token stream. Framework-agnostic.
@@ -91,7 +91,7 @@ This separation allows `renderer` and `highlighter` to be unit-tested without a 
 
 ## Design System
 
-CodeShot uses an editorial monochrome design system inspired by austere, restraint-first aesthetics:
+CodeFrame uses an editorial monochrome design system inspired by austere, restraint-first aesthetics:
 
 - Monochrome palette with five tiers of grey for the entire UI
 - Hairline dividers instead of thick borders or shadows

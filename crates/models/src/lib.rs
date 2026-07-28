@@ -1,4 +1,4 @@
-//! Shared vocabulary types for CodeShot.
+//! Shared vocabulary types for CodeFrame.
 //!
 //! This crate intentionally has no dependencies beyond `serde` - it must
 //! compile on any target (including non-wasm hosts) and knows nothing about

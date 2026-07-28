@@ -1,6 +1,6 @@
-# DESIGN.md - CodeShot Design System
+# DESIGN.md - CodeFrame Design System
 
-> The visual language of CodeShot: an editorial monochrome system built for
+> The visual language of CodeFrame: an editorial monochrome system built for
 > focus, restraint, and readability. This file is the single source of truth
 > for any UI work.
 
@@ -8,7 +8,7 @@
 
 ## Philosophy
 
-CodeShot is a tool for presenting code, not for decorating it. The design
+CodeFrame is a tool for presenting code, not for decorating it. The design
 system follows three principles:
 
 1. **Restraint over expression.** The UI should disappear. The code - and
@@ -132,7 +132,7 @@ same token names are reused across all three themes (`light`, `dark`,
 
 ## Elevation Model
 
-CodeShot uses tonal shifts, not shadows, for depth:
+CodeFrame uses tonal shifts, not shadows, for depth:
 
 | Level | Surface | Use |
 |-------|---------|-----|
@@ -268,7 +268,7 @@ Warm reading mode with paper-like tones:
 The UI theme is controlled by a `data-theme` attribute on `<html>`, cycled
 through `light` → `dark` → `sepia` → `light` by the `ThemeToggle` button
 in the topbar. The choice is persisted to `localStorage` under the key
-`codeshot-ui-theme` and restored on page load.
+`CodeFrame-ui-theme` and restored on page load.
 
 This is independent of the **canvas syntax theme** (Dracula, One Dark, etc.)
 which only affects the exported code image.

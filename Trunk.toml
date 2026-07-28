@@ -1,4 +1,4 @@
-# Trunk config for the CodeShot workspace.
+# Trunk config for the CodeFrame workspace.
 #
 # This file must exist: without it, Trunk auto-detects the workspace-root
 # Cargo.toml as its config source and fails because a virtual manifest has no

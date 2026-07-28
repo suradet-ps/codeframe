@@ -1,4 +1,4 @@
-//! Canvas-drawing logic for CodeShot.
+//! Canvas-drawing logic for CodeFrame.
 //!
 //! Split into two layers (AGENTS.md §3):
 //! * [`layout`] - pure geometry math, no browser APIs, unit-testable anywhere.

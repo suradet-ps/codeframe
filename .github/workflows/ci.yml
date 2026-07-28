@@ -26,7 +26,7 @@ jobs:
           toolchain: stable
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@23869a5bd66c73db3c0ac40331f3206eb23791dc # v2.9.1
-      - run: cargo check -p codeshot-app --target wasm32-unknown-unknown
+      - run: cargo check -p CodeFrame-app --target wasm32-unknown-unknown
 
   clippy:
     name: Clippy

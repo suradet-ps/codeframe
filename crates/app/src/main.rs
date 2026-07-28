@@ -1,4 +1,4 @@
-//! CodeShot - Leptos CSR frontend.
+//! CodeFrame - Leptos CSR frontend.
 //!
 //! This is the only crate that knows about Leptos: components, signals, and
 //! event handlers live here (AGENTS.md §3).
@@ -41,7 +41,7 @@ fn App() -> impl IntoView {
       <div class="app">
           <header class="topbar">
               <div class="brand">
-                  <span class="brand-name">"CodeShot"</span>
+                  <span class="brand-name">"CodeFrame"</span>
                   <span class="brand-tag">"code → png"</span>
               </div>
               <div class="topbar-actions">
