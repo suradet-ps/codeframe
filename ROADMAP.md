@@ -66,7 +66,8 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Controls**: Code textarea, language/theme/font selects, font-size/padding/
   corner-radius/line-height sliders, segmented scale selector (1x/2x/4x/8x + custom),
   target-width input, tab-width selector, window-frame and line-number toggles,
-  6 background presets + custom color picker (solid/gradient), filename template.
+  7 B&W background presets (Snow, Top Glow, Bottom Glow, Left Beam, Right Beam,
+  Center Radial, Dark Vignette). Filename template.
   Keyboard: Ctrl/Cmd+Enter to export, Tab inserts spaces.
 - **Tests**: 30 unit tests across `models` (4), `highlighter` (7), `renderer`
   (13 in `layout.rs` + `svg.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
@@ -84,8 +85,8 @@ PR #1 on `main` with all 7 CI jobs passing.
 Phase 2 (Visual Identity) is **complete**. Version bumped to `v0.4.0`.
 PR #3 on `main`.
 
-Phase 3 (Export & UX Depth) is **complete** (except split-screen). Version bumped to `v0.6.0`.
-PRs #7, #8 on `main`. The project now has:
+Phase 3 (Export & UX Depth) is **complete**. Version bumped to `v0.6.0`.
+PRs #7, #8, #9 on `main`. The project now has:
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
@@ -102,8 +103,8 @@ PRs #7, #8 on `main`. The project now has:
 | SVG export | Working |
 | Window frame (macOS traffic lights) | Working |
 | Line numbers | Working |
-| Background presets (6) | Working |
-| Custom background color picker (solid/gradient) | Working |
+| Background presets (7 B&W) | Working |
+| Split-screen comparison (separate code inputs) | Working |
 | Font-size / padding / corner-radius controls | Working |
 | Line-height slider (1.0–2.5) | Working |
 | Tab-width control (2/4/8) | Working |
@@ -147,9 +148,8 @@ PRs #7, #8 on `main`. The project now has:
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
 | **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
-| **v0.6** | Export & UX | SVG export, custom bg color picker, custom export dimensions ✅ |
-| **v0.7** | Export & UX | Split-screen comparison ✅ |
-| **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
+| **v0.6** | Export & UX | SVG export, B&W background presets, custom export dimensions, split-screen comparison ✅ |
+| **v0.7** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
 ---
@@ -255,10 +255,11 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   `layout.rs`. Expose as a select (2 / 4 / 8) so users can match their
   editor's settings.
 
-- [x] **Custom background color picker** - beyond the 6 presets, allow
-  the user to pick a solid color or define a two-stop gradient via a
-  simple color input. The `Background` enum in `models` already supports
-  `Solid(RgbColor)` and `Gradient(Vec<RgbColor>)`.
+- [x] **B&W background presets** - 7 curated monochrome presets (Snow,
+  Top Glow, Bottom Glow, Left Beam, Right Beam, Center Radial, Dark
+  Vignette). The `Background` enum in `models` supports `Solid(RgbColor)`,
+  `LinearGradient { colors, dir }`, and `RadialGradient { colors }` with
+  a `GradientDir` enum (`ToBottom`, `ToTop`, `ToRight`, `ToLeft`).
 
 - [x] **Code input improvements** - tab key inserts spaces (not focus-
   trap), line numbers in the textarea gutter (CSS counter), and a
@@ -276,12 +277,11 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   (e.g. 1200px for Twitter, 1920 for a slide) and compute the scale
   from that, instead of always starting from logical size × scale.
 
-- [x] **Split-screen comparison** - side-by-side view showing two code
-  snippets (or the same snippet with different themes/settings) in a
-  single exported image. The rendering layer already supports drawing
-  at arbitrary canvas positions (`render_to_canvas` is pure), so the
-  core work is UI + state: two code inputs, two settings panels, a
-  divider line, and a combined export canvas that draws both halves.
+- [x] **Split-screen comparison** - side-by-side view with separate code
+  inputs per panel (each panel has its own `<textarea>` bound to its own
+  signal). The rendering layer supports drawing at arbitrary canvas
+  positions (`render_split_to_canvas`), and the combined export canvas
+  draws both halves into a single PNG/SVG.
 
 **Acceptance:** SVG export produces valid, renderable SVG; clipboard copy works
 in Chrome/Firefox/Safari; every new control is reactive (Leptos signal), has

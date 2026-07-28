@@ -22,9 +22,12 @@ Built as a lightweight alternative to carbon.now.sh and ray.so, with one differe
 - **Browser-native rendering** - syntax highlighting via `syntect`, canvas drawing via `web-sys`. No DOM screenshots, no html2canvas.
 - **High-resolution export** - user-selectable scale up to 12x. Canvas pixel size = logical size × scale, not upscaled after the fact.
 - **15 languages** - Rust, Python, JavaScript, TypeScript, Go, Java, C, C++, HTML, CSS, JSON, YAML, TOML, Bash, SQL.
-- **4 themes** - Dracula, One Dark, Nord, GitHub Light.
+- **7 themes** - Dracula, One Dark, Nord, GitHub Light, Tokyo Night, Catppuccin Mocha, Monokai.
 - **3 monospace fonts** - JetBrains Mono, Fira Code, Cascadia Code (all bundled as woff2/ttf).
 - **Live preview** - Reactivity-driven canvas updates as you type, with a capped preview scale for performance.
+- **SVG export** - token-accurate SVG output alongside PNG, using the same layout engine.
+- **Split-screen comparison** - side-by-side view with separate code inputs for each panel.
+- **7 B&W background presets** - Snow, Top Glow, Bottom Glow, Left Beam, Right Beam, Center Radial, Dark Vignette. Curated monochrome gradients, no custom color picker needed.
 - **Zero dependencies at runtime** - static WASM, no server required.
 
 ## Getting Started
@@ -61,7 +64,7 @@ CodeFrame/
 │   ├── renderer/     # Canvas2D drawing logic, no Leptos dependency
 │   └── models/       # Shared types: Theme, ExportOptions, Token, Language
 ├── fonts/            # Bundled monospace fonts (woff2/ttf)
-├── themes/           # Bundled .tmTheme files (Dracula, One Dark, Nord, GitHub Light)
+├── themes/           # Bundled .tmTheme files (7 themes: Dracula, One Dark, Nord, GitHub Light, Tokyo Night, Catppuccin Mocha, Monokai)
 ├── syntaxes/         # Extra .sublime-syntax grammars (TypeScript, TOML)
 ├── style.css         # UI design tokens and component styles
 ├── index.html        # Trunk entry point
@@ -82,9 +85,9 @@ CodeFrame/
 
 CodeFrame follows a workspace-based architecture with clear crate boundaries:
 
-- **`models`** - Shared vocabulary (Token, ExportOptions, Language, Theme). No web-sys or Leptos dependency.
+- **`models`** - Shared vocabulary (Token, ExportOptions, Background, GradientDir, Language, Theme). No web-sys or Leptos dependency.
 - **`highlighter`** - Takes source code + language, returns a colored token stream. Framework-agnostic.
-- **`renderer`** - Takes tokens + export options, draws onto a `CanvasRenderingContext2d`. No Leptos dependency.
+- **`renderer`** - Takes tokens + export options, draws onto a `CanvasRenderingContext2d` (PNG) or emits SVG markup. No Leptos dependency.
 - **`app`** - The only crate that knows about Leptos. Wires signals, components, and event handlers.
 
 This separation allows `renderer` and `highlighter` to be unit-tested without a WASM runtime.
@@ -112,7 +115,6 @@ See [SECURITY.md](SECURITY.md) for the security posture, data flow, and vulnerab
 ## Known Limitations
 
 - **Font ligatures** - Canvas2D `fillText()` does not support ligature shaping. Sequences like `!=` or `=>` in ligature fonts (Fira Code, JetBrains Mono, Cascadia Code) render as separate glyphs. A warning is shown in the UI when a ligature font is selected.
-- **No SVG export** in v1 - the token stream is designed to support this in the future.
 - **No server-side rendering** - export is purely client-side via `canvas.toBlob()`.
 
 ## License
