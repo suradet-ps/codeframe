@@ -7,6 +7,7 @@ use leptos::prelude::*;
 use crate::state::{Settings, SAMPLE_CODE};
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
+const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
 
 /// CSS value used to paint a background swatch button.
 fn background_css(background: &Background) -> String {
@@ -164,6 +165,31 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           <section>
               <label class="control-label">"Corner radius"</label>
               <Slider value=settings.corner_radius min=0.0 max=24.0 step=1.0 format=|v| format!("{v}px") />
+          </section>
+
+          <section>
+              <label class="control-label">"Line height"</label>
+              <Slider value=settings.line_height min=1.0 max=2.5 step=0.1 format=|v| format!("{v:.1}") />
+          </section>
+
+          <section>
+              <label class="control-label">"Tab width"</label>
+              <div class="segmented">
+                  {TAB_WIDTH_PRESETS
+                      .into_iter()
+                      .map(|preset| {
+                          view! {
+                              <button
+                                  class="seg"
+                                  class:active=move || settings.tab_width.get() == preset
+                                  on:click=move |_| settings.tab_width.set(preset)
+                              >
+                                  {format!("{preset}")}
+                              </button>
+                          }
+                      })
+                      .collect_view()}
+              </div>
           </section>
 
           <section>
