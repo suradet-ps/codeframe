@@ -209,7 +209,7 @@ pub fn render_svg(
 }
 
 /// Gap between panels in split-screen SVG (logical px).
-const SPLIT_GAP: f64 = 16.0;
+const SPLIT_GAP: f64 = 6.0;
 
 /// Render two code panels side by side as a single SVG.
 pub fn render_split_svg(

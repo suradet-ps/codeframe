@@ -104,7 +104,7 @@ pub fn Controls(settings: Settings) -> impl IntoView {
   view! {
       <aside class="controls">
           <section>
-              <label class="control-label" for="code-input">"Code"</label>
+              <label class="control-label" for="code-input">{move || if settings.split_enabled.get() { "Left panel code" } else { "Code" }}</label>
               <textarea
                   id="code-input"
                   class="code-input"
@@ -130,6 +130,41 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   }
               >{SAMPLE_CODE}</textarea>
           </section>
+
+          {move || {
+              settings.split_enabled.get().then(|| {
+                  let code_signal = settings.split_code;
+                  view! {
+                      <section>
+                          <label class="control-label split-label">"Right panel code"</label>
+                          <textarea
+                              class="code-input"
+                              rows="12"
+                              spellcheck="false"
+                              autocomplete="off"
+                              prop:value=move || code_signal.get()
+                              on:input=move |ev| code_signal.set(event_target_value(&ev))
+                              on:keydown=move |ev| {
+                                  if ev.key() == "Tab" {
+                                      ev.prevent_default();
+                                      let target = ev.target().unwrap();
+                                      let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                                      let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                                      let value = textarea.value();
+                                      let spaces = " ".repeat(settings.tab_width.get());
+                                      let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                                      code_signal.set(new_value.clone());
+                                      textarea.set_value(&new_value);
+                                      let pos = (start + spaces.len()) as u32;
+                                      let _ = textarea.set_selection_range(pos, pos);
+                                  }
+                              }
+                          ></textarea>
+                      </section>
+                  }
+              })
+          }}
 
           <div class="control-row">
               <section>

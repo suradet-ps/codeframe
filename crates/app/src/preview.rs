@@ -27,6 +27,7 @@ pub fn Preview(settings: Settings) -> impl IntoView {
     let language = settings.language.get();
     let theme = settings.theme.get();
     let split_enabled = settings.split_enabled.get();
+    let split_code = settings.split_code.get();
     let split_theme = settings.split_theme.get();
     let split_language = settings.split_language.get();
     // Track custom background signals so preview updates when they change.
@@ -59,7 +60,7 @@ pub fn Preview(settings: Settings) -> impl IntoView {
           let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
           let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
           let tokens_right =
-            highlight(&code, split_language, split_theme).map_err(|e| e.to_string())?;
+            highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
           let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
           render_split_to_canvas(
             &canvas,

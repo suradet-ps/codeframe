@@ -358,7 +358,7 @@ pub fn render_to_canvas(
 }
 
 /// Gap between the two panels in split-screen mode (logical px).
-const SPLIT_GAP: f64 = 16.0;
+const SPLIT_GAP: f64 = 6.0;
 
 /// Fully-resolved geometry for a split-screen render.
 #[derive(Clone, Debug)]

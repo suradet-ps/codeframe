@@ -102,6 +102,8 @@ pub struct Settings {
   pub target_width: RwSignal<Option<f64>>,
   /// Split-screen mode: show two code cards side by side.
   pub split_enabled: RwSignal<bool>,
+  /// Code for the right panel in split-screen mode.
+  pub split_code: RwSignal<String>,
   /// Theme for the right panel in split-screen mode.
   pub split_theme: RwSignal<ThemeChoice>,
   /// Language for the right panel in split-screen mode.
@@ -143,6 +145,7 @@ impl Settings {
       custom_color_2: RwSignal::new("#ec4899".to_string()),
       target_width: RwSignal::new(None),
       split_enabled: RwSignal::new(false),
+      split_code: RwSignal::new(SAMPLE_CODE.to_string()),
       split_theme: RwSignal::new(ThemeChoice::OneDark),
       split_language: RwSignal::new(Language::Rust),
     }

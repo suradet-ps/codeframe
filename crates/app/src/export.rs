@@ -70,6 +70,7 @@ async fn do_export_png(settings: Settings) -> Result<(), String> {
   let language = settings.language.get_untracked();
   let theme = settings.theme.get_untracked();
   let split_enabled = settings.split_enabled.get_untracked();
+  let split_code = settings.split_code.get_untracked();
   let split_theme = settings.split_theme.get_untracked();
   let split_language = settings.split_language.get_untracked();
   let mut options = settings.export_options();
@@ -88,7 +89,7 @@ async fn do_export_png(settings: Settings) -> Result<(), String> {
   if split_enabled {
     let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
     let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
-    let tokens_right = highlight(&code, split_language, split_theme).map_err(|e| e.to_string())?;
+    let tokens_right = highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
     let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
 
     // For target_width in split mode, compute scale using combined width.
@@ -134,6 +135,7 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   let language = settings.language.get_untracked();
   let theme = settings.theme.get_untracked();
   let split_enabled = settings.split_enabled.get_untracked();
+  let split_code = settings.split_code.get_untracked();
   let split_theme = settings.split_theme.get_untracked();
   let split_language = settings.split_language.get_untracked();
   let mut options = settings.export_options();
@@ -148,7 +150,7 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   let (svg_string, _w, _h) = if split_enabled {
     let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
     let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
-    let tokens_right = highlight(&code, split_language, split_theme).map_err(|e| e.to_string())?;
+    let tokens_right = highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
     let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
 
     if let Some(target) = settings.target_width.get_untracked() {
