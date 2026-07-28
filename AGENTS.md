@@ -15,7 +15,6 @@
 ### Non-goals for v1
 - No user accounts / no cloud save
 - No server-side rendering or headless-browser export (ruled out entirely for the first version)
-- No SVG export in v1 (design the token stream to be generic enough to add this later, but don't implement it now)
 
 ---
 
@@ -86,11 +85,17 @@ Selects Language + Theme + ExportOptions (scale, padding, background, window-fra
         ↓
 highlighter::highlight(code, language, theme) -> Vec<Token>
         ↓
-renderer::draw(ctx: &CanvasRenderingContext2d, tokens: &[Token], options: &ExportOptions)
+renderer::draw(ctx, tokens, options)          → PNG via Canvas2D
+renderer::render_svg(tokens, options)          → SVG string
         ↓
 [preview] canvas rendered live, scaled down via CSS to fit the screen
 [export]  canvas.toBlob("image/png") -> Blob -> ObjectURL -> <a download>
+          or render_svg() -> Blob -> ObjectURL -> <a download>
 ```
+
+### Split-screen mode
+
+When split mode is enabled, the app maintains a second code input (`split_code: RwSignal<String>`) and renders both panels side-by-side on a combined canvas. Each panel draws independently at the same theme/font/scale settings but with separate source code.
 
 ### Critical resolution rules (the project's core differentiator)
 
@@ -131,10 +136,23 @@ pub struct Token {
     pub font_style: FontStyle,  // bold / italic / underline (from theme)
 }
 
+pub enum GradientDir {
+    ToBottom,
+    ToTop,
+    ToRight,
+    ToLeft,
+}
+
+pub enum Background {
+    Solid(RgbColor),
+    LinearGradient { colors: Vec<RgbColor>, dir: GradientDir },
+    RadialGradient { colors: Vec<RgbColor> },
+}
+
 pub struct ExportOptions {
     pub scale: f64,              // 1.0, 2.0, 4.0, 8.0, or custom
     pub padding: f64,             // px, at 1x scale
-    pub background: Background,   // Solid(RgbColor) | Gradient(Vec<RgbColor>)
+    pub background: Background,   // Solid | LinearGradient | RadialGradient
     pub window_frame: bool,
     pub line_numbers: bool,
     pub font_family: FontChoice,  // enum of bundled fonts
@@ -143,7 +161,7 @@ pub struct ExportOptions {
     pub corner_radius: f64,
 }
 
-pub enum Language { Rust, Python, JavaScript, TypeScript, /* ... */ }
+pub enum Language { Rust, Python, JavaScript, TypeScript, /* ...15 total */ }
 ```
 
 **Rule:** Never introduce `web_sys::CanvasRenderingContext2d` or any Leptos type into `models` - this crate must compile even without the `wasm32` target.
@@ -181,7 +199,7 @@ boot, live re-render on settings change, line-number gutter, theme switching,
 ## 9. Open Questions to Resolve Before M3 - RESOLVED
 
 - [x] How many fonts to bundle in v1? **3: JetBrains Mono, Fira Code, Cascadia Code** (woff2/ttf in `fonts/`, see `fonts/README.md` for sources & licenses). All three have ligatures → the ligature warning shows for any selection.
-- [x] How many themes to bundle? **4: Dracula, One Dark, GitHub Light, Nord** (hand-written `.tmTheme` files in `themes/` using the official palettes, embedded via `include_bytes!` and parsed lazily).
+- [x] How many themes to bundle? **7: Dracula, One Dark, GitHub Light, Nord, Tokyo Night, Catppuccin Mocha, Monokai** (hand-written `.tmTheme` files in `themes/` using the official palettes, embedded via `include_bytes!` and parsed lazily).
 - [x] What scale cap should the preview canvas use to avoid jank while typing? **2x** (`PREVIEW_SCALE_CAP` in `crates/app/src/preview.rs`, clamped against `devicePixelRatio`).
 
 ---

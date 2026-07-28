@@ -50,64 +50,95 @@ pub struct Token {
   pub font_style: FontStyle,
 }
 
+/// Direction for a linear gradient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum GradientDir {
+  ToBottom,
+  ToTop,
+  ToRight,
+  ToLeft,
+}
+
+impl GradientDir {
+  /// CSS angle in degrees for this direction.
+  pub fn css_angle(self) -> f64 {
+    match self {
+      GradientDir::ToBottom => 180.0,
+      GradientDir::ToTop => 0.0,
+      GradientDir::ToRight => 90.0,
+      GradientDir::ToLeft => 270.0,
+    }
+  }
+}
+
 /// Canvas backdrop painted behind the code card.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Background {
   Solid(RgbColor),
-  /// Linear gradient drawn diagonally (top-left → bottom-right); stops are
-  /// spaced evenly. A single entry degenerates to a solid fill.
-  Gradient(Vec<RgbColor>),
+  LinearGradient {
+    colors: Vec<RgbColor>,
+    dir: GradientDir,
+  },
+  RadialGradient {
+    colors: Vec<RgbColor>,
+  },
 }
 
 impl Background {
-  /// Built-in presets shown in the UI: `(display name, background)`.
+  /// Built-in B&W presets shown in the UI: `(display name, background)`.
   pub fn presets() -> Vec<(&'static str, Background)> {
+    let black = RgbColor::new(0x00, 0x00, 0x00);
+    let white = RgbColor::new(0xff, 0xff, 0xff);
+    let dark_gray = RgbColor::new(0x1a, 0x1a, 0x1a);
     vec![
+      ("Snow", Background::Solid(white)),
       (
-        "Aurora",
-        Background::Gradient(vec![
-          RgbColor::new(0x63, 0x66, 0xf1),
-          RgbColor::new(0xa8, 0x55, 0xf7),
-          RgbColor::new(0xec, 0x48, 0x99),
-        ]),
+        "Top Glow",
+        Background::LinearGradient {
+          colors: vec![white, black],
+          dir: GradientDir::ToBottom,
+        },
       ),
       (
-        "Sunset",
-        Background::Gradient(vec![
-          RgbColor::new(0xf9, 0x73, 0x16),
-          RgbColor::new(0xdb, 0x27, 0x77),
-        ]),
+        "Bottom Glow",
+        Background::LinearGradient {
+          colors: vec![white, black],
+          dir: GradientDir::ToTop,
+        },
       ),
       (
-        "Ocean",
-        Background::Gradient(vec![
-          RgbColor::new(0x0e, 0xa5, 0xe9),
-          RgbColor::new(0x22, 0xd3, 0xee),
-        ]),
+        "Left Beam",
+        Background::LinearGradient {
+          colors: vec![white, black],
+          dir: GradientDir::ToRight,
+        },
       ),
       (
-        "Forest",
-        Background::Gradient(vec![
-          RgbColor::new(0x16, 0xa3, 0x4a),
-          RgbColor::new(0x84, 0xcc, 0x16),
-        ]),
+        "Right Beam",
+        Background::LinearGradient {
+          colors: vec![white, black],
+          dir: GradientDir::ToLeft,
+        },
       ),
       (
-        "Midnight",
-        Background::Solid(RgbColor::new(0x1e, 0x1e, 0x2e)),
+        "Center Radial",
+        Background::RadialGradient {
+          colors: vec![white, black],
+        },
       ),
-      ("Paper", Background::Solid(RgbColor::new(0xf5, 0xf5, 0xf5))),
+      (
+        "Dark Vignette",
+        Background::RadialGradient {
+          colors: vec![black, dark_gray, white],
+        },
+      ),
     ]
   }
 }
 
 impl Default for Background {
   fn default() -> Self {
-    Background::Gradient(vec![
-      RgbColor::new(0x63, 0x66, 0xf1),
-      RgbColor::new(0xa8, 0x55, 0xf7),
-      RgbColor::new(0xec, 0x48, 0x99),
-    ])
+    Background::Solid(RgbColor::new(0xff, 0xff, 0xff))
   }
 }
 
@@ -341,7 +372,8 @@ mod tests {
     for (_, bg) in &presets {
       match bg {
         Background::Solid(_) => {}
-        Background::Gradient(colors) => assert!(colors.len() >= 2),
+        Background::LinearGradient { colors, .. } => assert!(colors.len() >= 2),
+        Background::RadialGradient { colors } => assert!(colors.len() >= 2),
       }
     }
   }

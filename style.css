@@ -473,9 +473,10 @@ input:focus {
 }
 
 /* ---- Background swatches ---- */
-.swatches {
+.swatches,
+.bw-swatches {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--sp-xs);
 }
 
@@ -495,35 +496,6 @@ input:focus {
 .swatch.active {
     border-color: var(--ink);
     border-width: 2px;
-}
-
-/* ---- Custom background controls ---- */
-.custom-bg-controls {
-    margin-top: var(--sp-sm);
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-sm);
-}
-
-.color-pickers {
-    display: flex;
-    gap: var(--sp-sm);
-}
-
-.color-pick {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-xxs);
-}
-
-.color-pick input[type="color"] {
-    width: 48px;
-    height: 32px;
-    border: 1px solid var(--hairline);
-    border-radius: 0;
-    padding: 0;
-    cursor: pointer;
-    background: none;
 }
 
 /* ---- Split-screen controls ---- */

@@ -6,7 +6,7 @@
 //! (rounded rect, optional drop shadow) → traffic lights → tokens →
 //! line numbers.
 
-use codeframe_models::{Background, ExportOptions, FontStyle, ThemePalette, Token};
+use codeframe_models::{Background, ExportOptions, FontStyle, GradientDir, ThemePalette, Token};
 use thiserror::Error;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
@@ -22,6 +22,16 @@ pub const MAX_CANVAS_DIMENSION: f64 = 16384.0;
 
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
+
+/// Map a [`GradientDir`] to canvas linear-gradient start/end coordinates.
+fn dir_to_coords(dir: GradientDir, w: f64, h: f64) -> (f64, f64, f64, f64) {
+  match dir {
+    GradientDir::ToBottom => (w / 2.0, 0.0, w / 2.0, h),
+    GradientDir::ToTop => (w / 2.0, h, w / 2.0, 0.0),
+    GradientDir::ToRight => (0.0, h / 2.0, w, h / 2.0),
+    GradientDir::ToLeft => (w, h / 2.0, 0.0, h / 2.0),
+  }
+}
 
 /// Errors that can occur while measuring, sizing, or drawing the canvas.
 #[derive(Debug, Error)]
@@ -211,23 +221,28 @@ pub fn draw_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
     }
-    Background::Gradient(colors) => match colors.as_slice() {
-      [] => {} // transparent PNG backdrop
-      [single] => {
-        ctx.set_fill_style_str(&single.to_css());
-        ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    Background::LinearGradient { colors, dir } => {
+      let (x1, y1, x2, y2) = dir_to_coords(*dir, layout.canvas_width, layout.canvas_height);
+      let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-      many => {
-        let gradient =
-          ctx.create_linear_gradient(0.0, 0.0, layout.canvas_width, layout.canvas_height);
-        let last = many.len() - 1;
-        for (index, color) in many.iter().enumerate() {
-          gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
-        }
-        ctx.set_fill_style_canvas_gradient(&gradient);
-        ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    }
+    Background::RadialGradient { colors } => {
+      let cx = layout.canvas_width / 2.0;
+      let cy = layout.canvas_height / 2.0;
+      let r = cx.max(cy);
+      let gradient = ctx.create_radial_gradient(cx, cy, 0.0, cx, cy, r)?;
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-    },
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    }
   }
 
   // 2. Code card: rounded rect filled with the theme background, with a
@@ -473,23 +488,28 @@ pub fn draw_split_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
     }
-    Background::Gradient(colors) => match colors.as_slice() {
-      [] => {}
-      [single] => {
-        ctx.set_fill_style_str(&single.to_css());
-        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    Background::LinearGradient { colors, dir } => {
+      let (x1, y1, x2, y2) = dir_to_coords(*dir, split.canvas_width, split.canvas_height);
+      let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-      many => {
-        let gradient =
-          ctx.create_linear_gradient(0.0, 0.0, split.canvas_width, split.canvas_height);
-        let last = many.len() - 1;
-        for (index, color) in many.iter().enumerate() {
-          gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
-        }
-        ctx.set_fill_style_canvas_gradient(&gradient);
-        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    }
+    Background::RadialGradient { colors } => {
+      let cx = split.canvas_width / 2.0;
+      let cy = split.canvas_height / 2.0;
+      let r = cx.max(cy);
+      let gradient = ctx.create_radial_gradient(cx, cy, 0.0, cx, cy, r)?;
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-    },
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    }
   }
 
   // 2. Left panel (at origin).
