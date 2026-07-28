@@ -13,6 +13,8 @@ mod theme;
 
 use leptos::mount::mount_to_body;
 use leptos::prelude::*;
+use wasm_bindgen::closure::Closure;
+use wasm_bindgen::JsCast;
 use web_sys::window;
 
 use crate::controls::Controls;
@@ -37,6 +39,34 @@ fn App() -> impl IntoView {
       let _ = html.set_attribute("data-theme", theme.as_str());
     }
   });
+
+  // Keyboard shortcuts: Ctrl/Cmd+Enter to export.
+  {
+    let settings_kbd = settings;
+    let set_export_error_kbd = set_export_error;
+    let set_exporting_kbd = set_exporting;
+    let listener = Closure::wrap(Box::new(move |ev: web_sys::KeyboardEvent| {
+      let ctrl = ev.ctrl_key() || ev.meta_key();
+      if ctrl && ev.key() == "Enter" {
+        ev.prevent_default();
+        set_export_error_kbd.set(None);
+        export::export_png(
+          settings_kbd,
+          set_exporting_kbd,
+          set_export_error_kbd,
+        );
+      }
+    }) as Box<dyn FnMut(_)>);
+    if let Some(win) = window() {
+      if let Some(doc) = win.document() {
+        let _ = doc.add_event_listener_with_callback(
+          "keydown",
+          listener.as_ref().unchecked_ref(),
+        );
+        listener.forget();
+      }
+    }
+  }
 
   view! {
       <div class="app">
