@@ -14,17 +14,19 @@ use crate::layout::{
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
-/// Convert an angle (degrees) to SVG linearGradient x1/y1/x2/y2 percentages.
-/// 0° = left→right, 90° = top→bottom, etc.
+/// Convert a CSS angle (degrees) to SVG linearGradient x1/y1/x2/y2 percentages.
+/// CSS convention: 0° = bottom→top, 90° = left→right, 180° = top→bottom,
+/// 270° = right→left.
 fn angle_to_svg_coords(angle: f64) -> (f64, f64, f64, f64) {
   let rad = angle.to_radians();
-  let cos = rad.cos();
-  let sin = rad.sin();
-  let x1 = 50.0 - cos * 50.0;
-  let y1 = 50.0 - sin * 50.0;
-  let x2 = 50.0 + cos * 50.0;
-  let y2 = 50.0 + sin * 50.0;
-  (x1, y1, x2, y2)
+  let dx = rad.sin();
+  let dy = -rad.cos();
+  (
+    50.0 - dx * 50.0,
+    50.0 - dy * 50.0,
+    50.0 + dx * 50.0,
+    50.0 + dy * 50.0,
+  )
 }
 
 /// Escape special XML characters.

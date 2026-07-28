@@ -23,17 +23,16 @@ pub const MAX_CANVAS_DIMENSION: f64 = 16384.0;
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
-/// Convert an angle (degrees) to linear-gradient start/end coordinates.
-/// 0° = left→right, 90° = top→bottom, 180° = right→left, 270° = bottom→top.
+/// Convert a CSS angle (degrees) to canvas linear-gradient coordinates.
+/// CSS convention: 0° = bottom→top, 90° = left→right, 180° = top→bottom,
+/// 270° = right→left.
 fn angle_to_coords(angle: f64, w: f64, h: f64) -> (f64, f64, f64, f64) {
   let rad = angle.to_radians();
-  let cos = rad.cos();
-  let sin = rad.sin();
+  let dx = rad.sin();
+  let dy = -rad.cos();
   let cx = w / 2.0;
   let cy = h / 2.0;
-  let dx = cx * cos;
-  let dy = cy * sin;
-  (cx - dx, cy - dy, cx + dx, cy + dy)
+  (cx - dx * cx, cy - dy * cy, cx + dx * cx, cy + dy * cy)
 }
 
 /// Errors that can occur while measuring, sizing, or drawing the canvas.

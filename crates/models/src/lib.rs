@@ -71,34 +71,33 @@ impl Background {
     let white = RgbColor::new(0xff, 0xff, 0xff);
     let dark_gray = RgbColor::new(0x1a, 0x1a, 0x1a);
     vec![
-      ("Midnight", Background::Solid(black)),
       ("Snow", Background::Solid(white)),
       (
         "Top Glow",
         Background::LinearGradient {
           colors: vec![white, black],
-          angle: 90.0,
+          angle: 180.0,
         },
       ),
       (
         "Bottom Glow",
         Background::LinearGradient {
           colors: vec![black, white],
-          angle: 90.0,
+          angle: 0.0,
         },
       ),
       (
         "Left Beam",
         Background::LinearGradient {
           colors: vec![white, black],
-          angle: 0.0,
+          angle: 90.0,
         },
       ),
       (
         "Right Beam",
         Background::LinearGradient {
           colors: vec![black, white],
-          angle: 0.0,
+          angle: 270.0,
         },
       ),
       (
@@ -110,7 +109,7 @@ impl Background {
       (
         "Dark Vignette",
         Background::RadialGradient {
-          colors: vec![dark_gray, black],
+          colors: vec![black, dark_gray],
         },
       ),
     ]
@@ -119,7 +118,7 @@ impl Background {
 
 impl Default for Background {
   fn default() -> Self {
-    Background::Solid(RgbColor::new(0x00, 0x00, 0x00))
+    Background::Solid(RgbColor::new(0xff, 0xff, 0xff))
   }
 }
 
