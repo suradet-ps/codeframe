@@ -89,7 +89,8 @@ async fn do_export_png(settings: Settings) -> Result<(), String> {
   if split_enabled {
     let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
     let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
-    let tokens_right = highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
+    let tokens_right =
+      highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
     let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
 
     // For target_width in split mode, compute scale using combined width.
@@ -150,7 +151,8 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   let (svg_string, _w, _h) = if split_enabled {
     let tokens_left = highlight(&code, language, theme).map_err(|e| e.to_string())?;
     let palette_left = theme_palette(theme).map_err(|e| e.to_string())?;
-    let tokens_right = highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
+    let tokens_right =
+      highlight(&split_code, split_language, split_theme).map_err(|e| e.to_string())?;
     let palette_right = theme_palette(split_theme).map_err(|e| e.to_string())?;
 
     if let Some(target) = settings.target_width.get_untracked() {
