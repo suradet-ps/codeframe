@@ -14,6 +14,19 @@ use crate::layout::{
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
+/// Convert an angle (degrees) to SVG linearGradient x1/y1/x2/y2 percentages.
+/// 0° = left→right, 90° = top→bottom, etc.
+fn angle_to_svg_coords(angle: f64) -> (f64, f64, f64, f64) {
+  let rad = angle.to_radians();
+  let cos = rad.cos();
+  let sin = rad.sin();
+  let x1 = 50.0 - cos * 50.0;
+  let y1 = 50.0 - sin * 50.0;
+  let x2 = 50.0 + cos * 50.0;
+  let y2 = 50.0 + sin * 50.0;
+  (x1, y1, x2, y2)
+}
+
 /// Escape special XML characters.
 fn esc(s: &str) -> String {
   s.replace('&', "&amp;")
@@ -90,10 +103,13 @@ pub fn render_svg(
       </filter>"#,
     );
   }
-  // Background gradient.
-  if let Background::Gradient(colors) = &options.background {
-    if colors.len() >= 2 {
-      svg.push_str("<linearGradient id=\"bg\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">");
+  // Background gradient defs.
+  match &options.background {
+    Background::LinearGradient { colors, angle } if colors.len() >= 2 => {
+      let (x1, y1, x2, y2) = angle_to_svg_coords(*angle);
+      svg.push_str(&format!(
+        "<linearGradient id=\"bg\" x1=\"{x1:.1}%\" y1=\"{y1:.1}%\" x2=\"{x2:.1}%\" y2=\"{y2:.1}%\">"
+      ));
       let last = colors.len() - 1;
       for (i, c) in colors.iter().enumerate() {
         let offset = i as f32 / last as f32 * 100.0;
@@ -104,6 +120,19 @@ pub fn render_svg(
       }
       svg.push_str("</linearGradient>");
     }
+    Background::RadialGradient { colors } if colors.len() >= 2 => {
+      svg.push_str("<radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\" r=\"70%\">");
+      let last = colors.len() - 1;
+      for (i, c) in colors.iter().enumerate() {
+        let offset = i as f32 / last as f32 * 100.0;
+        svg.push_str(&format!(
+          "<stop offset=\"{offset:.0}%\" stop-color=\"{}\"/>",
+          c.to_css()
+        ));
+      }
+      svg.push_str("</radialGradient>");
+    }
+    _ => {}
   }
   svg.push_str("</defs>");
 
@@ -115,10 +144,20 @@ pub fn render_svg(
         color.to_css()
       ));
     }
-    Background::Gradient(colors) => {
-      if colors.is_empty() {
-        // Transparent.
-      } else if colors.len() == 1 {
+    Background::LinearGradient { colors, .. } => {
+      if colors.len() == 1 {
+        svg.push_str(&format!(
+          "<rect width=\"{w}\" height=\"{h}\" fill=\"{}\"/>",
+          colors[0].to_css()
+        ));
+      } else {
+        svg.push_str(&format!(
+          "<rect width=\"{w}\" height=\"{h}\" fill=\"url(#bg)\"/>"
+        ));
+      }
+    }
+    Background::RadialGradient { colors } => {
+      if colors.len() == 1 {
         svg.push_str(&format!(
           "<rect width=\"{w}\" height=\"{h}\" fill=\"{}\"/>",
           colors[0].to_css()
@@ -263,9 +302,12 @@ pub fn render_split_svg(
       </filter>"#,
     );
   }
-  if let Background::Gradient(colors) = &options.background {
-    if colors.len() >= 2 {
-      svg.push_str("<linearGradient id=\"bg\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">");
+  match &options.background {
+    Background::LinearGradient { colors, angle } if colors.len() >= 2 => {
+      let (x1, y1, x2, y2) = angle_to_svg_coords(*angle);
+      svg.push_str(&format!(
+        "<linearGradient id=\"bg\" x1=\"{x1:.1}%\" y1=\"{y1:.1}%\" x2=\"{x2:.1}%\" y2=\"{y2:.1}%\">"
+      ));
       let last = colors.len() - 1;
       for (i, c) in colors.iter().enumerate() {
         let offset = i as f32 / last as f32 * 100.0;
@@ -276,6 +318,19 @@ pub fn render_split_svg(
       }
       svg.push_str("</linearGradient>");
     }
+    Background::RadialGradient { colors } if colors.len() >= 2 => {
+      svg.push_str("<radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\" r=\"70%\">");
+      let last = colors.len() - 1;
+      for (i, c) in colors.iter().enumerate() {
+        let offset = i as f32 / last as f32 * 100.0;
+        svg.push_str(&format!(
+          "<stop offset=\"{offset:.0}%\" stop-color=\"{}\"/>",
+          c.to_css()
+        ));
+      }
+      svg.push_str("</radialGradient>");
+    }
+    _ => {}
   }
   svg.push_str("</defs>");
 
@@ -287,13 +342,23 @@ pub fn render_split_svg(
         color.to_css()
       ));
     }
-    Background::Gradient(colors) => {
+    Background::LinearGradient { colors, .. } => {
       if colors.len() == 1 {
         svg.push_str(&format!(
           "<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"{}\"/>",
           colors[0].to_css()
         ));
-      } else if !colors.is_empty() {
+      } else {
+        svg.push_str("<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"url(#bg)\"/>");
+      }
+    }
+    Background::RadialGradient { colors } => {
+      if colors.len() == 1 {
+        svg.push_str(&format!(
+          "<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"{}\"/>",
+          colors[0].to_css()
+        ));
+      } else {
         svg.push_str("<rect width=\"{total_w}\" height=\"{total_h}\" fill=\"url(#bg)\"/>");
       }
     }

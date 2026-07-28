@@ -5,7 +5,7 @@ use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 
-use crate::state::{CustomBgMode, Settings, SAMPLE_CODE};
+use crate::state::{Settings, SAMPLE_CODE};
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
 const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
@@ -14,9 +14,13 @@ const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
 fn background_css(background: &Background) -> String {
   match background {
     Background::Solid(color) => color.to_css(),
-    Background::Gradient(colors) => {
+    Background::LinearGradient { colors, angle } => {
       let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
-      format!("linear-gradient(135deg, {})", stops.join(", "))
+      format!("linear-gradient({angle}deg, {})", stops.join(", "))
+    }
+    Background::RadialGradient { colors } => {
+      let stops: Vec<String> = colors.iter().map(|c| c.to_css()).collect();
+      format!("radial-gradient(circle, {})", stops.join(", "))
     }
   }
 }
@@ -341,20 +345,19 @@ pub fn Controls(settings: Settings) -> impl IntoView {
 
           <section>
               <label class="control-label">"Background"</label>
-              <div class="swatches">
+              <div class="bw-swatches">
                   {Background::presets()
                       .into_iter()
-                        .map(|(name, background)| {
-                            let css = format!("background: {}", background_css(&background));
-                            let bg_for_class = background.clone();
+                      .map(|(name, background)| {
+                          let css = format!("background: {}", background_css(&background));
+                          let bg_for_cmp = background.clone();
                           view! {
                               <button
-                                  class="swatch"
-                                  class:active=move || !settings.custom_bg_enabled.get() && settings.background.get() == bg_for_class
+                                  class="swatch bw-swatch"
+                                  class:active=move || settings.background.get() == bg_for_cmp
                                   title=name
                                   style=css
                                   on:click=move |_| {
-                                      settings.custom_bg_enabled.set(false);
                                       settings.background.set(background.clone());
                                   }
                               ></button>
@@ -362,61 +365,6 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                       })
                       .collect_view()}
               </div>
-          </section>
-
-          <section>
-              <label class="toggle">
-                  <input
-                      type="checkbox"
-                      prop:checked=move || settings.custom_bg_enabled.get()
-                      on:change=move |ev| settings.custom_bg_enabled.set(event_target_checked(&ev))
-                  />
-                  "Custom background"
-              </label>
-              {move || {
-                  settings.custom_bg_enabled.get().then(|| view! {
-                      <div class="custom-bg-controls">
-                          <div class="segmented">
-                              <button
-                                  class="seg"
-                                  class:active=move || settings.custom_bg_mode.get() == CustomBgMode::Solid
-                                  on:click=move |_| settings.custom_bg_mode.set(CustomBgMode::Solid)
-                              >
-                                  "Solid"
-                              </button>
-                              <button
-                                  class="seg"
-                                  class:active=move || settings.custom_bg_mode.get() == CustomBgMode::Gradient
-                                  on:click=move |_| settings.custom_bg_mode.set(CustomBgMode::Gradient)
-                              >
-                                  "Gradient"
-                              </button>
-                          </div>
-                          <div class="color-pickers">
-                              <label class="color-pick">
-                                  <span class="control-label">"Color 1"</span>
-                                  <input
-                                      type="color"
-                                      prop:value=move || settings.custom_color_1.get()
-                                      on:input=move |ev| settings.custom_color_1.set(event_target_value(&ev))
-                                  />
-                              </label>
-                              {move || {
-                                  (settings.custom_bg_mode.get() == CustomBgMode::Gradient).then(|| view! {
-                                      <label class="color-pick">
-                                          <span class="control-label">"Color 2"</span>
-                                          <input
-                                              type="color"
-                                              prop:value=move || settings.custom_color_2.get()
-                                              on:input=move |ev| settings.custom_color_2.set(event_target_value(&ev))
-                                          />
-                                      </label>
-                                  })
-                              }}
-                          </div>
-                      </div>
-                  })
-              }}
           </section>
 
           <section>

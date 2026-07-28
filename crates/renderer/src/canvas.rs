@@ -23,6 +23,19 @@ pub const MAX_CANVAS_DIMENSION: f64 = 16384.0;
 /// macOS traffic-light colors (close, minimize, zoom).
 const TRAFFIC_LIGHT_COLORS: [&str; 3] = ["#ff5f57", "#febc2e", "#28c840"];
 
+/// Convert an angle (degrees) to linear-gradient start/end coordinates.
+/// 0° = left→right, 90° = top→bottom, 180° = right→left, 270° = bottom→top.
+fn angle_to_coords(angle: f64, w: f64, h: f64) -> (f64, f64, f64, f64) {
+  let rad = angle.to_radians();
+  let cos = rad.cos();
+  let sin = rad.sin();
+  let cx = w / 2.0;
+  let cy = h / 2.0;
+  let dx = cx * cos;
+  let dy = cy * sin;
+  (cx - dx, cy - dy, cx + dx, cy + dy)
+}
+
 /// Errors that can occur while measuring, sizing, or drawing the canvas.
 #[derive(Debug, Error)]
 pub enum RenderError {
@@ -211,23 +224,28 @@ pub fn draw_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
     }
-    Background::Gradient(colors) => match colors.as_slice() {
-      [] => {} // transparent PNG backdrop
-      [single] => {
-        ctx.set_fill_style_str(&single.to_css());
-        ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    Background::LinearGradient { colors, angle } => {
+      let (x1, y1, x2, y2) = angle_to_coords(*angle, layout.canvas_width, layout.canvas_height);
+      let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-      many => {
-        let gradient =
-          ctx.create_linear_gradient(0.0, 0.0, layout.canvas_width, layout.canvas_height);
-        let last = many.len() - 1;
-        for (index, color) in many.iter().enumerate() {
-          gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
-        }
-        ctx.set_fill_style_canvas_gradient(&gradient);
-        ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    }
+    Background::RadialGradient { colors } => {
+      let cx = layout.canvas_width / 2.0;
+      let cy = layout.canvas_height / 2.0;
+      let r = cx.max(cy);
+      let gradient = ctx.create_radial_gradient(cx, cy, 0.0, cx, cy, r)?;
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-    },
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, layout.canvas_width, layout.canvas_height);
+    }
   }
 
   // 2. Code card: rounded rect filled with the theme background, with a
@@ -473,23 +491,28 @@ pub fn draw_split_prepared(
       ctx.set_fill_style_str(&color.to_css());
       ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
     }
-    Background::Gradient(colors) => match colors.as_slice() {
-      [] => {}
-      [single] => {
-        ctx.set_fill_style_str(&single.to_css());
-        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    Background::LinearGradient { colors, angle } => {
+      let (x1, y1, x2, y2) = angle_to_coords(*angle, split.canvas_width, split.canvas_height);
+      let gradient = ctx.create_linear_gradient(x1, y1, x2, y2);
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-      many => {
-        let gradient =
-          ctx.create_linear_gradient(0.0, 0.0, split.canvas_width, split.canvas_height);
-        let last = many.len() - 1;
-        for (index, color) in many.iter().enumerate() {
-          gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
-        }
-        ctx.set_fill_style_canvas_gradient(&gradient);
-        ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    }
+    Background::RadialGradient { colors } => {
+      let cx = split.canvas_width / 2.0;
+      let cy = split.canvas_height / 2.0;
+      let r = cx.max(cy);
+      let gradient = ctx.create_radial_gradient(cx, cy, 0.0, cx, cy, r)?;
+      let last = colors.len() - 1;
+      for (index, color) in colors.iter().enumerate() {
+        gradient.add_color_stop(index as f32 / last as f32, &color.to_css())?;
       }
-    },
+      ctx.set_fill_style_canvas_gradient(&gradient);
+      ctx.fill_rect(0.0, 0.0, split.canvas_width, split.canvas_height);
+    }
   }
 
   // 2. Left panel (at origin).
