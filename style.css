@@ -302,6 +302,16 @@ body {
     cursor: wait;
 }
 
+.export-btn-secondary {
+    background: var(--canvas-warm);
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+}
+
+.export-btn-secondary:hover:not(:disabled) {
+    background: var(--surface-elevated);
+}
+
 /* ---- Controls sidebar ---- */
 .controls {
     grid-area: controls;
