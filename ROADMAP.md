@@ -152,7 +152,7 @@ PR #3 on `main`. The project now has:
 |-----------|-------|------------|
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
-| **v0.6** | Export & UX | SVG export, copy to clipboard, new controls (line-height, tab-width, custom bg), keyboard shortcuts |
+| **v0.6** | Export & UX | SVG export, copy to clipboard, new controls (line-height, tab-width, custom bg), keyboard shortcuts, split-screen comparison |
 | **v0.8** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
@@ -280,9 +280,17 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   (e.g. 1200px for Twitter, 1920 for a slide) and compute the scale
   from that, instead of always starting from logical size × scale.
 
+- [ ] **Split-screen comparison** - side-by-side view showing two code
+  snippets (or the same snippet with different themes/settings) in a
+  single exported image. The rendering layer already supports drawing
+  at arbitrary canvas positions (`render_to_canvas` is pure), so the
+  core work is UI + state: two code inputs, two settings panels, a
+  divider line, and a combined export canvas that draws both halves.
+
 **Acceptance:** SVG export produces valid, renderable SVG; clipboard copy works
 in Chrome/Firefox/Safari; every new control is reactive (Leptos signal), has
-a sensible default, and the export reflects it immediately in the preview.
+a sensible default, and the export reflects it immediately in the preview;
+split-screen renders two code panels side by side in a single PNG export.
 
 ---
 
