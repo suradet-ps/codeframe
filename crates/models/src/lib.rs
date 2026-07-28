@@ -109,7 +109,7 @@ impl Background {
       (
         "Dark Vignette",
         Background::RadialGradient {
-          colors: vec![black, dark_gray],
+          colors: vec![black, dark_gray, white],
         },
       ),
     ]
