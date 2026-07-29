@@ -23,7 +23,7 @@ def create_png(width, height, pixels):
 
 
 def draw_icon(size):
-    """Draw a simplified CodeFrame icon."""
+    """Draw a simplified CodeFrame icon with safe zone for adaptive icons."""
     pixels = bytearray(size * size * 4)
 
     def px(x, y, r, g, b, a=255):
@@ -42,7 +42,6 @@ def draw_icon(size):
     def fill_rounded_rect(x1, y1, w, h, radius, r, g, b):
         for y in range(y1, min(y1 + h, size)):
             for x in range(x1, min(x1 + w, size)):
-                # Check corners
                 in_rect = True
                 if x < x1 + radius and y < y1 + radius:
                     dx = x1 + radius - x
@@ -67,28 +66,34 @@ def draw_icon(size):
                 if in_rect:
                     px(x, y, r, g, b)
 
-    s = size / 512.0
+    # Draw within an 80% safe zone, centered (10% margin each side)
+    margin = size * 0.10
+    inner = size - 2 * margin
 
-    # Background rounded rect (dark gradient approximated as solid #09090b)
-    fill_rounded_rect(0, 0, size, size, int(116 * s), 9, 9, 11)
+    def sx(v):
+        """Map 0..512 coordinate to safe zone."""
+        return int(margin + v * inner / 512.0)
+
+    # Background rounded rect (dark solid #09090b)
+    fill_rounded_rect(0, 0, size, size, int(size * 0.227), 9, 9, 11)
 
     # White card
     fill_rounded_rect(
-        int(88 * s), int(64 * s), int(336 * s), int(384 * s), int(20 * s), 255, 255, 255
+        sx(88), sx(64), sx(336) - sx(88), sx(448) - sx(64), sx(20) - sx(0), 255, 255, 255
     )
 
     # Code area (dark)
     fill_rounded_rect(
-        int(116 * s), int(92 * s), int(280 * s), int(240 * s), int(12 * s), 15, 23, 42
+        sx(116), sx(92), sx(396) - sx(116), sx(332) - sx(92), sx(12) - sx(0), 15, 23, 42
     )
 
     # Traffic lights
-    dot_r = int(6 * s)
-    dot_y = int(118 * s)
+    dot_r = max(1, int(size * 0.012))
+    dot_y = sx(118)
     for cx, (cr, cg, cb) in [
-        (int(144 * s), (239, 68, 68)),
-        (int(164 * s), (245, 158, 11)),
-        (int(184 * s), (16, 185, 129)),
+        (sx(144), (239, 68, 68)),
+        (sx(164), (245, 158, 11)),
+        (sx(184), (16, 185, 129)),
     ]:
         for dy in range(-dot_r, dot_r + 1):
             for dx in range(-dot_r, dot_r + 1):
@@ -99,17 +104,17 @@ def draw_icon(size):
     line_colors = [(56, 189, 248), (203, 213, 225), (192, 132, 252), (52, 211, 153)]
     line_y = [152, 182, 212, 242]
     line_w = [125, 200, 150, 105]
-    line_h = int(11 * s)
-    line_r = int(5.5 * s)
-    for i, (y, w, (lr, lg, lb)) in enumerate(zip(line_y, line_w, line_colors)):
+    line_h = max(1, int(size * 0.021))
+    line_r = max(1, int(size * 0.011))
+    for y, w, (lr, lg, lb) in zip(line_y, line_w, line_colors):
         fill_rounded_rect(
-            int(144 * s), int(y * s), int(w * s), line_h, line_r, lr, lg, lb
+            sx(144), sx(y), sx(144 + w) - sx(144), line_h, line_r, lr, lg, lb
         )
 
     # Bottom circle
-    circle_r = int(18 * s)
-    circle_cx = int(256 * s)
-    circle_cy = int(392 * s)
+    circle_r = max(1, int(size * 0.035))
+    circle_cx = sx(256)
+    circle_cy = sx(392)
     for dy in range(-circle_r, circle_r + 1):
         for dx in range(-circle_r, circle_r + 1):
             if dx * dx + dy * dy <= circle_r * circle_r:
