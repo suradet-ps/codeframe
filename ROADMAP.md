@@ -312,12 +312,15 @@ via keyboard, screen reader, and assistive technology.
 - [x] **Reduced-motion respect** - `@media (prefers-reduced-motion: reduce)`
   disables all transitions and animations.
 
-- [ ] **Contrast audit** - verify all text/background combinations in
+- [x] **Contrast audit** - verify all text/background combinations in
   light, dark, and sepia themes against WCAG AA (4.5:1 for body text,
-  3:1 for large text and UI components).
+  3:1 for large text and UI components). Token values adjusted:
+  `stone` darkened across all themes (4.5:1+), `slate` darkened in
+  light (4.54:1) and sepia (4.62:1). `ash` kept as-is (disabled text
+  is WCAG-exempt).
 
 **Acceptance:** full keyboard navigation; ARIA labels on all interactive
-elements; contrast ratios pass AA in all three themes.
+elements; contrast ratios pass AA in all three themes. ✅ **All met.**
 
 ---
 
