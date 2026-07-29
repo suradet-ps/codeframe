@@ -330,22 +330,26 @@ CodeFrame is already a static site with no server dependency. Making it
 a PWA is a natural fit - and it means the tool works on planes, trains,
 and bad café wifi.
 
-- [ ] **Web app manifest** (`manifest.json`) - name, icons, theme-color,
-  display: standalone. Link from `index.html`.
+- [x] **Web app manifest** (`manifest.json`) - name, icons, theme-color,
+  display: standalone. Linked from `index.html` with Apple meta tags for
+  iOS support. Copied to `dist/` via Trunk `copy-file` directive.
 
-- [ ] **Service worker** - cache the app shell (HTML, CSS, WASM, fonts,
-  themes) on install. Serve from cache first, fall back to network.
-  The app has no dynamic API calls, so this is straightforward.
+- [x] **Service worker** - cache the app shell (HTML, CSS, fonts, icons,
+  manifest) on install via precache. WASM/JS use stale-while-revalidate
+  (content-hashed filenames by Trunk). Network-first for navigation
+  with cache fallback. Old caches cleaned on activate.
 
-- [ ] **Install prompt** - detect `beforeinstallprompt`, show an
-  "Install CodeFrame" button in the topbar. Dismiss after install.
+- [x] **Install prompt** - detect `beforeinstallprompt`, show an
+  "Install CodeFrame" banner at the bottom of the screen. Dismiss
+  after install or via close button.
 
-- [ ] **Offline indicator** - a calm banner when the network is offline
-  ("You're offline - CodeFrame still works"). Dismiss when back online.
+- [x] **Offline indicator** - a calm banner at the bottom when the
+  network is offline ("You are offline — CodeFrame still works").
+  Hidden when back online.
 
 **Acceptance:** `trunk build --release` + deploy to any static host; the app
 loads and fully functions with network disabled; installable on Chrome/Edge/
-Safari.
+Safari. ✅ **All met.**
 
 ---
 

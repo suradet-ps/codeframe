@@ -6,11 +6,82 @@
     <meta name="description" content="CodeFrame - turn source code into high-resolution PNG images, entirely in your browser." />
     <title>CodeFrame - Code to PNG</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <!-- Trunk pipeline -->
     <link data-trunk rel="rust" href="crates/app/Cargo.toml" data-bin="codeframe" data-wasm-opt />
     <link data-trunk rel="css" href="style.css" />
     <link data-trunk rel="copy-dir" href="fonts" />
     <link data-trunk rel="copy-file" href="favicon.svg" />
+    <link data-trunk rel="copy-file" href="manifest.json" />
+    <link data-trunk rel="copy-file" href="sw.js" />
+    <link data-trunk rel="copy-file" href="icon-192.png" />
+    <link data-trunk rel="copy-file" href="icon-512.png" />
     <base data-trunk-public-url />
   </head>
-  <body></body>
+  <body>
+    <div id="install-banner" class="install-banner" hidden>
+      <span>Install CodeFrame for offline use</span>
+      <button id="install-btn" class="install-btn">Install</button>
+      <button id="install-dismiss" class="install-dismiss" aria-label="Dismiss install prompt">&times;</button>
+    </div>
+    <div id="offline-banner" class="offline-banner" hidden>
+      You are offline — CodeFrame still works.
+    </div>
+    <script>
+      // Service worker registration
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function (err) {
+            console.warn("SW registration failed:", err);
+          });
+        });
+      }
+
+      // Install prompt
+      var deferredPrompt = null;
+      var installBanner = document.getElementById("install-banner");
+      var installBtn = document.getElementById("install-btn");
+      var installDismiss = document.getElementById("install-dismiss");
+
+      window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBanner.hidden = false;
+      });
+
+      installBtn.addEventListener("click", function () {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function (choice) {
+          deferredPrompt = null;
+          installBanner.hidden = true;
+        });
+      });
+
+      installDismiss.addEventListener("click", function () {
+        installBanner.hidden = true;
+      });
+
+      window.addEventListener("appinstalled", function () {
+        deferredPrompt = null;
+        installBanner.hidden = true;
+      });
+
+      // Offline detection
+      var offlineBanner = document.getElementById("offline-banner");
+
+      function updateOnlineStatus() {
+        offlineBanner.hidden = navigator.onLine;
+      }
+
+      window.addEventListener("online", updateOnlineStatus);
+      window.addEventListener("offline", updateOnlineStatus);
+      updateOnlineStatus();
+    </script>
+  </body>
 </html>
