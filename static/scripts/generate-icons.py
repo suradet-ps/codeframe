@@ -121,7 +121,7 @@ def draw_icon(size):
 for size in [192, 512]:
     pixels = draw_icon(size)
     png_data = create_png(size, size, pixels)
-    out_path = os.path.join(os.path.dirname(__file__), "..", f"icon-{size}.png")
+    out_path = os.path.join(os.path.dirname(__file__), "..", "pwa", f"icon-{size}.png")
     with open(out_path, "wb") as f:
         f.write(png_data)
     print(f"Generated icon-{size}.png ({len(png_data)} bytes)")
