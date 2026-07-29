@@ -7,11 +7,12 @@
     <title>CodeFrame - Code to PNG</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <!-- PWA -->
-    <link rel="manifest" href="static/pwa/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#09090b" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="apple-touch-icon" href="static/pwa/icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <!-- Trunk pipeline -->
     <link data-trunk rel="rust" href="crates/app/Cargo.toml" data-bin="codeframe" data-wasm-opt />
     <link data-trunk rel="css" href="style.css" />
@@ -36,7 +37,7 @@
       // Service worker registration
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function () {
-          navigator.serviceWorker.register("/static/pwa/sw.js").catch(function (err) {
+          navigator.serviceWorker.register("/sw.js").catch(function (err) {
             console.warn("SW registration failed:", err);
           });
         });
