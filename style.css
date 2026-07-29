@@ -77,6 +77,7 @@
 
     /* Semantic */
     --warning: #b45309;
+    --on-warning: #ffffff;
     --error-bg: #fef2f2;
     --error-border: #fecaca;
     --error-text: #991b1b;
@@ -122,6 +123,7 @@
 
     /* Semantic */
     --warning: #f59e0b;
+    --on-warning: #0a0a0a;
     --error-bg: #2d1b1b;
     --error-border: #5c2020;
     --error-text: #fca5a5;
@@ -157,6 +159,7 @@
 
     /* Semantic */
     --warning: #92400e;
+    --on-warning: #faf5ed;
     --error-bg: #fdf2f0;
     --error-border: #f5c6c0;
     --error-text: #991b1b;
@@ -248,7 +251,7 @@
     right: 0;
     padding: var(--sp-xs) var(--sp-md);
     background: var(--warning);
-    color: #ffffff;
+    color: var(--on-warning);
     text-align: center;
     font-size: 13px;
     font-weight: 500;
