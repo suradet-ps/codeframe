@@ -45,12 +45,14 @@
 
       // Install prompt
       var deferredPrompt = null;
+      var installDismissed = false;
       var installBanner = document.getElementById("install-banner");
       var installBtn = document.getElementById("install-btn");
       var installDismiss = document.getElementById("install-dismiss");
 
       window.addEventListener("beforeinstallprompt", function (e) {
         e.preventDefault();
+        if (installDismissed) return;
         deferredPrompt = e;
         installBanner.hidden = false;
       });
@@ -65,11 +67,13 @@
       });
 
       installDismiss.addEventListener("click", function () {
+        installDismissed = true;
         installBanner.hidden = true;
       });
 
       window.addEventListener("appinstalled", function () {
         deferredPrompt = null;
+        installDismissed = true;
         installBanner.hidden = true;
       });
 
