@@ -89,7 +89,6 @@ impl Background {
   pub fn presets() -> Vec<(&'static str, Background)> {
     let black = RgbColor::new(0x00, 0x00, 0x00);
     let white = RgbColor::new(0xff, 0xff, 0xff);
-    let dark_gray = RgbColor::new(0x1a, 0x1a, 0x1a);
     vec![
       ("Snow", Background::Solid(white)),
       (
@@ -118,18 +117,6 @@ impl Background {
         Background::LinearGradient {
           colors: vec![white, black],
           dir: GradientDir::ToLeft,
-        },
-      ),
-      (
-        "Center Radial",
-        Background::RadialGradient {
-          colors: vec![white, black],
-        },
-      ),
-      (
-        "Dark Vignette",
-        Background::RadialGradient {
-          colors: vec![black, dark_gray, white],
         },
       ),
     ]
