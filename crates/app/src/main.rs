@@ -103,7 +103,7 @@ fn App() -> impl IntoView {
                       }
                   >
                       <CopyIcon />
-                      {move || if copied.get() { "Copied!" } else { "Copy" }}
+                      <span class="copy-label">{move || if copied.get() { "Copied!" } else { "Copy" }}</span>
                   </button>
                   <button
                       class="export-btn export-btn-secondary"
@@ -114,7 +114,7 @@ fn App() -> impl IntoView {
                       }
                   >
                       <SvgIcon />
-                      {move || if exporting.get() { "Exporting…" } else { "Export SVG" }}
+                      <span class="btn-label">{move || if exporting.get() { "Exporting…" } else { "Export SVG" }}</span>
                   </button>
                   <button
                       class="export-btn"
@@ -125,7 +125,7 @@ fn App() -> impl IntoView {
                       }
                   >
                       <DownloadIcon />
-                      {move || if exporting.get() { "Exporting…" } else { "Export PNG" }}
+                      <span class="btn-label">{move || if exporting.get() { "Exporting…" } else { "Export PNG" }}</span>
                   </button>
               </div>
           </header>
