@@ -63,9 +63,9 @@ def draw_icon(size):
                 if in_rect:
                     px(x, y, r, g, b)
 
-    # Scale factor: all 512-space coords → actual size, then shrink to 60% safe zone
-    s = (size * 0.60) / 512.0
-    off = size * 0.20  # 20% margin on each side
+    # Scale factor: all 512-space coords → actual size, then shrink to 80% safe zone
+    s = (size * 0.80) / 512.0
+    off = size * 0.10  # 10% margin on each side
 
     def v(val):
         """Map a 512-space coordinate to the safe zone."""
