@@ -25,68 +25,6 @@
     <base data-trunk-public-url />
   </head>
   <body>
-    <div id="install-banner" class="install-banner" hidden>
-      <span>Install CodeFrame for offline use</span>
-      <button id="install-btn" class="install-btn">Install</button>
-      <button id="install-dismiss" class="install-dismiss" aria-label="Dismiss install prompt">&times;</button>
-    </div>
-    <div id="offline-banner" class="offline-banner" hidden>
-      You are offline — CodeFrame still works.
-    </div>
-    <script>
-      // Service worker registration
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker.register("/sw.js").catch(function (err) {
-            console.warn("SW registration failed:", err);
-          });
-        });
-      }
-
-      // Install prompt
-      var deferredPrompt = null;
-      var installDismissed = false;
-      var installBanner = document.getElementById("install-banner");
-      var installBtn = document.getElementById("install-btn");
-      var installDismiss = document.getElementById("install-dismiss");
-
-      window.addEventListener("beforeinstallprompt", function (e) {
-        e.preventDefault();
-        if (installDismissed) return;
-        deferredPrompt = e;
-        installBanner.hidden = false;
-      });
-
-      installBtn.addEventListener("click", function () {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function (choice) {
-          deferredPrompt = null;
-          installBanner.hidden = true;
-        });
-      });
-
-      installDismiss.addEventListener("click", function () {
-        installDismissed = true;
-        installBanner.hidden = true;
-      });
-
-      window.addEventListener("appinstalled", function () {
-        deferredPrompt = null;
-        installDismissed = true;
-        installBanner.hidden = true;
-      });
-
-      // Offline detection
-      var offlineBanner = document.getElementById("offline-banner");
-
-      function updateOnlineStatus() {
-        offlineBanner.hidden = navigator.onLine;
-      }
-
-      window.addEventListener("online", updateOnlineStatus);
-      window.addEventListener("offline", updateOnlineStatus);
-      updateOnlineStatus();
-    </script>
+    <!-- PWA banners + SW registration are handled by Leptos (crates/app/src/pwa.rs) -->
   </body>
 </html>

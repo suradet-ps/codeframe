@@ -8,6 +8,7 @@ mod controls;
 mod export;
 mod fonts;
 mod preview;
+mod pwa;
 mod state;
 mod theme;
 
@@ -19,6 +20,7 @@ use web_sys::window;
 
 use crate::controls::Controls;
 use crate::preview::Preview;
+use crate::pwa::PwaBanners;
 use crate::state::Settings;
 use crate::theme::ThemeToggle;
 
@@ -137,6 +139,7 @@ fn App() -> impl IntoView {
               <Preview settings />
           </main>
       </div>
+      <PwaBanners />
   }
 }
 
