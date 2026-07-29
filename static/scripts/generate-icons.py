@@ -66,8 +66,8 @@ def draw_icon(size):
                 if in_rect:
                     px(x, y, r, g, b)
 
-    # Draw within an 80% safe zone, centered (10% margin each side)
-    margin = size * 0.10
+    # Draw within a 60% safe zone, centered (20% margin each side)
+    margin = size * 0.20
     inner = size - 2 * margin
 
     def sx(v):
