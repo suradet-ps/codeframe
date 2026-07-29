@@ -94,10 +94,10 @@ pub fn Preview(settings: Settings) -> impl IntoView {
 
   view! {
       <div class="preview-area">
-          <canvas node_ref=canvas_ref class="preview-canvas"></canvas>
+          <canvas node_ref=canvas_ref class="preview-canvas" aria-label="Code preview"></canvas>
           {move || {
               error.get().map(|message| view! {
-                  <div class="error-banner">{message}</div>
+                  <div class="error-banner" role="alert">{message}</div>
               })
           }}
       </div>
