@@ -476,8 +476,8 @@ input:focus {
 .swatches,
 .bw-swatches {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--sp-xs);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
 }
 
 .swatch {
@@ -569,16 +569,83 @@ input:focus {
 @media (max-width: 900px) {
     .app {
         grid-template-columns: 1fr;
-        grid-template-rows: 64px minmax(0, 1fr) auto;
+        grid-template-rows: 56px minmax(0, 1fr) auto;
         grid-template-areas:
             "header"
             "main"
             "controls";
     }
 
+    .topbar {
+        padding: 0 var(--sp-md);
+        gap: var(--sp-sm);
+    }
+
+    .brand-tag {
+        display: none;
+    }
+
+    .topbar-actions {
+        gap: var(--sp-xs);
+    }
+
+    .export-btn {
+        padding: 0 var(--sp-md);
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .copy-btn {
+        padding: 0 var(--sp-sm);
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .copy-btn .copy-label,
+    .export-btn .btn-label {
+        display: none;
+    }
+
     .controls {
         border-right: 0;
         border-top: 1px solid var(--hairline);
-        max-height: 48vh;
+        max-height: 50vh;
+        padding: var(--sp-md);
+        gap: var(--sp-md);
+    }
+
+    .control-row {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+
+    .preview-area {
+        padding: var(--sp-lg) var(--sp-md);
+    }
+
+    .bw-swatches {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .topbar {
+        height: 48px;
+    }
+
+    .brand-name {
+        font-size: 14px;
+    }
+
+    .export-btn,
+    .copy-btn {
+        height: 34px;
+        font-size: 12px;
+    }
+
+    .controls {
+        max-height: 55vh;
+        padding: var(--sp-sm);
+        gap: var(--sp-sm);
     }
 }
