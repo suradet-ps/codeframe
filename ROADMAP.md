@@ -66,8 +66,8 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 - **Controls**: Code textarea, language/theme/font selects, font-size/padding/
   corner-radius/line-height sliders, segmented scale selector (1x/2x/4x/8x + custom),
   target-width input, tab-width selector, window-frame and line-number toggles,
-  7 B&W background presets (Snow, Top Glow, Bottom Glow, Left Beam, Right Beam,
-  Center Radial, Dark Vignette). Filename template.
+  5 B&W background presets (Snow, Top Glow, Bottom Glow, Left Beam, Right Beam).
+  Filename template.
   Keyboard: Ctrl/Cmd+Enter to export, Tab inserts spaces.
 - **Tests**: 30 unit tests across `models` (4), `highlighter` (7), `renderer`
   (13 in `layout.rs` + `svg.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
@@ -103,7 +103,7 @@ PRs #7, #8, #9 on `main`. The project now has:
 | SVG export | Working |
 | Window frame (macOS traffic lights) | Working |
 | Line numbers | Working |
-| Background presets (7 B&W) | Working |
+| Background presets (5 B&W) | Working |
 | Split-screen comparison (separate code inputs) | Working |
 | Font-size / padding / corner-radius controls | Working |
 | Line-height slider (1.0–2.5) | Working |
@@ -255,9 +255,9 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   `layout.rs`. Expose as a select (2 / 4 / 8) so users can match their
   editor's settings.
 
-- [x] **B&W background presets** - 7 curated monochrome presets (Snow,
-  Top Glow, Bottom Glow, Left Beam, Right Beam, Center Radial, Dark
-  Vignette). The `Background` enum in `models` supports `Solid(RgbColor)`,
+- [x] **B&W background presets** - 5 curated monochrome presets (Snow,
+  Top Glow, Bottom Glow, Left Beam, Right Beam). The `Background` enum in
+  `models` supports `Solid(RgbColor)`,
   `LinearGradient { colors, dir }`, and `RadialGradient { colors }` with
   a `GradientDir` enum (`ToBottom`, `ToTop`, `ToRight`, `ToLeft`).
 
@@ -295,22 +295,22 @@ split-screen renders two code panels side by side in a single PNG export.
 A tool that generates images for sharing should itself be shareable -
 via keyboard, screen reader, and assistive technology.
 
-- [ ] **Keyboard-only pass** - every control reachable via Tab, every
+- [x] **Keyboard-only pass** - every control reachable via Tab, every
   action triggerable via Enter/Space. The code textarea already handles
   typing; the selects, sliders, toggles, and buttons must follow.
 
-- [ ] **ARIA labels** - `aria-label` on the canvas ("Preview of exported
-  code image"), `aria-live="polite"` on the error banner, proper
-  `<label>` associations on every input (some `for=`/`id=` links are
-  missing today).
+- [x] **ARIA labels** - `aria-label` on the canvas ("Code preview"),
+  `role="alert"` on error banners, `aria-label` on buttons (Copy, Export SVG,
+  Export PNG), `aria-label` on background swatches, proper `<label>`
+  associations (`for`/`id`) on every input. `role="radiogroup"` on
+  segmented controls with `role="radio"` + `aria-checked` on each button.
 
-- [ ] **Focus-visible styling** - a clear focus ring on every interactive
-  element, using the existing `--primary` token. No `outline: none`
-  without a replacement.
+- [x] **Focus-visible styling** - a clear `2px solid` focus ring on every
+  interactive element via `:focus-visible`, using `var(--ink)`. Inputs that
+  already have a border-bottom indicator suppress the outline.
 
-- [ ] **Reduced-motion respect** - `@media (prefers-reduced-motion:
-  reduce)` disables the export-button opacity transition and any future
-  animations.
+- [x] **Reduced-motion respect** - `@media (prefers-reduced-motion: reduce)`
+  disables all transitions and animations.
 
 - [ ] **Contrast audit** - verify all text/background combinations in
   light, dark, and sepia themes against WCAG AA (4.5:1 for body text,

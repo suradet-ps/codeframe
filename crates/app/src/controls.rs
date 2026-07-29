@@ -37,12 +37,14 @@ fn EnumSelect<T>(
   value: RwSignal<T>,
   options: &'static [T],
   label: fn(T) -> &'static str,
+  #[prop(optional)] id: Option<&'static str>,
 ) -> impl IntoView
 where
   T: Copy + Eq + Send + Sync + 'static,
 {
   view! {
       <select
+          id=id.unwrap_or_default()
           prop:value=move || label(value.get())
           on:change=move |ev| {
               let selected = event_target_value(&ev);
@@ -67,11 +69,13 @@ fn Slider(
   max: f64,
   step: f64,
   format: fn(f64) -> String,
+  #[prop(optional)] id: Option<&'static str>,
 ) -> impl IntoView {
   view! {
       <div class="slider-row">
           <input
               type="range"
+              id=id.unwrap_or_default()
               min=min.to_string()
               max=max.to_string()
               step=step.to_string()
@@ -112,7 +116,7 @@ fn AlertTriangleIcon() -> impl IntoView {
 #[component]
 pub fn Controls(settings: Settings) -> impl IntoView {
   view! {
-      <aside class="controls">
+      <aside class="controls" aria-label="Settings">
           <section>
               <label class="control-label" for="code-input">{move || if settings.split_enabled.get() { "Left panel code" } else { "Code" }}</label>
               <textarea
@@ -146,8 +150,9 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   let code_signal = settings.split_code;
                   view! {
                       <section>
-                          <label class="control-label split-label">"Right panel code"</label>
+                          <label class="control-label split-label" for="split-code-input">"Right panel code"</label>
                           <textarea
+                              id="split-code-input"
                               class="code-input"
                               rows="12"
                               spellcheck="false"
@@ -178,16 +183,18 @@ pub fn Controls(settings: Settings) -> impl IntoView {
 
           <div class="control-row">
               <section>
-                  <label class="control-label">"Language"</label>
+                  <label class="control-label" for="language-select">"Language"</label>
                   <EnumSelect
+                      id="language-select"
                       value=settings.language
                       options=&Language::ALL
                       label=Language::display_name
                   />
               </section>
               <section>
-                  <label class="control-label">"Theme"</label>
+                  <label class="control-label" for="theme-select">"Theme"</label>
                   <EnumSelect
+                      id="theme-select"
                       value=settings.theme
                       options=&ThemeChoice::ALL
                       label=ThemeChoice::display_name
@@ -196,8 +203,9 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </div>
 
           <section>
-              <label class="control-label">"Font"</label>
+              <label class="control-label" for="font-select">"Font"</label>
               <EnumSelect
+                  id="font-select"
                   value=settings.font
                   options=&FontChoice::ALL
                   label=FontChoice::display_name
@@ -215,28 +223,28 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
-              <label class="control-label">"Font size"</label>
-              <Slider value=settings.font_size min=10.0 max=24.0 step=1.0 format=|v| format!("{v}px") />
+              <label class="control-label" for="font-size-slider">"Font size"</label>
+              <Slider id="font-size-slider" value=settings.font_size min=10.0 max=24.0 step=1.0 format=|v| format!("{v}px") />
           </section>
 
           <section>
-              <label class="control-label">"Padding"</label>
-              <Slider value=settings.padding min=16.0 max=128.0 step=8.0 format=|v| format!("{v}px") />
+              <label class="control-label" for="padding-slider">"Padding"</label>
+              <Slider id="padding-slider" value=settings.padding min=16.0 max=128.0 step=8.0 format=|v| format!("{v}px") />
           </section>
 
           <section>
-              <label class="control-label">"Corner radius"</label>
-              <Slider value=settings.corner_radius min=0.0 max=24.0 step=1.0 format=|v| format!("{v}px") />
+              <label class="control-label" for="corner-radius-slider">"Corner radius"</label>
+              <Slider id="corner-radius-slider" value=settings.corner_radius min=0.0 max=24.0 step=1.0 format=|v| format!("{v}px") />
           </section>
 
           <section>
-              <label class="control-label">"Line height"</label>
-              <Slider value=settings.line_height min=1.0 max=2.5 step=0.1 format=|v| format!("{v:.1}") />
+              <label class="control-label" for="line-height-slider">"Line height"</label>
+              <Slider id="line-height-slider" value=settings.line_height min=1.0 max=2.5 step=0.1 format=|v| format!("{v:.1}") />
           </section>
 
           <section>
-              <label class="control-label">"Tab width"</label>
-              <div class="segmented">
+              <label class="control-label" id="tab-width-label">"Tab width"</label>
+              <div class="segmented" role="radiogroup" aria-labelledby="tab-width-label">
                   {TAB_WIDTH_PRESETS
                       .into_iter()
                       .map(|preset| {
@@ -244,6 +252,8 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                               <button
                                   class="seg"
                                   class:active=move || settings.tab_width.get() == preset
+                                  role="radio"
+                                  aria-checked=move || settings.tab_width.get() == preset
                                   on:click=move |_| settings.tab_width.set(preset)
                               >
                                   {format!("{preset}")}
@@ -255,8 +265,8 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
-              <label class="control-label">"Export scale"</label>
-              <div class="segmented">
+              <label class="control-label" id="export-scale-label">"Export scale"</label>
+              <div class="segmented" role="radiogroup" aria-labelledby="export-scale-label">
                   {SCALE_PRESETS
                       .into_iter()
                       .map(|preset| {
@@ -264,6 +274,8 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                               <button
                                   class="seg"
                                   class:active=move || settings.scale.get() == preset
+                                  role="radio"
+                                  aria-checked=move || settings.scale.get() == preset
                                   on:click=move |_| settings.scale.set(preset)
                               >
                                   {format!("{preset}x")}
@@ -273,6 +285,7 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                       .collect_view()}
                   <input
                       class="scale-custom"
+                      id="scale-custom"
                       type="number"
                       min="1"
                       max="12"
@@ -289,9 +302,10 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
-              <label class="control-label">"Target width"</label>
+              <label class="control-label" for="target-width-input">"Target width"</label>
               <div class="slider-row">
                   <input
+                      id="target-width-input"
                       type="number"
                       min="320"
                       max="3840"
@@ -338,8 +352,9 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           </section>
 
           <section>
-              <label class="control-label">"Filename template"</label>
+              <label class="control-label" for="filename-input">"Filename template"</label>
               <input
+                  id="filename-input"
                   class="filename-input"
                   type="text"
                   prop:value=move || settings.filename_template.get()
@@ -351,16 +366,20 @@ pub fn Controls(settings: Settings) -> impl IntoView {
 
           <section>
               <label class="control-label">"Background"</label>
-              <div class="bw-swatches">
+              <div class="bw-swatches" role="radiogroup" aria-label="Background preset">
                   {Background::presets()
                       .into_iter()
                       .map(|(name, background)| {
                           let css = format!("background: {}", background_css(&background));
                           let bg_for_cmp = background.clone();
+                          let bg_for_active = background.clone();
                           view! {
                               <button
                                   class="swatch bw-swatch"
                                   class:active=move || settings.background.get() == bg_for_cmp
+                                  role="radio"
+                                  aria-checked=move || settings.background.get() == bg_for_active
+                                  aria-label=name
                                   title=name
                                   style=css
                                   on:click=move |_| {
@@ -387,16 +406,18 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                       <div class="split-controls">
                           <div class="control-row">
                               <section>
-                                  <label class="control-label">"Right panel theme"</label>
+                                  <label class="control-label" for="split-theme-select">"Right panel theme"</label>
                                   <EnumSelect
+                                      id="split-theme-select"
                                       value=settings.split_theme
                                       options=&ThemeChoice::ALL
                                       label=ThemeChoice::display_name
                                   />
                               </section>
                               <section>
-                                  <label class="control-label">"Right panel language"</label>
+                                  <label class="control-label" for="split-language-select">"Right panel language"</label>
                                   <EnumSelect
+                                      id="split-language-select"
                                       value=settings.split_language
                                       options=&Language::ALL
                                       label=Language::display_name
