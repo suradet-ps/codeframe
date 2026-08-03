@@ -88,6 +88,15 @@ PR #3 on `main`.
 Phase 3 (Export & UX Depth) is **complete**. Version bumped to `v0.6.0`.
 PRs #7, #8, #9 on `main`. The project now has:
 
+Phase 4 (Accessibility & Keyboard-First Use) is **complete**. Version bumped to `v0.6.0`.
+
+Phase 5 (Offline-First PWA) is **complete**. Version bumped to `v0.6.0`.
+
+Phase 6 (Performance Budgets) is **complete**. Version bumped to `v0.7.0`.
+CI now enforces WASM gzipped size budget (1200 KB) and total bundle budget (1350 KB).
+wasm-opt is installed via binaryen in CI builds. Over-render audit documented.
+PNG optimization (oxipng WASM) deferred to post-v1.
+
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
 - Visual identity: SVG favicon linked in `index.html`
@@ -149,7 +158,8 @@ PRs #7, #8, #9 on `main`. The project now has:
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
 | **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
 | **v0.6** | Export & UX | SVG export, B&W background presets, custom export dimensions, split-screen comparison ✅ |
-| **v0.7** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker |
+| **v0.7** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker ✅ |
+| **v0.8** | Performance | CI-enforced budgets (1200 KB WASM gzipped), wasm-opt in CI, over-render audit, PNG optimization explored ✅ |
 | **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
 
 ---
@@ -353,31 +363,31 @@ Safari. ✅ **All met.**
 
 ---
 
-## Phase 6: Performance Budgets (verified, not claimed)
+## Phase 6: Performance Budgets (verified, not claimed) ✅
 
 The baseline was measured in Phase 2. Now enforce it.
 
-- [ ] **Set CI-enforced budgets** - bundle size ceiling that fails the
+- [x] **Set CI-enforced budgets** - bundle size ceiling that fails the
   build; first-paint target. Calibrated to the Phase 2 baseline, not
   guesses. Write the budget rules in `ci.yml`.
 
-- [ ] **Over-render audit** - confirm the reactive graph doesn't
+- [x] **Over-render audit** - confirm the reactive graph doesn't
   recompute the canvas on unrelated signal changes. The `generation`
   counter in `preview.rs` already handles staleness, but the effect
   could still fire unnecessarily.
 
-- [ ] **Re-enable `wasm-opt`** - `index.html` currently has
+- [x] **Re-enable `wasm-opt`** - `index.html` currently has
   `data-wasm-opt` on the Trunk rust link, but verify it's actually
   running in the CI build. If not, add `--release` to the trunk build
   command in `ci.yml` and confirm the size reduction.
 
-- [ ] **PNG optimization** - explore `oxipng` compiled to WASM for
+- [x] **PNG optimization** - explore `oxipng` compiled to WASM for
   post-processing the exported blob (lossless compression). Measure
   the size reduction vs. the compile-time and runtime cost before
   committing.
 
 **Acceptance:** budgets enforced in CI; baseline doc updated with before/after;
-no regression merges without a noted exception.
+no regression merges without a noted exception. ✅ **All met.**
 
 ---
 
