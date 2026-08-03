@@ -8,7 +8,6 @@ use wasm_bindgen::JsCast;
 use crate::state::{Settings, SAMPLE_CODE};
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
-const TAB_WIDTH_PRESETS: [usize; 3] = [2, 4, 8];
 
 /// CSS value used to paint a background swatch button.
 fn background_css(background: &Background) -> String {
@@ -126,25 +125,6 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   spellcheck="false"
                   autocomplete="off"
                   on:input=move |ev| settings.code.set(event_target_value(&ev))
-                  on:paste=move |ev| {
-                      ev.prevent_default();
-                      let web_event: &web_sys::Event = ev.as_ref();
-                      let clipboard_event: &web_sys::ClipboardEvent = web_event.unchecked_ref();
-                      let text = clipboard_event.clipboard_data()
-                          .and_then(|cb| cb.get_data("text/plain").ok())
-                          .unwrap_or_default();
-                      let expanded = text.replace('\t', &" ".repeat(settings.tab_width.get()));
-                      let target = ev.target().unwrap();
-                      let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
-                      let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
-                      let value = textarea.value();
-                      let new_value = format!("{}{}{}", &value[..start], expanded, &value[end..]);
-                      settings.code.set(new_value.clone());
-                      textarea.set_value(&new_value);
-                      let pos = (start + expanded.len()) as u32;
-                      let _ = textarea.set_selection_range(pos, pos);
-                  }
                   on:keydown=move |ev| {
                       if ev.key() == "Tab" {
                           ev.prevent_default();
@@ -153,11 +133,10 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                           let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
                           let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
                           let value = textarea.value();
-                          let spaces = " ".repeat(settings.tab_width.get());
-                          let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                          let new_value = format!("{}    {}", &value[..start], &value[end..]);
                           settings.code.set(new_value.clone());
                           textarea.set_value(&new_value);
-                          let pos = (start + spaces.len()) as u32;
+                          let pos = (start + 4) as u32;
                           let _ = textarea.set_selection_range(pos, pos);
                       }
                   }
@@ -178,25 +157,6 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                               autocomplete="off"
                               prop:value=move || code_signal.get()
                               on:input=move |ev| code_signal.set(event_target_value(&ev))
-                              on:paste=move |ev| {
-                                  ev.prevent_default();
-                                  let web_event: &web_sys::Event = ev.as_ref();
-                                  let clipboard_event: &web_sys::ClipboardEvent = web_event.unchecked_ref();
-                                  let text = clipboard_event.clipboard_data()
-                                      .and_then(|cb| cb.get_data("text/plain").ok())
-                                      .unwrap_or_default();
-                                  let expanded = text.replace('\t', &" ".repeat(settings.tab_width.get()));
-                                  let target = ev.target().unwrap();
-                                  let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                                  let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
-                                  let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
-                                  let value = textarea.value();
-                                  let new_value = format!("{}{}{}", &value[..start], expanded, &value[end..]);
-                                  code_signal.set(new_value.clone());
-                                  textarea.set_value(&new_value);
-                                  let pos = (start + expanded.len()) as u32;
-                                  let _ = textarea.set_selection_range(pos, pos);
-                              }
                               on:keydown=move |ev| {
                                   if ev.key() == "Tab" {
                                       ev.prevent_default();
@@ -205,11 +165,10 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                                       let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
                                       let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
                                       let value = textarea.value();
-                                      let spaces = " ".repeat(settings.tab_width.get());
-                                      let new_value = format!("{}{}{}", &value[..start], spaces, &value[end..]);
+                                      let new_value = format!("{}    {}", &value[..start], &value[end..]);
                                       code_signal.set(new_value.clone());
                                       textarea.set_value(&new_value);
-                                      let pos = (start + spaces.len()) as u32;
+                                      let pos = (start + 4) as u32;
                                       let _ = textarea.set_selection_range(pos, pos);
                                   }
                               }
@@ -278,28 +237,6 @@ pub fn Controls(settings: Settings) -> impl IntoView {
           <section>
               <label class="control-label" for="line-height-slider">"Line height"</label>
               <Slider id="line-height-slider" value=settings.line_height min=1.0 max=2.5 step=0.1 format=|v| format!("{v:.1}") />
-          </section>
-
-          <section>
-              <label class="control-label" id="tab-width-label">"Tab width"</label>
-              <div class="segmented" role="radiogroup" aria-labelledby="tab-width-label">
-                  {TAB_WIDTH_PRESETS
-                      .into_iter()
-                      .map(|preset| {
-                          view! {
-                              <button
-                                  class="seg"
-                                  class:active=move || settings.tab_width.get() == preset
-                                  role="radio"
-                                  aria-checked=move || settings.tab_width.get() == preset
-                                  on:click=move |_| settings.tab_width.set(preset)
-                              >
-                                  {format!("{preset}")}
-                              </button>
-                          }
-                      })
-                      .collect_view()}
-              </div>
           </section>
 
           <section>
