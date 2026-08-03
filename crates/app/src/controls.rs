@@ -126,6 +126,25 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                   spellcheck="false"
                   autocomplete="off"
                   on:input=move |ev| settings.code.set(event_target_value(&ev))
+                  on:paste=move |ev| {
+                      ev.prevent_default();
+                      let web_event: &web_sys::Event = ev.as_ref();
+                      let clipboard_event: &web_sys::ClipboardEvent = web_event.unchecked_ref();
+                      let text = clipboard_event.clipboard_data()
+                          .and_then(|cb| cb.get_data("text/plain").ok())
+                          .unwrap_or_default();
+                      let expanded = text.replace('\t', &" ".repeat(settings.tab_width.get()));
+                      let target = ev.target().unwrap();
+                      let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                      let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                      let value = textarea.value();
+                      let new_value = format!("{}{}{}", &value[..start], expanded, &value[end..]);
+                      settings.code.set(new_value.clone());
+                      textarea.set_value(&new_value);
+                      let pos = (start + expanded.len()) as u32;
+                      let _ = textarea.set_selection_range(pos, pos);
+                  }
                   on:keydown=move |ev| {
                       if ev.key() == "Tab" {
                           ev.prevent_default();
@@ -159,6 +178,25 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                               autocomplete="off"
                               prop:value=move || code_signal.get()
                               on:input=move |ev| code_signal.set(event_target_value(&ev))
+                              on:paste=move |ev| {
+                                  ev.prevent_default();
+                                  let web_event: &web_sys::Event = ev.as_ref();
+                                  let clipboard_event: &web_sys::ClipboardEvent = web_event.unchecked_ref();
+                                  let text = clipboard_event.clipboard_data()
+                                      .and_then(|cb| cb.get_data("text/plain").ok())
+                                      .unwrap_or_default();
+                                  let expanded = text.replace('\t', &" ".repeat(settings.tab_width.get()));
+                                  let target = ev.target().unwrap();
+                                  let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
+                                  let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
+                                  let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
+                                  let value = textarea.value();
+                                  let new_value = format!("{}{}{}", &value[..start], expanded, &value[end..]);
+                                  code_signal.set(new_value.clone());
+                                  textarea.set_value(&new_value);
+                                  let pos = (start + expanded.len()) as u32;
+                                  let _ = textarea.set_selection_range(pos, pos);
+                              }
                               on:keydown=move |ev| {
                                   if ev.key() == "Tab" {
                                       ev.prevent_default();
