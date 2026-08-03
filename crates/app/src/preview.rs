@@ -1,5 +1,18 @@
 //! Live preview canvas. Renders on every state change at a screen-friendly
 //! scale (capped - AGENTS.md §4, rule 3); export uses a separate canvas.
+//!
+//! ## Over-render audit (Phase 6)
+//!
+//! The `Effect` in [`Preview`] tracks only signals that affect the rendered
+//! image: `code`, `language`, `theme`, `split_*`, and the fields read by
+//! [`Settings::export_options`] (padding, background, font, etc.). Signals
+//! like `filename_template` and `ui_theme` are *not* tracked because they
+//! do not change the canvas output.
+//!
+//! A `generation` counter (u64) guards against stale async draws: each
+//! signal change increments the counter; the async block captures the
+//! current value and aborts if a newer draw has started. This prevents
+//! wasted canvas work when the user types quickly.
 
 use codeframe_highlighter::{highlight, theme_palette};
 use codeframe_renderer::canvas::render_split_to_canvas;
