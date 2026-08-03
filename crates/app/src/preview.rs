@@ -58,7 +58,7 @@ pub fn Preview(settings: Settings) -> impl IntoView {
       if generation.get_untracked() != my_generation {
         return; // superseded by a newer draw
       }
-      let Some(canvas) = canvas_ref.get() else {
+      let Some(canvas) = canvas_ref.get_untracked() else {
         return;
       };
 

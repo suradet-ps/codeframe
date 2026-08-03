@@ -91,7 +91,6 @@ pub struct Settings {
   pub background: RwSignal<Background>,
   pub ui_theme: RwSignal<UiTheme>,
   pub line_height: RwSignal<f64>,
-  pub tab_width: RwSignal<usize>,
   pub filename_template: RwSignal<String>,
   /// When `Some(px)`, export width is clamped to this value and scale is
   /// computed automatically. `None` means use the manual scale slider.
@@ -123,7 +122,6 @@ impl Settings {
       background: RwSignal::new(Background::default()),
       ui_theme: RwSignal::new(initial_ui_theme),
       line_height: RwSignal::new(1.5),
-      tab_width: RwSignal::new(4),
       filename_template: RwSignal::new("codeframe-{scale}x".to_string()),
       target_width: RwSignal::new(None),
       split_enabled: RwSignal::new(false),
@@ -150,7 +148,7 @@ impl Settings {
       font_size: self.font_size.get(),
       line_height: self.line_height.get(),
       corner_radius: self.corner_radius.get(),
-      tab_width: self.tab_width.get(),
+      tab_width: 4,
     }
   }
 
