@@ -123,9 +123,67 @@ jobs:
           fi
           echo "No raw hex leakage found in style.css"
 
+  csp-verify:
+    name: CSP Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate CSP header in vercel.json
+        run: |
+          # Extract the CSP value from vercel.json
+          csp=$(python3 -c "
+          import json, sys
+          with open('vercel.json') as f:
+              cfg = json.load(f)
+          for block in cfg.get('headers', []):
+              for h in block.get('headers', []):
+                  if h['key'] == 'Content-Security-Policy':
+                      print(h['value'])
+                      sys.exit(0)
+          print('NOT_FOUND')
+          ")
+
+          if [ "$csp" = "NOT_FOUND" ]; then
+            echo "::error::Content-Security-Policy header not found in vercel.json"
+            exit 1
+          fi
+
+          echo "CSP: $csp"
+
+          # Required directives
+          for dir in default-src script-src style-src img-src font-src connect-src worker-src manifest-src; do
+            if ! echo "$csp" | grep -q "$dir"; then
+              echo "::error::Missing required CSP directive: $dir"
+              exit 1
+            fi
+          done
+
+          # Deny dangerous directives
+          if echo "$csp" | grep -q "unsafe-eval"; then
+            echo "::error::CSP must not contain 'unsafe-eval'"
+            exit 1
+          fi
+
+          # style-src may contain 'unsafe-inline' (Leptos requirement), but no other source should
+          style_val=$(echo "$csp" | sed -n 's/.*style-src \([^;]*\);.*/\1/p')
+          if echo "$style_val" | grep -q "unsafe-inline"; then
+            echo "  style-src contains 'unsafe-inline' (expected for Leptos)"
+          fi
+
+          # script-src must NOT contain 'unsafe-inline'
+          script_val=$(echo "$csp" | sed -n 's/.*script-src \([^;]*\);.*/\1/p')
+          if echo "$script_val" | grep -q "unsafe-inline"; then
+            echo "::error::script-src must not contain 'unsafe-inline'"
+            exit 1
+          fi
+
+          echo "✅ CSP header is valid and contains all required directives"
+
   build:
     name: Build
-    needs: [check, clippy, fmt, test, audit, deny, hex-audit]
+    needs: [check, clippy, fmt, test, audit, deny, hex-audit, csp-verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

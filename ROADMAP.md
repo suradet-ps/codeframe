@@ -97,10 +97,15 @@ CI now enforces WASM gzipped size budget (1200 KB) and total bundle budget (1350
 wasm-opt is installed via binaryen in CI builds. Over-render audit documented.
 PNG optimization (oxipng WASM) deferred to post-v1.
 
+Phase 7 (Supply-Chain & Security Hardening) is **complete**. Version bumped to `v0.8.0`.
+PR #18 on `main`. CSP header added to `vercel.json`, CI now enforces 8 jobs
+with a new `csp-verify` step that validates CSP directives.
+
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
+- CSP: `Content-Security-Policy` header enforced via CI verification
 - Visual identity: SVG favicon linked in `index.html`
-- CI hardened: SHA-pinned actions, restricted permissions, 7-job pipeline
+- CI hardened: SHA-pinned actions, restricted permissions, 8-job pipeline
 
 | Feature | Status |
 |---------|--------|
@@ -160,7 +165,8 @@ PNG optimization (oxipng WASM) deferred to post-v1.
 | **v0.6** | Export & UX | SVG export, B&W background presets, custom export dimensions, split-screen comparison ✅ |
 | **v0.7** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker ✅ |
 | **v0.8** | Performance | CI-enforced budgets (1200 KB WASM gzipped), wasm-opt in CI, over-render audit, PNG optimization explored ✅ |
-| **v1.0** | Stable Release | Performance budgets enforced, CSP tightened, reproducible build, branch protection, `v1.0.0` tag |
+| **v0.9** | Security | CSP header in vercel.json, CSP verification CI job, `#![deny(unsafe_code)]` verified across all crates ✅ |
+| **v1.0** | Stable Release | Performance budgets enforced, CSP tightened ✅, reproducible build, branch protection, `v1.0.0` tag |
 
 ---
 
@@ -391,32 +397,32 @@ no regression merges without a noted exception. ✅ **All met.**
 
 ---
 
-## Phase 7: Supply-Chain & Security Hardening
+## Phase 7: Supply-Chain & Security Hardening ✅
 
 `cargo audit` and `cargo deny` were added in Phase 1. This phase
 tightens the remaining security surface.
 
-- [ ] **CSP audit** - review `vercel.json` headers. The current config
+- [x] **CSP audit** - review `vercel.json` headers. The current config
   has no `Content-Security-Policy` header. Add one that allows only
   `script-src 'self'`, `style-src 'self' 'unsafe-inline'` (Leptos
   needs inline styles), `connect-src 'self'` (no external APIs), and
   `font-src 'self'`. No `unsafe-eval`.
 
-- [ ] **Dependency pinning** - `Cargo.lock` is already committed (good).
+- [x] **Dependency pinning** - `Cargo.lock` is already committed (good).
   Verify `Cargo.toml` uses version ranges, not exact pins, for direct
   deps; the lock file handles reproducibility.
 
-- [ ] **`#![deny(unsafe_code)]` stays** in every crate. Any future
+- [x] **`#![deny(unsafe_code)]` stays** in every crate. Any future
   exception must be justified, isolated, tested, and noted in the crate's
   `lib.rs` doc comment.
 
-- [ ] **CSP header verification** - add a CI step that fetches the
+- [x] **CSP header verification** - add a CI step that fetches the
   deployed site and asserts the `Content-Security-Policy` header is
   present and contains no `unsafe-inline` or `unsafe-eval` (except
   the Leptos inline-style exception).
 
 **Acceptance:** CSP header present and correct; `cargo audit` + `cargo deny`
-green in CI; no `unsafe` in any crate.
+green in CI; no `unsafe` in any crate. ✅ **All met.**
 
 ---
 
