@@ -161,7 +161,8 @@ jobs:
           done
 
           # Deny dangerous directives
-          if echo "$csp" | grep -q "unsafe-eval"; then
+          # Remove 'wasm-unsafe-eval' before checking to avoid false positive
+          if echo "$csp" | sed "s/wasm-unsafe-eval//g" | grep -q "unsafe-eval"; then
             echo "::error::CSP must not contain 'unsafe-eval'"
             exit 1
           fi
