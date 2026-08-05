@@ -59,23 +59,28 @@ The `vercel.json` deploys security headers on every response:
 
 | Header | Value | Purpose |
 |--------|-------|---------|
+| `Content-Security-Policy` | See below | Deny-by-default, self-origin only |
 | `X-Content-Type-Options` | `nosniff` | Prevents MIME-type sniffing |
 | `X-Frame-Options` | `DENY` | Prevents framing (clickjacking) |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Limits referrer leakage |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | Disables unused APIs |
 
-A `Content-Security-Policy` header should be added with:
+CSP directives enforced:
 
 ```
+default-src 'none';
 script-src 'self';
 style-src 'self' 'unsafe-inline';
-connect-src 'self';
-font-src 'self';
 img-src 'self' blob:;
+font-src 'self';
+connect-src 'self';
+worker-src 'self';
+manifest-src 'self';
 ```
 
 No `unsafe-eval`. The `unsafe-inline` for styles is required by Leptos's
-CSR rendering.
+CSR rendering. CI enforces that the CSP header is present and valid via the
+`csp-verify` job in `.github/workflows/ci.yml`.
 
 ---
 
