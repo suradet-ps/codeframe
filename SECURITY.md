@@ -69,7 +69,7 @@ CSP directives enforced:
 
 ```
 default-src 'none';
-script-src 'self' 'unsafe-inline';
+script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval';
 style-src 'self' 'unsafe-inline';
 img-src 'self' blob:;
 font-src 'self';
@@ -82,10 +82,11 @@ No `unsafe-eval`. The `unsafe-inline` for styles is required by Leptos's
 CSR rendering. The `unsafe-inline` for scripts is required because Trunk
 generates an inline `<script type="module">` to bootstrap WASM — its
 content (including hashed filenames) changes per build, making a static
-SHA-256 hash non-viable. This is a known limitation; a post-build
-extraction step would be needed to eliminate it. CI enforces that the
-CSP header is present and valid via the `csp-verify` job in
-`.github/workflows/ci.yml`.
+SHA-256 hash non-viable. The `wasm-unsafe-eval` is required because
+WebAssembly.instantiateStreaming() needs it; this is more restrictive
+than `unsafe-eval` — it only permits WASM compilation, not arbitrary
+`eval()`. CI enforces that the CSP header is present and valid via the
+`csp-verify` job in `.github/workflows/ci.yml`.
 
 ---
 
