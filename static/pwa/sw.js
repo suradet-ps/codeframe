@@ -50,13 +50,22 @@ self.addEventListener("fetch", (event) => {
   // All other requests (CSS, WASM, JS, fonts, images): stale-while-revalidate
   event.respondWith(
     caches.match(request).then((cached) => {
-      const networkFetch = fetch(request).then((response) => {
-        if (response.ok && request.url.startsWith(self.location.origin)) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      });
+      const networkFetch = fetch(request)
+        .then((response) => {
+          if (response.ok && request.url.startsWith(self.location.origin)) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Network failed and no cache — return a proper error response
+          // instead of letting the promise reject with a TypeError.
+          return new Response("Offline", {
+            status: 503,
+            statusText: "Service Unavailable",
+          });
+        });
 
       return cached || networkFetch;
     })
