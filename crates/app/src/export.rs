@@ -127,6 +127,9 @@ async fn do_export_png(settings: Settings) -> Result<(), String> {
   anchor.set_href(&url);
   anchor.set_download(&format!("{}.png", settings.expanded_filename()));
   anchor.click();
+  // Revoking the object URL immediately after click() races the download
+  // in Firefox and can abort it. Give the browser a moment to start.
+  gloo_timers::future::TimeoutFuture::new(1500).await;
   let _ = Url::revoke_object_url(&url);
   Ok(())
 }
@@ -193,6 +196,8 @@ async fn do_export_svg(settings: Settings) -> Result<(), String> {
   anchor.set_href(&url);
   anchor.set_download(&format!("{}.svg", settings.expanded_filename()));
   anchor.click();
+  // See the PNG path: revoking too early can cancel the download in Firefox.
+  gloo_timers::future::TimeoutFuture::new(1500).await;
   let _ = Url::revoke_object_url(&url);
   Ok(())
 }
