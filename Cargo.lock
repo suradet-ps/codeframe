@@ -174,7 +174,7 @@ dependencies = [
 
 [[package]]
 name = "codeframe-app"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "codeframe-highlighter",
  "codeframe-models",
@@ -191,7 +191,7 @@ dependencies = [
 
 [[package]]
 name = "codeframe-highlighter"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "codeframe-models",
  "syntect",
@@ -200,14 +200,14 @@ dependencies = [
 
 [[package]]
 name = "codeframe-models"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "codeframe-renderer"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "codeframe-models",
  "thiserror 2.0.19",
