@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cargo install trunk --locked && rustup target add wasm32-unknown-unknown && trunk build --release",
+  "buildCommand": "apt-get install -y binaryen && cargo install trunk --locked && rustup target add wasm32-unknown-unknown && trunk build --release",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
