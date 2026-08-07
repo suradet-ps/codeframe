@@ -39,16 +39,18 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
 ## Current State (verified against the repo, not assumed)
 
 - **Stack**: Rust 2021 + Leptos 0.8 (CSR) + Trunk, `wasm32-unknown-unknown`,
-  deployed to Vercel as static assets behind security headers. Version `0.6.0`
+  deployed to Vercel as static assets behind security headers. Version `0.7.0`
   in `Cargo.toml`. No server - the browser does everything.
 - **Workspace**: 4 crates - `models` (shared types, zero deps beyond serde),
   `highlighter` (syntect wrapper, framework-agnostic), `renderer` (Canvas2D
   drawing, no Leptos), `app` (the only Leptos-aware crate).
-- **CI** (`.github/workflows/ci.yml`): 7 jobs - `check` (WASM), `clippy`,
+- **CI** (`.github/workflows/ci.yml`): 10 jobs - `check` (WASM), `clippy`,
   `fmt --check`, `test` (`cargo test --lib`), `cargo audit`, `cargo deny`,
-  gated `trunk build --release`. SHA-pinned actions, `persist-credentials:
-  false`, `permissions: contents: read`. `RUSTFLAGS: "-Dwarnings"` enforced
-  globally.
+  `hex-audit` (no raw hex outside CSS tokens), `csp-verify` (validates the
+  CSP in `vercel.json`), gated `trunk build --release`, and `perf-budget`
+  (WASM gzipped ≤ 1200 KB, total bundle ≤ 1350 KB). SHA-pinned actions,
+  `persist-credentials: false`, `permissions: contents: read`. `RUSTFLAGS:
+  "-Dwarnings"` enforced globally.
 - **Syntax highlighting**: `syntect` with `default-fancy` (fancy-regex backend,
   wasm32-compatible). 15 languages. Extra grammars: TypeScript (wrapper),
   TOML (vendored).
@@ -69,8 +71,9 @@ shape are listed under "Out of Scope" so the line is drawn on purpose.
   5 B&W background presets (Snow, Top Glow, Bottom Glow, Left Beam, Right Beam).
   Filename template.
   Keyboard: Ctrl/Cmd+Enter to export, Tab inserts spaces.
-- **Tests**: 30 unit tests across `models` (4), `highlighter` (7), `renderer`
-  (13 in `layout.rs` + `svg.rs`, 6 doc-tests). All pure Rust, no WASM runtime needed.
+- **Tests**: 32 tests across `models` (4), `highlighter` (7), `renderer`
+  (15 in `layout.rs` + `svg.rs`), `app` (2 in `state.rs`), plus 6 doc-tests.
+  All pure Rust, no WASM runtime needed.
 - **Deployment**: Vercel with SPA rewrite, security headers (X-Content-Type-Options,
   X-Frame-Options, Referrer-Policy, Permissions-Policy), immutable caching for
   static assets.
@@ -97,15 +100,16 @@ CI now enforces WASM gzipped size budget (1200 KB) and total bundle budget (1350
 wasm-opt is installed via binaryen in CI builds. Over-render audit documented.
 PNG optimization (oxipng WASM) deferred to post-v1.
 
-Phase 7 (Supply-Chain & Security Hardening) is **complete**. Version bumped to `v0.8.0`.
-PR #18 on `main`. CSP header added to `vercel.json`, CI now enforces 8 jobs
-with a new `csp-verify` step that validates CSP directives.
+Phase 7 (Supply-Chain & Security Hardening) is **complete**. Remains at
+`v0.7.0` (no version bump was made). PRs #18–#21 on `main`. CSP header added
+to `vercel.json`, CI now enforces 10 jobs with a `csp-verify` step that
+validates CSP directives.
 
 - Complete documentation: `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`
 - Supply-chain security: `cargo audit` + `cargo deny` enforced in CI
 - CSP: `Content-Security-Policy` header enforced via CI verification
 - Visual identity: SVG favicon linked in `index.html`
-- CI hardened: SHA-pinned actions, restricted permissions, 8-job pipeline
+- CI hardened: SHA-pinned actions, restricted permissions, 10-job pipeline
 
 | Feature | Status |
 |---------|--------|
@@ -121,7 +125,6 @@ with a new `csp-verify` step that validates CSP directives.
 | Split-screen comparison (separate code inputs) | Working |
 | Font-size / padding / corner-radius controls | Working |
 | Line-height slider (1.0–2.5) | Working |
-| Tab-width control (2/4/8) | Working |
 | Copy to clipboard | Working |
 | Keyboard shortcuts (Ctrl/Cmd+Enter) | Working |
 | Export filename template | Working |
@@ -132,7 +135,7 @@ with a new `csp-verify` step that validates CSP directives.
 | Staleness guard in preview (generation counter) | Working |
 | Separate preview/export canvases | Working |
 | `#![deny(unsafe_code)]` | Enforced |
-| CI (7 jobs) | Enforced |
+| CI (10 jobs) | Enforced |
 | DESIGN.md | Exists |
 | CONTRIBUTING.md | Exists |
 | SECURITY.md | Exists |
@@ -149,10 +152,6 @@ with a new `csp-verify` step that validates CSP directives.
 2. **No URL sharing of settings.** Each page load starts from the same
    defaults. There is no way to bookmark a specific configuration.
 
-3. **No offline story.** The app is a static site, but there is no service
-   worker, no manifest, no PWA support. It could work offline trivially
-   (it's already CSR + static), but doesn't yet.
-
 ---
 
 ## Milestones
@@ -161,7 +160,7 @@ with a new `csp-verify` step that validates CSP directives.
 |-----------|-------|------------|
 | **v0.2** | Foundation | `DESIGN.md`, `CONTRIBUTING.md`, `SECURITY.md`, favicon, `cargo audit` + `cargo deny` in CI ✅ |
 | **v0.4** | Visual Identity | Dark / sepia / light UI theme toggle, favicon, inline hex audit, perf baseline measured ✅ |
-| **v0.5** | Export & UX | Copy to clipboard, line-height/tab-width controls, filename template, keyboard shortcuts ✅ |
+| **v0.5** | Export & UX | Copy to clipboard, line-height control (tab-width decided against - see Phase 3), filename template, keyboard shortcuts ✅ |
 | **v0.6** | Export & UX | SVG export, B&W background presets, custom export dimensions, split-screen comparison ✅ |
 | **v0.7** | Accessible + Offline | Full a11y pass, WCAG AA contrast, PWA with offline support, service worker ✅ |
 | **v0.8** | Performance | CI-enforced budgets (1200 KB WASM gzipped), wasm-opt in CI, over-render audit, PNG optimization explored ✅ |
@@ -233,11 +232,12 @@ should not be blinded by a white sidebar.
 - [x] **Add a theme-toggle button** in the topbar (lucide `sun` / `moon`
   / `coffee` icons), next to the export button.
 
-- [x] **Inline hex audit** - move the renderer's `TRAFFIC_LIGHT_COLORS`
-  into the theme palette (each theme defines its own traffic-light colors,
-  or a fixed set is exposed as a CSS custom property). Move the canvas
-  shadow `rgba` values in `style.css` into tokens. Add a CI grep step
-  that fails on raw `#rrggbb` in `.css` / `.rs` view code.
+- [x] **Inline hex audit** - move the preview-canvas shadow `rgba` values
+  in `style.css` into tokens (`--preview-shadow-*`). Add a CI grep step
+  (`hex-audit`) that fails on raw `#rrggbb` in `style.css` outside token
+  definitions. The renderer's `TRAFFIC_LIGHT_COLORS` and SVG brand colors
+  are *output-image* colors (not UI chrome) and intentionally remain
+  inline in `canvas.rs` / `svg.rs` / the inlined logo.
 
 - [x] **Performance baseline** - measure WASM `.wasm` gzip size, cold
   first-paint, preview render time, export time at 4x on a mid-tier
@@ -267,9 +267,11 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   1.0–2.5, step 0.1, default 1.5). Currently hardcoded in
   `state.rs:63`.
 
-- [x] **Tab-width control** - the renderer hardcodes `TAB_WIDTH = 4` in
-  `layout.rs`. Expose as a select (2 / 4 / 8) so users can match their
-  editor's settings.
+- [x] ~~**Tab-width control**~~ **decided against.** Tab width stays
+  hardcoded at `4` (`ExportOptions.tab_width`, `state.rs`). A user control
+  (2/4/8) was prototyped in PR #17 and reverted (`07d8c7a`) because it
+  conflicted with pasted code and the Tab key in the textarea inserts 4
+  spaces, which is the common editor default.
 
 - [x] **B&W background presets** - 5 curated monochrome presets (Snow,
   Top Glow, Bottom Glow, Left Beam, Right Beam). The `Background` enum in
@@ -278,16 +280,19 @@ adjustments that make the output *yours*, plus export formats beyond PNG.
   a `GradientDir` enum (`ToBottom`, `ToTop`, `ToRight`, `ToLeft`).
 
 - [x] **Code input improvements** - tab key inserts spaces (not focus-
-  trap), line numbers in the textarea gutter (CSS counter), and a
-  "paste from clipboard" button for quick import.
+  trap). The textarea line-number gutter (CSS counter) and the "paste from
+  clipboard" button were prototyped alongside the tab-width control and
+  dropped with the same revert (`07d8c7a`) - revisit if they earn their
+  keep.
 
 - [x] **Export filename template** - allow the user to set a pattern
   (default: `CodeFrame-{scale}x.png`). Simple string interpolation:
   `{language}`, `{theme}`, `{timestamp}`.
 
 - [x] **Keyboard shortcuts** - `Ctrl/Cmd+Enter` to export, `Ctrl/Cmd+Z`
-  undo (native textarea), `Ctrl/Cmd+Shift+Z` redo. Document in the UI
-  with a subtle hint or a `?` help overlay.
+  undo (native textarea), `Ctrl/Cmd+Shift+Z` redo. UI documentation of the
+  shortcuts (hint / `?` overlay) is deferred to Phase 8's getting-started
+  walkthrough.
 
 - [x] **Custom export dimensions** - let the user set a target width
   (e.g. 1200px for Twitter, 1920 for a slide) and compute the scale
@@ -402,11 +407,14 @@ no regression merges without a noted exception. ✅ **All met.**
 `cargo audit` and `cargo deny` were added in Phase 1. This phase
 tightens the remaining security surface.
 
-- [x] **CSP audit** - review `vercel.json` headers. The current config
-  has no `Content-Security-Policy` header. Add one that allows only
-  `script-src 'self'`, `style-src 'self' 'unsafe-inline'` (Leptos
-  needs inline styles), `connect-src 'self'` (no external APIs), and
-  `font-src 'self'`. No `unsafe-eval`.
+- [x] **CSP audit** - add `Content-Security-Policy` to `vercel.json`:
+  `default-src 'none'`, `style-src 'self' 'unsafe-inline'` (Leptos needs
+  inline styles), `connect-src 'self'` (no external APIs), `font-src
+  'self'`. Two documented exceptions to the ideal `script-src 'self'`:
+  `'wasm-unsafe-eval'` (required by `WebAssembly.instantiateStreaming`,
+  strictly narrower than `unsafe-eval`) and `script-src 'unsafe-inline'`
+  (Trunk's inline module bootstrap changes per build, so a static hash is
+  not viable). See `SECURITY.md`.
 
 - [x] **Dependency pinning** - `Cargo.lock` is already committed (good).
   Verify `Cargo.toml` uses version ranges, not exact pins, for direct
@@ -416,10 +424,11 @@ tightens the remaining security surface.
   exception must be justified, isolated, tested, and noted in the crate's
   `lib.rs` doc comment.
 
-- [x] **CSP header verification** - add a CI step that fetches the
-  deployed site and asserts the `Content-Security-Policy` header is
-  present and contains no `unsafe-inline` or `unsafe-eval` (except
-  the Leptos inline-style exception).
+- [x] **CSP header verification** - add a `csp-verify` CI step that
+  validates the `Content-Security-Policy` in `vercel.json` before deploy:
+  all required directives present, no `unsafe-eval` (modulo the
+  `wasm-unsafe-eval` exception), and prints the documented
+  `unsafe-inline` exceptions for auditability.
 
 **Acceptance:** CSP header present and correct; `cargo audit` + `cargo deny`
 green in CI; no `unsafe` in any crate. ✅ **All met.**
@@ -437,7 +446,7 @@ green in CI; no `unsafe` in any crate. ✅ **All met.**
   so header/rewrite regressions are caught before `main`.
 
 - [ ] **Branch protection on `main`** - strict required status checks
-  (the 7 CI jobs), no force-push, no deletion.
+  (the CI jobs), no force-push, no deletion.
 
 - [ ] **User-facing getting-started** - extend the README with a
   screenshot walkthrough: open → paste code → tweak settings → export.
