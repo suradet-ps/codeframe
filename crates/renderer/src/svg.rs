@@ -233,7 +233,7 @@ pub fn render_svg(
     let mut y = layout.code_origin_y;
     for number in 1..=layout.line_count {
       svg.push_str(&format!(
-        "<text x=\"{x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" text-anchor=\"end\" dominant-baseline=\"hopping\">{number}</text>",
+        "<text x=\"{x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" text-anchor=\"end\" dominant-baseline=\"hanging\">{number}</text>",
         x = layout.gutter_right_x,
       ));
       y += layout.line_height_px;
@@ -476,7 +476,7 @@ fn render_panel_svg(
     let gutter_x = layout.gutter_right_x + offset_x;
     for number in 1..=layout.line_count {
       svg.push_str(&format!(
-        "<text x=\"{gutter_x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" text-anchor=\"end\" dominant-baseline=\"hopping\">{number}</text>",
+        "<text x=\"{gutter_x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" text-anchor=\"end\" dominant-baseline=\"hanging\">{number}</text>",
       ));
       y += layout.line_height_px;
     }
@@ -568,6 +568,24 @@ mod tests {
     };
     let (svg, _) = render_svg(&tokens, &palette, &options);
     assert!(svg.contains("1"));
+  }
+
+  #[test]
+  fn line_numbers_use_hanging_baseline() {
+    let tokens = sample_tokens();
+    let palette = ThemePalette {
+      background: RgbColor::new(0x28, 0x2a, 0x36),
+      foreground: RgbColor::new(0xf8, 0xf8, 0xf2),
+    };
+    let options = ExportOptions {
+      line_numbers: true,
+      ..Default::default()
+    };
+    let (svg, _) = render_svg(&tokens, &palette, &options);
+    // Line numbers must use the same baseline as the token text so the SVG
+    // renders pixel-aligned with the canvas output.
+    assert!(svg.contains("dominant-baseline=\"hanging\""));
+    assert!(!svg.contains("dominant-baseline=\"hopping\""));
   }
 
   #[test]
