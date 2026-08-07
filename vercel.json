@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cargo install trunk --locked && rustup target add wasm32-unknown-unknown && trunk build --release",
+  "buildCommand": "bash scripts/install-wasm-opt.sh && export PATH=\"$HOME/.codeframe-bin:$PATH\" && cargo install trunk --locked && rustup target add wasm32-unknown-unknown && trunk build --release",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [

@@ -24,7 +24,7 @@ Opens at `http://localhost:8080` with hot-reload on file changes.
 
 ## CI Checks
 
-Every PR must pass these 5 jobs (defined in `.github/workflows/ci.yml`):
+Every PR must pass all jobs (defined in `.github/workflows/ci.yml`):
 
 | Job | Command | What it catches |
 |-----|---------|-----------------|
@@ -32,10 +32,12 @@ Every PR must pass these 5 jobs (defined in `.github/workflows/ci.yml`):
 | Clippy | `cargo clippy --workspace --all-targets -- -D clippy::correctness -D clippy::suspicious` | Correctness and suspicious lints |
 | Format | `cargo fmt --all --check` | Formatting drift |
 | Test | `cargo test --lib` | Unit test failures |
-| Build | `trunk build --release` | Full production build (gated on the 4 above) |
-
-Additionally, `cargo audit` and `cargo deny` run as separate jobs to catch
-advisories and license issues.
+| Audit | `cargo audit` | Dependency advisories |
+| Deny | `cargo deny check` | License + yanked-crate policy |
+| Hex Audit | grep over `style.css` | Raw hex colors outside token definitions |
+| CSP Verify | python3 check over `vercel.json` | Required CSP directives present |
+| Build | `trunk build --release` (gated on all of the above) | Full production build with wasm-opt |
+| Perf Budget | gzip-size check over `dist/` | WASM gzipped ≤ 1200 KB, total bundle ≤ 1350 KB |
 
 Run all checks locally before pushing:
 
@@ -113,8 +115,9 @@ No exceptions in production code. If you truly need `unsafe`, it must:
 
 - **Formatting:** `cargo fmt --all --check` (2-space indent, 100 char max).
   See `rustfmt.toml`.
-- **Lints:** `#![deny(unsafe_code)]` + `#![deny(unused_must_use)]` at crate
-  root. Clippy: correctness + suspicious.
+- **Lints:** `#![deny(unsafe_code)]` at every crate root. Clippy:
+  correctness + suspicious in CI; run `cargo clippy --all-targets -- -D
+  warnings` locally to catch the rest.
 - **Error handling:** Use `thiserror` for crate error types. No `unwrap()`
   in production code paths.
 - **Doc comments:** Every public function in `renderer` and `highlighter`
@@ -156,7 +159,7 @@ No exceptions in production code. If you truly need `unsafe`, it must:
 1. Create a branch from `main`.
 2. Make your changes, ensuring all CI checks pass locally.
 3. Open a PR against `main`.
-4. CI runs automatically. All 7 jobs must pass.
+4. CI runs automatically. All jobs must pass.
 5. Squash-merge (or regular merge - team preference).
 
 ---

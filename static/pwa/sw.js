@@ -9,6 +9,26 @@ const PRECACHE_URLS = [
   "/icon-512.png"
 ];
 
+// Content-hashed assets (JS/WASM) are added to the cache on first fetch and
+// never referenced again after a redeploy, so the cache would grow forever.
+// Cap the total number of entries; the oldest extra entries are evicted.
+const MAX_CACHE_ENTRIES = 80;
+
+async function pruneCache() {
+  const cache = await caches.open(CACHE_NAME);
+  const keys = await cache.keys();
+  if (keys.length <= MAX_CACHE_ENTRIES) return;
+  const keep = new Set(
+    PRECACHE_URLS.map((url) => new URL(url, self.location.origin).href)
+  );
+  // keys() returns insertion order, so filtering keeps the newest extras.
+  const extras = keys.filter((request) => !keep.has(request.url));
+  const excess = Math.min(keys.length - MAX_CACHE_ENTRIES, extras.length);
+  for (let i = 0; i < excess; i++) {
+    await cache.delete(extras[i]);
+  }
+}
+
 // --- Install: precache the app shell ---
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -54,7 +74,9 @@ self.addEventListener("fetch", (event) => {
         .then((response) => {
           if (response.ok && request.url.startsWith(self.location.origin)) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(CACHE_NAME).then((cache) =>
+              cache.put(request, clone).then(pruneCache)
+            );
           }
           return response;
         })

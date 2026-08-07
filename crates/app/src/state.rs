@@ -167,9 +167,36 @@ impl Settings {
     // Extract date part (YYYY-MM-DD) from ISO string.
     let date = timestamp.split('T').next().unwrap_or("unknown").to_string();
     template
-      .replace("{scale}", &format!("{}", scale as u32))
+      .replace("{scale}", &format_scale(scale))
       .replace("{language}", &language)
       .replace("{theme}", &theme)
       .replace("{timestamp}", &date)
+  }
+}
+
+/// Render an export scale for filenames: `2.0` becomes `2`, `2.5` stays
+/// `2.5` (no trailing `.0`).
+fn format_scale(scale: f64) -> String {
+  if scale.fract() == 0.0 {
+    format!("{}", scale as u64)
+  } else {
+    format!("{scale}")
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::format_scale;
+
+  #[test]
+  fn format_scale_drops_trailing_zero() {
+    assert_eq!(format_scale(2.0), "2");
+    assert_eq!(format_scale(8.0), "8");
+  }
+
+  #[test]
+  fn format_scale_keeps_fractions() {
+    assert_eq!(format_scale(2.5), "2.5");
+    assert_eq!(format_scale(1.25), "1.25");
   }
 }
