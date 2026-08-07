@@ -23,7 +23,7 @@ async function pruneCache() {
   );
   // keys() returns insertion order, so filtering keeps the newest extras.
   const extras = keys.filter((request) => !keep.has(request.url));
-  const excess = keys.length - MAX_CACHE_ENTRIES;
+  const excess = Math.min(keys.length - MAX_CACHE_ENTRIES, extras.length);
   for (let i = 0; i < excess; i++) {
     await cache.delete(extras[i]);
   }
