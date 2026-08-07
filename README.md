@@ -27,7 +27,7 @@ Built as a lightweight alternative to carbon.now.sh and ray.so, with one differe
 - **Live preview** - Reactivity-driven canvas updates as you type, with a capped preview scale for performance.
 - **SVG export** - token-accurate SVG output alongside PNG, using the same layout engine.
 - **Split-screen comparison** - side-by-side view with separate code inputs for each panel.
-- **7 B&W background presets** - Snow, Top Glow, Bottom Glow, Left Beam, Right Beam, Center Radial, Dark Vignette. Curated monochrome gradients, no custom color picker needed.
+- **5 B&W background presets** - Snow, Top Glow, Bottom Glow, Left Beam, Right Beam. Curated monochrome gradients, no custom color picker needed.
 - **Zero dependencies at runtime** - static WASM, no server required.
 
 ## Getting Started
