@@ -213,7 +213,7 @@ fn compute_scale_for_width(
   for line in &lines {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * char_width;
+      w += token.text.chars().count() as f64 * char_width;
     }
     max_line_width = max_line_width.max(w);
   }
@@ -239,7 +239,7 @@ fn compute_split_scale_for_width(
   for line in &lines_left {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * char_width;
+      w += token.text.chars().count() as f64 * char_width;
     }
     max_left = max_left.max(w);
   }
@@ -251,7 +251,7 @@ fn compute_split_scale_for_width(
   for line in &lines_right {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * char_width;
+      w += token.text.chars().count() as f64 * char_width;
     }
     max_right = max_right.max(w);
   }

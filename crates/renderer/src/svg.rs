@@ -74,7 +74,7 @@ pub fn render_svg(
   for line in &lines {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * cw;
+      w += token.text.chars().count() as f64 * cw;
     }
     max_line_width = max_line_width.max(w);
   }
@@ -221,7 +221,7 @@ pub fn render_svg(
       svg.push_str(&format!(
         "<text x=\"{x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" dominant-baseline=\"hanging\">{text}</text>",
       ));
-      x += token.text.len() as f64 * cw;
+      x += token.text.chars().count() as f64 * cw;
     }
     y += layout.line_height_px;
   }
@@ -264,7 +264,7 @@ pub fn render_split_svg(
   for line in &lines_left {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * cw;
+      w += token.text.chars().count() as f64 * cw;
     }
     max_left = max_left.max(w);
   }
@@ -276,7 +276,7 @@ pub fn render_split_svg(
   for line in &lines_right {
     let mut w = 0.0;
     for token in line {
-      w += token.text.len() as f64 * cw;
+      w += token.text.chars().count() as f64 * cw;
     }
     max_right = max_right.max(w);
   }
@@ -463,7 +463,7 @@ fn render_panel_svg(
       svg.push_str(&format!(
         "<text x=\"{x}\" y=\"{y}\" font=\"{font}\" fill=\"{fill}\" dominant-baseline=\"hanging\">{text}</text>",
       ));
-      x += token.text.len() as f64 * cw;
+      x += token.text.chars().count() as f64 * cw;
     }
     y += layout.line_height_px;
   }
@@ -553,6 +553,43 @@ mod tests {
     let (svg, _) = render_svg(&tokens, &palette, &options);
     assert!(!svg.contains("<script>"));
     assert!(svg.contains("&lt;script&gt;"));
+  }
+
+  #[test]
+  fn svg_advances_by_char_count_not_byte_count() {
+    // 2 Thai chars = 6 UTF-8 bytes. The next token must start 2 cells (not 6)
+    // after the first, matching the canvas renderer's monospace measurement.
+    let tokens = vec![
+      Token {
+        text: "\u{0e01}\u{0e02}".to_string(), // "กข" - 2 chars, 6 bytes
+        color: RgbColor::new(0xff, 0xff, 0xff),
+        font_style: FontStyle::default(),
+      },
+      Token {
+        text: "x".to_string(),
+        color: RgbColor::new(0xff, 0xff, 0xff),
+        font_style: FontStyle::default(),
+      },
+    ];
+    let palette = ThemePalette {
+      background: RgbColor::new(0x00, 0x00, 0x00),
+      foreground: RgbColor::new(0xff, 0xff, 0xff),
+    };
+    let options = ExportOptions::default();
+    let (svg, layout) = render_svg(&tokens, &palette, &options);
+    let cw = estimate_char_width(options.font_size);
+    let expected_x = layout.code_origin_x + 2.0 * cw;
+    let second_x: f64 = svg
+      .split("<text ")
+      .nth(2)
+      .and_then(|s| s.split("x=\"").nth(1))
+      .and_then(|s| s.split('"').next())
+      .and_then(|s| s.parse().ok())
+      .expect("second token x attribute should be parseable");
+    assert!(
+      (second_x - expected_x).abs() < 1e-9,
+      "second token should start 2 cells ({expected_x}) in, got {second_x}"
+    );
   }
 
   #[test]
