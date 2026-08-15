@@ -63,20 +63,22 @@ pub fn CodeEditor(
               spellcheck="false"
               autocomplete="off"
               node_ref=textarea_ref
-              prop:value=move || code.get()
+              // Set once at creation, then let the DOM own the value: a
+              // reactive binding would rewrite the textarea on every input
+              // and stomp the native caret during paste/undo (cursor jumps).
+              prop:value=code.get_untracked()
               on:input=move |ev| code.set(event_target_value(&ev))
               on:keydown=move |ev| {
                   if ev.key() == "Tab" {
                       ev.prevent_default();
                       let target = ev.target().unwrap();
                       let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
-                      let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
-                      let value = textarea.value();
-                      let new_value = format!("{}    {}", &value[..start], &value[end..]);
-                      code.set(new_value.clone());
-                      textarea.set_value(&new_value);
-                      let pos = (start + 4) as u32;
+                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as u32;
+                      // Native insertion - no manual byte slicing, so
+                      // multi-byte characters before the caret are safe.
+                      let _ = textarea.set_range_text("    ");
+                      code.set(textarea.value());
+                      let pos = start + 4;
                       let _ = textarea.set_selection_range(pos, pos);
                   }
               }
