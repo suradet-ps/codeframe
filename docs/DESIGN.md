@@ -208,12 +208,23 @@ image's internal geometry:
   `gap: var(--sp-lg)`
 - Field labels: 11px uppercase, `var(--stone)`, letter-spacing 0.035em
 
-### Code Input (`.code-input`)
+### Code Editor (`.code-editor`)
 
-- Background: `var(--canvas-warm)`
-- Full hairline border, no border-radius
-- Hover: border becomes `var(--stone)`
-- Focus: border becomes `var(--ink)`, background lifts to `var(--canvas)`
+Syntax-highlighted input: a transparent-text `<textarea>` overlaid on a
+`<pre>` whose `innerHTML` is the token stream from
+`highlighter::highlight_to_html` (one `<span>` per token).
+
+- Wrapper (`.code-editor`): hairline border + the **syntax theme palette**
+  as background — the input area mirrors the export card for the same
+  theme. Hover: border `var(--stone)`; focus-within: border `var(--ink)`
+- Textarea (`.code-input`): transparent text, `caret-color` = theme
+  foreground, transparent background
+- Both layers share identical metrics: JetBrains Mono 12.5px, line-height
+  1.5, tab-size 4, 12px padding, `white-space: pre-wrap` +
+  `word-break: break-all` so wrapping matches exactly
+- The `<pre>` layer is `pointer-events: none`, `overflow: hidden`, and
+  scrolls in lockstep with the textarea (`scrollTop`/`scrollLeft` sync)
+- Tab still inserts 4 spaces (keydown handler)
 
 ### Selects and Inputs
 
