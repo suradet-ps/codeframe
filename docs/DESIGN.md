@@ -198,31 +198,52 @@ image's internal geometry:
 - Width: 320px (fixed via grid)
 - Background: `var(--canvas)`
 - Right border: `1px solid var(--hairline)`
-- Sections separated by `gap: var(--sp-lg)`
-- Labels: 11px uppercase, `var(--stone)`, letter-spacing 0.035em
+- Content scrolls internally; thin scrollbar in `var(--hairline)`
+- Controls grouped into five labeled sections: **Code**, **Appearance**,
+  **Canvas**, **Frame**, **Export**
+- Each group (`.control-group`) carries a header row: small lucide icon in
+  `var(--stone)` + 11px uppercase title in `var(--ink-soft)`,
+  letter-spacing 0.08em
+- Groups are separated by `1px solid var(--hairline)` on the top edge plus
+  `gap: var(--sp-lg)`
+- Field labels: 11px uppercase, `var(--stone)`, letter-spacing 0.035em
 
 ### Code Input (`.code-input`)
 
 - Background: `var(--canvas-warm)`
-- No border, bottom hairline only
-- Focus: bottom border becomes `var(--ink)`
-- No border-radius
+- Full hairline border, no border-radius
+- Hover: border becomes `var(--stone)`
+- Focus: border becomes `var(--ink)`, background lifts to `var(--canvas)`
 
 ### Selects and Inputs
 
-- Same pattern as code input
-- Background: `var(--canvas-warm)`
-- Bottom hairline, no border-radius
+- Same pattern as code input: boxed hairline field, no border-radius
+- Padding: `8px var(--sp-sm)`, font-size 13px
+- Hover: border becomes `var(--stone)`
+- Focus: border becomes `var(--ink)`, background lifts to `var(--canvas)`
 
 ### Segmented Control (`.segmented`)
 
-- Row of buttons with bottom hairline
-- Active state: bottom border becomes `var(--ink)`
+- Joined row of cells (shared 1px hairline borders, no gaps)
+- Active cell fills with `var(--ink)` and text becomes `var(--on-primary)`
+- Hover: text darkens to `var(--ink)`
+
+### Switch Toggle (`.switch`)
+
+- Rectangular track `34x20px` on `var(--surface-elevated)` with hairline
+  border, and a square `14x14px` thumb in `var(--stone)`
+- Checked: track fills with `var(--ink)`, thumb slides 14px and turns
+  `var(--on-primary)`
+- Slide transition: `transform 0.15s ease` (respects
+  `prefers-reduced-motion`)
+- Semantic checkbox kept in the DOM with `role="switch"`; focus ring on
+  the track
 
 ### Background Swatches (`.swatches`)
 
-- 6-column grid of square buttons
-- Active: 2px border in `var(--ink)`
+- 5-column grid of square buttons
+- Active: `var(--ink)` border plus a 1px inset ring in `var(--canvas)`
+  (no border-width shift)
 - Hover: border in `var(--stone)`
 
 ### Preview Area (`.preview-area`)
