@@ -5,6 +5,7 @@
 #![deny(unsafe_code)]
 
 mod controls;
+mod editor;
 mod export;
 mod fonts;
 mod preview;

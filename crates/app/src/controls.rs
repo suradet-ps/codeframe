@@ -3,9 +3,9 @@
 
 use codeframe_models::{Background, FontChoice, Language, ThemeChoice};
 use leptos::prelude::*;
-use wasm_bindgen::JsCast;
 
-use crate::state::{Settings, SAMPLE_CODE};
+use crate::editor::CodeEditor;
+use crate::state::Settings;
 
 const SCALE_PRESETS: [f64; 4] = [1.0, 2.0, 4.0, 8.0];
 
@@ -259,64 +259,18 @@ pub fn Controls(settings: Settings) -> impl IntoView {
               <div class="section-body">
                   <div>
                       <label class="control-label" for="code-input">{move || if settings.split_enabled.get() { "Left panel code" } else { "Code" }}</label>
-                      <textarea
-                          id="code-input"
-                          class="code-input"
-                          rows="12"
-                          spellcheck="false"
-                          autocomplete="off"
-                          on:input=move |ev| settings.code.set(event_target_value(&ev))
-                          on:keydown=move |ev| {
-                              if ev.key() == "Tab" {
-                                  ev.prevent_default();
-                                  let target = ev.target().unwrap();
-                                  let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                                  let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
-                                  let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
-                                  let value = textarea.value();
-                                  let new_value = format!("{}    {}", &value[..start], &value[end..]);
-                                  settings.code.set(new_value.clone());
-                                  textarea.set_value(&new_value);
-                                  let pos = (start + 4) as u32;
-                                  let _ = textarea.set_selection_range(pos, pos);
-                              }
-                          }
-                      >{SAMPLE_CODE}</textarea>
+                      <CodeEditor id="code-input" code=settings.code language=settings.language theme=settings.theme />
                   </div>
 
                   <Toggle id="split-toggle" checked=settings.split_enabled label="Split-screen comparison" />
 
                   {move || {
                       settings.split_enabled.get().then(|| {
-                          let code_signal = settings.split_code;
                           view! {
                               <div class="split-controls">
                                   <div>
                                       <label class="control-label" for="split-code-input">"Right panel code"</label>
-                                      <textarea
-                                          id="split-code-input"
-                                          class="code-input"
-                                          rows="12"
-                                          spellcheck="false"
-                                          autocomplete="off"
-                                          prop:value=move || code_signal.get()
-                                          on:input=move |ev| code_signal.set(event_target_value(&ev))
-                                          on:keydown=move |ev| {
-                                              if ev.key() == "Tab" {
-                                                  ev.prevent_default();
-                                                  let target = ev.target().unwrap();
-                                                  let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                                                  let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as usize;
-                                                  let end = textarea.selection_end().unwrap_or_default().unwrap_or(0) as usize;
-                                                  let value = textarea.value();
-                                                  let new_value = format!("{}    {}", &value[..start], &value[end..]);
-                                                  code_signal.set(new_value.clone());
-                                                  textarea.set_value(&new_value);
-                                                  let pos = (start + 4) as u32;
-                                                  let _ = textarea.set_selection_range(pos, pos);
-                                              }
-                                          }
-                                      ></textarea>
+                                      <CodeEditor id="split-code-input" code=settings.split_code language=settings.split_language theme=settings.split_theme />
                                   </div>
                                   <div class="control-row">
                                       <div>

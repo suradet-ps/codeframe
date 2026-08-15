@@ -480,28 +480,57 @@ body {
     gap: var(--sp-md);
 }
 
+.code-editor {
+    position: relative;
+    border: 1px solid var(--hairline);
+    transition: border-color 0.15s ease;
+}
+
+.code-editor:hover {
+    border-color: var(--stone);
+}
+
+.code-editor:focus-within {
+    border-color: var(--ink);
+}
+
+.code-editor-highlight {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: var(--sp-sm);
+    overflow: hidden;
+    pointer-events: none;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+    tab-size: 4;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
 .code-input {
+    position: relative;
     width: 100%;
     resize: vertical;
-    background: var(--canvas-warm);
-    color: var(--ink);
-    border: 1px solid var(--hairline);
+    background: transparent;
+    color: transparent;
+    border: none;
     padding: var(--sp-sm);
     font-family: "JetBrains Mono", monospace;
     font-size: 12.5px;
     line-height: 1.5;
     tab-size: 4;
-    transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.code-input:hover {
-    border-color: var(--stone);
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .code-input:focus {
     outline: none;
-    border-color: var(--ink);
-    background: var(--canvas);
+}
+
+.code-input::selection {
+    background: color-mix(in srgb, var(--ink) 25%, transparent);
 }
 
 select,
