@@ -469,7 +469,7 @@ mod tests {
       let Some(inner) = part.split_once('>') else {
         continue;
       };
-      reconstructed.push_str(&inner.1);
+      reconstructed.push_str(inner.1);
     }
     assert_eq!(reconstructed, code, "html must round-trip source text");
   }
