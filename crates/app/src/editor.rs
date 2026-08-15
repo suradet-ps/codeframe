@@ -73,7 +73,7 @@ pub fn CodeEditor(
                       ev.prevent_default();
                       let target = ev.target().unwrap();
                       let textarea: web_sys::HtmlTextAreaElement = target.unchecked_into();
-                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0) as u32;
+                      let start = textarea.selection_start().unwrap_or_default().unwrap_or(0);
                       // Native insertion - no manual byte slicing, so
                       // multi-byte characters before the caret are safe.
                       let _ = textarea.set_range_text("    ");
