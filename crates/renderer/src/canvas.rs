@@ -12,8 +12,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::layout::{
-  compute_layout, split_tokens_into_lines, Layout, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH,
-  TRAFFIC_LIGHT_RADIUS,
+  compute_layout, split_tokens_into_lines, Layout, CARD_SHADOW_BLUR, CARD_SHADOW_OFFSET_Y,
+  TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
 };
 
 /// Conservative maximum canvas dimension in *device* pixels. Safari caps
@@ -258,8 +258,8 @@ pub fn draw_prepared(
   )?;
   if options.window_frame {
     ctx.set_shadow_color("rgba(0, 0, 0, 0.35)");
-    ctx.set_shadow_blur(20.0);
-    ctx.set_shadow_offset_y(10.0);
+    ctx.set_shadow_blur(CARD_SHADOW_BLUR);
+    ctx.set_shadow_offset_y(CARD_SHADOW_OFFSET_Y);
   }
   ctx.set_fill_style_str(&palette.background.to_css());
   ctx.fill();
@@ -520,9 +520,9 @@ pub fn draw_split_prepared(
   ctx.set_fill_style_str("rgba(128, 128, 128, 0.3)");
   ctx.fill_rect(
     divider_x,
-    options.padding,
+    split.left.card_y,
     1.0,
-    split.canvas_height - 2.0 * options.padding,
+    split.canvas_height - 2.0 * split.left.card_y,
   );
 
   // 4. Right panel (offset by left width + gap).
@@ -558,8 +558,8 @@ fn draw_panel(
   )?;
   if options.window_frame {
     ctx.set_shadow_color("rgba(0, 0, 0, 0.35)");
-    ctx.set_shadow_blur(20.0);
-    ctx.set_shadow_offset_y(10.0);
+    ctx.set_shadow_blur(CARD_SHADOW_BLUR);
+    ctx.set_shadow_offset_y(CARD_SHADOW_OFFSET_Y);
   }
   ctx.set_fill_style_str(&palette.background.to_css());
   ctx.fill();
