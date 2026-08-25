@@ -145,21 +145,29 @@ pub fn compute_layout(
   } else {
     0.0
   };
+  // The card drop shadow paints up to `CARD_SHADOW_SAFE_MARGIN` px beyond the
+  // card edge (painted overflow is invisible to text metrics), so clamp the
+  // padding to keep it inside the canvas.
+  let padding = if options.window_frame {
+    options.padding.max(CARD_SHADOW_SAFE_MARGIN)
+  } else {
+    options.padding
+  };
 
   let card_width = gutter + max_line_width_px + 2.0 * INNER_PADDING;
   let card_height = header_height + code_height + 2.0 * INNER_PADDING;
 
   Layout {
-    canvas_width: options.padding + card_width + options.padding,
-    canvas_height: options.padding + card_height + options.padding,
-    card_x: options.padding,
-    card_y: options.padding,
+    canvas_width: padding + card_width + padding,
+    canvas_height: padding + card_height + padding,
+    card_x: padding,
+    card_y: padding,
     card_width,
     card_height,
     header_height,
-    code_origin_x: options.padding + INNER_PADDING + gutter,
-    code_origin_y: options.padding + header_height + INNER_PADDING,
-    gutter_right_x: options.padding + INNER_PADDING + gutter - 0.5 * char_width,
+    code_origin_x: padding + INNER_PADDING + gutter,
+    code_origin_y: padding + header_height + INNER_PADDING,
+    gutter_right_x: padding + INNER_PADDING + gutter - 0.5 * char_width,
     line_height_px,
     line_count,
   }
@@ -275,5 +283,58 @@ mod tests {
       layout.gutter_right_x,
       options.padding + INNER_PADDING + gutter - 0.5 * char_width
     );
+  }
+
+  #[test]
+  fn frame_raises_padding_below_shadow_margin() {
+    let options = ExportOptions {
+      padding: 16.0,
+      window_frame: true,
+      line_numbers: false,
+      ..Default::default()
+    };
+    let layout = compute_layout(&options, 1, 50.0, 8.0);
+    assert_eq!(layout.card_x, CARD_SHADOW_SAFE_MARGIN);
+    assert_eq!(layout.card_y, CARD_SHADOW_SAFE_MARGIN);
+    assert_eq!(
+      layout.canvas_width,
+      CARD_SHADOW_SAFE_MARGIN + layout.card_width + CARD_SHADOW_SAFE_MARGIN
+    );
+    assert_eq!(
+      layout.canvas_height,
+      CARD_SHADOW_SAFE_MARGIN + layout.card_height + CARD_SHADOW_SAFE_MARGIN
+    );
+  }
+
+  #[test]
+  fn frame_keeps_padding_at_or_above_shadow_margin() {
+    let at_margin = ExportOptions {
+      padding: CARD_SHADOW_SAFE_MARGIN,
+      window_frame: true,
+      ..Default::default()
+    };
+    assert_eq!(
+      compute_layout(&at_margin, 1, 50.0, 8.0).card_x,
+      CARD_SHADOW_SAFE_MARGIN
+    );
+    let above_margin = ExportOptions {
+      padding: 48.0,
+      window_frame: true,
+      ..Default::default()
+    };
+    assert_eq!(compute_layout(&above_margin, 1, 50.0, 8.0).card_x, 48.0);
+  }
+
+  #[test]
+  fn no_frame_leaves_padding_untouched() {
+    let options = ExportOptions {
+      padding: 16.0,
+      window_frame: false,
+      line_numbers: false,
+      ..Default::default()
+    };
+    let layout = compute_layout(&options, 1, 50.0, 8.0);
+    assert_eq!(layout.card_x, 16.0);
+    assert_eq!(layout.card_y, 16.0);
   }
 }

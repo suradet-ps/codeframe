@@ -381,8 +381,8 @@ pub fn render_split_svg(
   let divider_x = layout_left.canvas_width + SPLIT_GAP / 2.0;
   svg.push_str(&format!(
     "<rect x=\"{divider_x}\" y=\"{y}\" width=\"1\" height=\"{h}\" fill=\"rgba(128,128,128,0.3)\"/>",
-    y = options.padding,
-    h = total_h - 2.0 * options.padding,
+    y = layout_left.card_y,
+    h = total_h - 2.0 * layout_left.card_y,
   ));
 
   // Right panel.

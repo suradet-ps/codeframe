@@ -520,9 +520,9 @@ pub fn draw_split_prepared(
   ctx.set_fill_style_str("rgba(128, 128, 128, 0.3)");
   ctx.fill_rect(
     divider_x,
-    options.padding,
+    split.left.card_y,
     1.0,
-    split.canvas_height - 2.0 * options.padding,
+    split.canvas_height - 2.0 * split.left.card_y,
   );
 
   // 4. Right panel (offset by left width + gap).
