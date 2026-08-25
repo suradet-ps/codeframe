@@ -7,8 +7,8 @@
 use codeframe_models::{Background, ExportOptions, FontStyle, GradientDir, ThemePalette, Token};
 
 use crate::layout::{
-  compute_layout, split_tokens_into_lines, Layout, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH,
-  TRAFFIC_LIGHT_RADIUS,
+  compute_layout, split_tokens_into_lines, Layout, CARD_SHADOW_BLUR, CARD_SHADOW_OFFSET_Y,
+  TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
 };
 
 /// macOS traffic-light colors (close, minimize, zoom).
@@ -94,11 +94,13 @@ pub fn render_svg(
   svg.push_str("<defs>");
   // Drop-shadow filter for the card.
   if options.window_frame {
-    svg.push_str(
+    svg.push_str(&format!(
       r#"<filter id="shadow" x="-10%" y="-5%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,0.35)"/>
+        <feDropShadow dx="0" dy="{dy}" stdDeviation="{sd}" flood-color="rgba(0,0,0,0.35)"/>
       </filter>"#,
-    );
+      dy = CARD_SHADOW_OFFSET_Y,
+      sd = CARD_SHADOW_BLUR / 2.0,
+    ));
   }
   // Background gradient defs.
   match &options.background {
@@ -293,11 +295,13 @@ pub fn render_split_svg(
   // Defs.
   svg.push_str("<defs>");
   if options.window_frame {
-    svg.push_str(
+    svg.push_str(&format!(
       r#"<filter id="shadow" x="-10%" y="-5%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,0.35)"/>
+        <feDropShadow dx="0" dy="{dy}" stdDeviation="{sd}" flood-color="rgba(0,0,0,0.35)"/>
       </filter>"#,
-    );
+      dy = CARD_SHADOW_OFFSET_Y,
+      sd = CARD_SHADOW_BLUR / 2.0,
+    ));
   }
   match &options.background {
     Background::LinearGradient { colors, dir } if colors.len() >= 2 => {

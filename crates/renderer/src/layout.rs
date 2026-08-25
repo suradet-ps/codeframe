@@ -21,6 +21,21 @@ pub const TRAFFIC_LIGHT_PITCH: f64 = 22.0;
 /// X offset of the first traffic-light dot center from the card edge.
 pub const TRAFFIC_LIGHT_OFFSET_X: f64 = 22.0;
 
+/// Canvas2D `shadowBlur` of the code-card drop shadow (logical px).
+pub const CARD_SHADOW_BLUR: f64 = 20.0;
+
+/// Canvas2D `shadowOffsetY` of the code-card drop shadow (logical px).
+pub const CARD_SHADOW_OFFSET_Y: f64 = 10.0;
+
+/// Conservative paint extent of the card shadow beyond the card edge.
+///
+/// `shadowBlur` spreads the shadow both ways around the shape, so the
+/// painted overflow is at most `blur + |offset|` — glyph-style metrics (e.g.
+/// `measureText`) never cover it. [`compute_layout`] clamps the canvas
+/// padding to at least this when the window frame is on, so the shadow never
+/// clips at the canvas edge.
+pub const CARD_SHADOW_SAFE_MARGIN: f64 = CARD_SHADOW_BLUR + CARD_SHADOW_OFFSET_Y;
+
 /// Gap between the line-number gutter and the code, in character cells.
 pub const GUTTER_GAP_CELLS: f64 = 1.5;
 
