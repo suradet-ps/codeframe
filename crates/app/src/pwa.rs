@@ -108,32 +108,34 @@ pub fn PwaBanners() -> impl IntoView {
   };
 
   view! {
-      {move || {
-          install_visible.get().then(|| {
-              view! {
-                  <div class="install-banner">
-                      <span>"Install CodeFrame for offline use"</span>
-                      <button class="install-btn" on:click=install_btn>"Install"</button>
-                      <button
-                          class="install-dismiss"
-                          aria-label="Dismiss install prompt"
-                          on:click=install_dismiss
-                      >
-                          "\u{00d7}"
-                      </button>
-                  </div>
-              }
-          })
-      }}
-      {move || {
-          offline_visible.get().then(|| {
-              view! {
-                  <div class="offline-banner">
-                      "You are offline \u{2014} CodeFrame still works."
-                  </div>
-              }
-          })
-      }}
+      <div class="app-banners">
+          {move || {
+              install_visible.get().then(|| {
+                  view! {
+                      <div class="install-banner">
+                          <span>"Install CodeFrame for offline use"</span>
+                          <button class="install-btn" on:click=install_btn>"Install"</button>
+                          <button
+                              class="install-dismiss"
+                              aria-label="Dismiss install prompt"
+                              on:click=install_dismiss
+                          >
+                              "\u{00d7}"
+                          </button>
+                      </div>
+                  }
+              })
+          }}
+          {move || {
+              offline_visible.get().then(|| {
+                  view! {
+                      <div class="offline-banner">
+                          "You are offline \u{2014} CodeFrame still works."
+                      </div>
+                  }
+              })
+          }}
+      </div>
   }
 }
 

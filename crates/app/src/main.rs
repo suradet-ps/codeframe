@@ -139,8 +139,8 @@ fn App() -> impl IntoView {
           <main class="main">
               <Preview settings />
           </main>
+          <PwaBanners />
       </div>
-      <PwaBanners />
   }
 }
 

@@ -196,11 +196,11 @@
 }
 
 /* ---- PWA install banner ---- */
+.app-banners {
+    grid-area: banners;
+}
+
 .install-banner {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,7 +209,6 @@
     background: var(--ink);
     color: var(--canvas);
     font-size: 13px;
-    z-index: 9998;
 }
 
 .install-btn {
@@ -245,17 +244,12 @@
 
 /* ---- Offline banner ---- */
 .offline-banner {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     padding: var(--sp-xs) var(--sp-md);
     background: var(--warning);
     color: var(--on-warning);
     text-align: center;
     font-size: 13px;
     font-weight: 500;
-    z-index: 9999;
 }
 
 html,
@@ -277,11 +271,12 @@ body {
 /* ---- App shell ---- */
 .app {
     display: grid;
-    grid-template-rows: 64px minmax(0, 1fr);
+    grid-template-rows: 64px minmax(0, 1fr) auto;
     grid-template-columns: 360px minmax(0, 1fr);
     grid-template-areas:
         "header header"
-        "controls main";
+        "controls main"
+        "banners banners";
     height: 100vh;
 }
 
@@ -505,11 +500,11 @@ body {
     font-size: 12.5px;
     line-height: 1.5;
     tab-size: 4;
-    white-space: pre-wrap;
-    word-break: break-all;
+    white-space: pre;
 }
 
 .code-input {
+    display: block;
     position: relative;
     width: 100%;
     resize: vertical;
@@ -521,8 +516,8 @@ body {
     font-size: 12.5px;
     line-height: 1.5;
     tab-size: 4;
-    white-space: pre-wrap;
-    word-break: break-all;
+    white-space: pre;
+    overflow-x: auto;
 }
 
 .code-input:focus {
@@ -850,11 +845,12 @@ input[type="range"]:focus-visible {
 @media (max-width: 900px) {
     .app {
         grid-template-columns: 1fr;
-        grid-template-rows: 56px minmax(0, 1fr) auto;
+        grid-template-rows: 56px minmax(0, 1fr) auto auto;
         grid-template-areas:
             "header"
             "main"
-            "controls";
+            "controls"
+            "banners";
     }
 
     .topbar {

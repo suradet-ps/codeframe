@@ -1,5 +1,11 @@
 //! Syntax-highlighted code input: a transparent-text textarea overlaid on a
 //! `<pre>` rendered from the token stream, so the input mirrors the export.
+//!
+//! Both layers use `white-space: pre` and the textarea is `wrap="off"`: the
+//! editor never re-wraps long lines (the export canvas does not wrap either -
+//! it grows to the widest line). Letting the browser wrap the textarea instead
+//! makes the caret drift from the highlighted layer, because textarea line
+//! breaking differs from a `<pre>`'s (most visibly in Firefox).
 
 use codeframe_models::{Language, ThemeChoice};
 use leptos::prelude::*;
@@ -23,8 +29,8 @@ fn editor_colors(theme: ThemeChoice) -> String {
 /// The `<pre>` layer carries the token colors (HTML from
 /// `codeframe_highlighter::highlight_to_html`); the textarea above it uses
 /// transparent text so only the caret and selection are visible. Both layers
-/// share identical font metrics and wrapping, and the `<pre>` scrolls in
-/// lockstep with the textarea.
+/// share identical font metrics and never wrap, and the `<pre>` scrolls in
+/// lockstep with the textarea on both axes.
 #[component]
 pub fn CodeEditor(
   id: &'static str,
@@ -60,6 +66,7 @@ pub fn CodeEditor(
               id=id
               class="code-input"
               rows="12"
+              wrap="off"
               spellcheck="false"
               autocomplete="off"
               node_ref=textarea_ref

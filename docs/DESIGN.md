@@ -220,10 +220,16 @@ Syntax-highlighted input: a transparent-text `<textarea>` overlaid on a
 - Textarea (`.code-input`): transparent text, `caret-color` = theme
   foreground, transparent background
 - Both layers share identical metrics: JetBrains Mono 12.5px, line-height
-  1.5, tab-size 4, 12px padding, `white-space: pre-wrap` +
-  `word-break: break-all` so wrapping matches exactly
+  1.5, tab-size 4, 12px padding, `white-space: pre`, and the textarea
+  carries `wrap="off"` - the editor never re-wraps, exactly like the
+  export canvas, which grows to the widest line. (A wrapping textarea
+  would drift from the `<pre>`: browser textarea line breaking differs
+  from a `<pre>`'s, and a classic scrollbar steals wrap width.)
 - The `<pre>` layer is `pointer-events: none`, `overflow: hidden`, and
-  scrolls in lockstep with the textarea (`scrollTop`/`scrollLeft` sync)
+  scrolls in lockstep with the textarea on both axes
+  (`scrollTop`/`scrollLeft` sync)
+- The PWA banners live in a `.app-banners` grid row instead of floating
+  over the app, so they never cover the editor or block clicks
 - Tab still inserts 4 spaces (keydown handler)
 
 ### Selects and Inputs
