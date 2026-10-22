@@ -435,7 +435,7 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                               min="1"
                               max="12"
                               step="0.5"
-                              title="Custom scale (1โ€“12)"
+                              title="Custom scale (1-12)"
                               prop:value=move || settings.scale.get().to_string()
                               on:change=move |ev| {
                                   if let Ok(parsed) = event_target_value(&ev).parse::<f64>() {
