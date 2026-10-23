@@ -33,6 +33,7 @@ web-sys = { version = "0.3", features = [
     "FontFaceSet",
     "HtmlAnchorElement",
     "HtmlCanvasElement",
+    "HtmlInputElement",
     "HtmlTextAreaElement",
     "Navigator",
     "Storage",
