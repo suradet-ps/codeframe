@@ -8,7 +8,7 @@ use codeframe_models::{Background, ExportOptions, FontStyle, GradientDir, ThemeP
 
 use crate::layout::{
   compute_layout, split_tokens_into_lines, Layout, CARD_SHADOW_BLUR, CARD_SHADOW_OFFSET_Y,
-  TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
+  SPLIT_GAP, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
 };
 
 /// macOS traffic-light colors (close, minimize, zoom).
@@ -250,9 +250,6 @@ pub fn render_svg(
   svg.push_str("</svg>");
   (svg, layout)
 }
-
-/// Gap between panels in split-screen SVG (logical px).
-const SPLIT_GAP: f64 = 6.0;
 
 /// Render two code panels side by side as a single SVG.
 pub fn render_split_svg(

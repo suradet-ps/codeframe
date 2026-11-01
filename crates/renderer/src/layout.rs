@@ -9,6 +9,10 @@ pub const TAB_WIDTH: usize = 4;
 /// Inner padding between the code-card edge and the text (logical px).
 pub const INNER_PADDING: f64 = 16.0;
 
+/// Gap between the two panels in split-screen mode (logical px). Shared by the
+/// canvas and SVG renderers and by the app's target-width math, so they agree.
+pub const SPLIT_GAP: f64 = 6.0;
+
 /// Height of the macOS-style window header bar (logical px).
 pub const FRAME_HEADER_HEIGHT: f64 = 40.0;
 
