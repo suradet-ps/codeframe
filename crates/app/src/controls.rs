@@ -470,7 +470,7 @@ pub fn Controls(settings: Settings) -> impl IntoView {
                                   if val.is_empty() {
                                       settings.target_width.set(None);
                                   } else if let Ok(px) = val.parse::<f64>() {
-                                      let clamped = px.clamp(320.0, 3840.0);
+                                      let clamped = px.clamp(320.0, 3840.0).round();
                                       settings.target_width.set(Some(clamped));
                                       input.set_value(&format!("{clamped:.0}"));
                                   }
