@@ -13,7 +13,7 @@ use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::layout::{
   compute_layout, split_tokens_into_lines, Layout, CARD_SHADOW_BLUR, CARD_SHADOW_OFFSET_Y,
-  TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
+  SPLIT_GAP, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_PITCH, TRAFFIC_LIGHT_RADIUS,
 };
 
 /// Conservative maximum canvas dimension in *device* pixels. Safari caps
@@ -371,9 +371,6 @@ pub fn render_to_canvas(
   draw_prepared(&ctx, &prepared, palette, options)?;
   Ok(prepared.layout)
 }
-
-/// Gap between the two panels in split-screen mode (logical px).
-const SPLIT_GAP: f64 = 6.0;
 
 /// Fully-resolved geometry for a split-screen render.
 #[derive(Clone, Debug)]

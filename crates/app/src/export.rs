@@ -263,7 +263,8 @@ fn compute_split_scale_for_width(
   let layout_right =
     codeframe_renderer::compute_layout(options, lines_right.len(), max_right, char_width);
 
-  let total_width = layout_left.canvas_width + 16.0 + layout_right.canvas_width;
+  let total_width =
+    layout_left.canvas_width + codeframe_renderer::layout::SPLIT_GAP + layout_right.canvas_width;
   (target_width / total_width).clamp(0.5, 12.0)
 }
 
@@ -337,4 +338,40 @@ async fn do_copy(settings: Settings) -> Result<(), String> {
     .await
     .map_err(|e| format!("{e:?}"))?;
   Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use codeframe_models::{ExportOptions, FontStyle, RgbColor, ThemePalette, Token};
+  use codeframe_renderer::svg::render_split_svg;
+
+  fn tokens(text: &str) -> Vec<Token> {
+    vec![Token {
+      text: text.to_string(),
+      color: RgbColor::new(0xf8, 0xf8, 0xf2),
+      font_style: FontStyle::default(),
+    }]
+  }
+
+  #[test]
+  fn split_scale_makes_export_match_target_width() {
+    let palette = ThemePalette {
+      background: RgbColor::new(0x28, 0x2a, 0x36),
+      foreground: RgbColor::new(0xf8, 0xf8, 0xf2),
+    };
+    let options = ExportOptions::default();
+    let left = tokens("fn main() {}");
+    let right = tokens("let answer = 42;\nprintln!(\"{answer}\");");
+    let target = 1920.0;
+
+    let scale = compute_split_scale_for_width(&left, &right, &options, target);
+    let (_, logical_width, _) = render_split_svg(&left, &palette, &right, &palette, &options);
+
+    let exported_width = logical_width * scale;
+    assert!(
+      (exported_width - target).abs() < 0.5,
+      "split export is {exported_width}px wide, expected {target}px"
+    );
+  }
 }
